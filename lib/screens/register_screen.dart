@@ -70,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Bắt đầu hành trình sống khỏe cùng FitLife',
+                  'Bắt đầu hành trình sống khỏe cùng HealthFlow',
                   style: TextStyle(
                     fontSize: 13.5,
                     color: AppTheme.textSecondary,
@@ -235,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Padding(
                 padding: EdgeInsets.only(top: 4),
                 child: Text(
-                  'Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật của FitLife',
+                  'Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật của HealthFlow',
                   style: TextStyle(
                     fontSize: 12.5,
                     height: 1.4,

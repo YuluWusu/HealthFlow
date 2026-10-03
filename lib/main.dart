@@ -9,21 +9,21 @@ import 'theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const FitLifeApp());
+  runApp(const HealthFlowApp());
 }
 
-/// Ứng dụng FitLife.
+/// Ứng dụng HealthFlow.
 ///
 /// Các repository được tạo một lần ở đây rồi truyền xuống qua [AuthScope] và
 /// [AppScope], nên không màn hình nào phải tự khởi tạo lại dữ liệu.
-class FitLifeApp extends StatefulWidget {
-  const FitLifeApp({super.key});
+class HealthFlowApp extends StatefulWidget {
+  const HealthFlowApp({super.key});
 
   @override
-  State<FitLifeApp> createState() => _FitLifeAppState();
+  State<HealthFlowApp> createState() => _HealthFlowAppState();
 }
 
-class _FitLifeAppState extends State<FitLifeApp> {
+class _HealthFlowAppState extends State<HealthFlowApp> {
   late final AuthRepository _auth;
   late final AppData _data;
 
@@ -49,7 +49,7 @@ class _FitLifeAppState extends State<FitLifeApp> {
       child: AppScope(
         data: _data,
         child: MaterialApp(
-          title: 'FitLife',
+          title: 'HealthFlow',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           home: const AuthGate(),

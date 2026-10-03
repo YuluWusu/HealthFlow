@@ -50,11 +50,11 @@ void main() {
   testWidgets('Ứng dụng mở ra màn hình chào mừng khi chưa đăng nhập', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Chào mừng bạn!'), findsOneWidget);
-    expect(find.text('FitLife'), findsOneWidget);
+    expect(find.text('HealthFlow'), findsOneWidget);
     expect(find.widgetWithText(PrimaryButton, 'Đăng nhập'), findsOneWidget);
     expect(find.widgetWithText(SecondaryButton, 'Đăng ký'), findsOneWidget);
   });
@@ -62,7 +62,7 @@ void main() {
   testWidgets('Đăng nhập bằng tài khoản mẫu thì vào được màn hình chính', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     // Mở màn hình đăng nhập từ màn hình chào mừng.
@@ -91,7 +91,7 @@ void main() {
   testWidgets('Đăng nhập sai mật khẩu thì hiện thông báo lỗi', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     await scrollAndTap(
@@ -115,7 +115,7 @@ void main() {
   testWidgets('Đăng nhập với email sai định dạng thì báo lỗi ngay trên ô nhập', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     await scrollAndTap(
@@ -139,7 +139,7 @@ void main() {
   testWidgets('Đăng ký thiếu đồng ý điều khoản thì chưa cho tạo tài khoản', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     await scrollAndTap(
@@ -169,7 +169,7 @@ void main() {
   testWidgets('Đăng ký với mật khẩu nhập lại không khớp thì báo lỗi', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     await scrollAndTap(
@@ -195,7 +195,7 @@ void main() {
   testWidgets('Đăng ký hợp lệ thì vào thẳng màn hình chính', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     await scrollAndTap(
@@ -224,7 +224,7 @@ void main() {
   testWidgets('Đăng xuất từ tab Cài đặt thì quay về màn hình chào mừng', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     // Đăng nhập bằng tài khoản mẫu.
@@ -268,7 +268,7 @@ void main() {
   testWidgets('Thêm chỉ số cân nặng thì trang Sức khỏe cập nhật theo', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const FitLifeApp());
+    await tester.pumpWidget(const HealthFlowApp());
     await tester.pumpAndSettle();
 
     // Đăng nhập bằng tài khoản mẫu.

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
-/// Biểu trưng FitLife: trái tim xanh có dấu tích trắng bên trong,
+/// Biểu trưng HealthFlow: trái tim xanh có dấu tích trắng bên trong,
 /// dùng ở màn hình chào mừng và màn hình đăng nhập.
 class FitLifeLogo extends StatelessWidget {
   final double size;
@@ -54,7 +54,7 @@ class FitLifeBrand extends StatelessWidget {
         FitLifeLogo(size: logoSize),
         SizedBox(height: logoSize * 0.24),
         Text(
-          'FitLife',
+          'HealthFlow',
           style: TextStyle(
             fontSize: titleSize,
             fontWeight: FontWeight.bold,

@@ -161,6 +161,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 else
                   _buildDemoHint(context),
                 const SizedBox(height: 22),
+                const _OrDivider(),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SocialButton(
+                        label: 'Google',
+                        icon: Icons.g_mobiledata_rounded,
+                        iconColor: const Color(0xFFDB4437),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => _showMessage(
+                                  'Đăng nhập bằng Google sẽ được bổ sung sau.',
+                                ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SocialButton(
+                        label: 'Apple',
+                        icon: Icons.apple_rounded,
+                        iconColor: AppTheme.textPrimary,
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => _showMessage(
+                                  'Đăng nhập bằng Apple sẽ được bổ sung sau.',
+                                ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 22),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -311,6 +343,33 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
+    );
+  }
+}
+
+/// Đường kẻ ngang kèm chữ "Hoặc" ở giữa.
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final lineColor = Colors.black.withValues(alpha: 0.10);
+
+    return Row(
+      children: [
+        Expanded(child: Divider(color: lineColor, height: 1)),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Text(
+            'Hoặc đăng nhập bằng',
+            style: TextStyle(
+              fontSize: 12.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ),
+        Expanded(child: Divider(color: lineColor, height: 1)),
+      ],
     );
   }
 }

@@ -1,3 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../data/auth_repository.dart';
@@ -108,7 +112,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 22),
           const Center(
             child: Text(
-              'FitLife phiên bản 1.0.0',
+              'HealthFlow phiên bản 1.0.0',
               style: TextStyle(fontSize: 11.5, color: AppTheme.textSecondary),
             ),
           ),
@@ -155,25 +159,27 @@ class SettingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               title: const Text('Thông tin cá nhân'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    onChanged: (_) => setDialogState(controller.clear),
-                    decoration: const InputDecoration(
-                      labelText: 'Họ và tên',
-                      prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      onChanged: (_) => setDialogState(controller.clear),
+                      decoration: const InputDecoration(
+                        labelText: 'Họ và tên',
+                        prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  _ReadOnlyField(label: 'Email', value: user.email),
-                  if (controller.message != null) ...[
-                    const SizedBox(height: 12),
-                    ErrorBanner(message: controller.message!),
+                    const SizedBox(height: 14),
+                    _ReadOnlyField(label: 'Email', value: user.email),
+                    if (controller.message != null) ...[
+                      const SizedBox(height: 12),
+                      ErrorBanner(message: controller.message!),
+                    ],
                   ],
-                ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -438,7 +444,7 @@ class SettingsScreen extends StatelessWidget {
               _HelpRow(
                 icon: Icons.mail_outline_rounded,
                 title: 'Email',
-                value: 'hotro@fitlife.vn',
+                value: 'hotro@healthflow.vn',
               ),
               SizedBox(height: 14),
               _HelpRow(
@@ -475,7 +481,7 @@ class SettingsScreen extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('Đăng xuất'),
           content: const Text(
-            'Bạn có chắc muốn đăng xuất khỏi FitLife?',
+            'Bạn có chắc muốn đăng xuất khỏi HealthFlow?',
             style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
           ),
           actions: [
@@ -531,7 +537,7 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-/// Thẻ thông tin người dùng ở đầu màn hình cài đặt.
+/// Thẻ thông tin người dùng ở đầu màn hình cài đặt, có hỗ trợ avatar.
 class _ProfileHeader extends StatelessWidget {
   final User user;
   final VoidCallback onEdit;
@@ -544,16 +550,46 @@ class _ProfileHeader extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 32,
-            backgroundColor: AppTheme.lightGreen,
-            child: Text(
-              user.initial,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.primary,
-              ),
+          GestureDetector(
+            onTap: () => _changeAvatar(context),
+            child: Stack(
+              children: [
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: AppTheme.lightGreen,
+                  backgroundImage: user.avatarPath != null
+                      ? FileImage(File(user.avatarPath!))
+                      : null,
+                  child: user.avatarPath == null
+                      ? Text(
+                          user.initial,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primary,
+                          ),
+                        )
+                      : null,
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      size: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 14),
@@ -605,6 +641,99 @@ class _ProfileHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Hiện hộp thoại chọn ảnh đại diện.
+  void _changeAvatar(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    'Đổi ảnh đại diện',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppTheme.lightBlue,
+                    child: Icon(Icons.photo_library_rounded, color: AppTheme.blue),
+                  ),
+                  title: const Text('Chọn từ thư viện ảnh'),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    _pickAvatarFromGallery(context);
+                  },
+                ),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppTheme.lightGreen,
+                    child: Icon(Icons.camera_alt_rounded, color: AppTheme.primary),
+                  ),
+                  title: const Text('Chụp ảnh mới'),
+                  onTap: () {
+                    Navigator.of(sheetContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Tính năng chụp ảnh sẽ được bổ sung sau.'),
+                      ),
+                    );
+                  },
+                ),
+                if (user.avatarPath != null)
+                  ListTile(
+                    leading: const CircleAvatar(
+                      backgroundColor: AppTheme.lightPink,
+                      child: Icon(Icons.delete_outline_rounded, color: AppTheme.danger),
+                    ),
+                    title: const Text('Xóa ảnh đại diện'),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      _removeAvatar(context);
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _pickAvatarFromGallery(BuildContext context) {
+    // Hiện tại chưa tích hợp image_picker package.
+    // Khi tích hợp, gọi ImagePicker().pickImage(source: ImageSource.gallery)
+    // rồi truyền đường dẫn file vào auth.updateProfile(avatarPath: ...).
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Vui lòng thêm package image_picker để chọn ảnh từ thư viện.'),
+      ),
+    );
+  }
+
+  void _removeAvatar(BuildContext context) {
+    final auth = AuthScope.of(context, listen: false);
+    auth.updateProfile(avatarPath: '').then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã xóa ảnh đại diện.')),
+      );
+    });
   }
 }
 

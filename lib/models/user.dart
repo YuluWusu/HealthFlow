@@ -1,6 +1,6 @@
 import '../utils/sha256.dart';
 
-/// Tài khoản người dùng của ứng dụng FitLife.
+/// Tài khoản người dùng của ứng dụng HealthFlow.
 ///
 /// [toMap] / [fromMap] được viết theo đúng dạng bản ghi của `sqflite`
 /// (kiểu dữ liệu chỉ gồm int, double, String, null) nên khi chuyển sang
@@ -23,6 +23,9 @@ class User {
   /// Mục tiêu sức khỏe người dùng tự mô tả, ví dụ "Giảm cân".
   final String healthGoal;
 
+  /// Đường dẫn tệp ảnh đại diện trên thiết bị (null nếu chưa đặt ảnh).
+  final String? avatarPath;
+
   final DateTime createdAt;
 
   const User({
@@ -34,6 +37,7 @@ class User {
     this.weightKg = 55,
     this.dailyCalorieGoal = 2000,
     this.healthGoal = 'Giữ dáng',
+    this.avatarPath,
     required this.createdAt,
   });
 
@@ -69,6 +73,7 @@ class User {
     double? weightKg,
     int? dailyCalorieGoal,
     String? healthGoal,
+    String? avatarPath,
   }) {
     return User(
       id: id,
@@ -79,6 +84,9 @@ class User {
       weightKg: weightKg ?? this.weightKg,
       dailyCalorieGoal: dailyCalorieGoal ?? this.dailyCalorieGoal,
       healthGoal: healthGoal ?? this.healthGoal,
+      avatarPath: avatarPath != null
+          ? (avatarPath.isEmpty ? null : avatarPath)
+          : this.avatarPath,
       createdAt: createdAt,
     );
   }
@@ -93,6 +101,7 @@ class User {
       'weight_kg': weightKg,
       'daily_calorie_goal': dailyCalorieGoal,
       'health_goal': healthGoal,
+      'avatar_path': avatarPath,
       'created_at': createdAt.millisecondsSinceEpoch,
     };
   }
@@ -107,6 +116,7 @@ class User {
       weightKg: (map['weight_kg'] as num?)?.toDouble() ?? 55,
       dailyCalorieGoal: (map['daily_calorie_goal'] as num?)?.toInt() ?? 2000,
       healthGoal: map['health_goal'] as String? ?? 'Giữ dáng',
+      avatarPath: map['avatar_path'] as String?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         (map['created_at'] as num?)?.toInt() ?? 0,
       ),
@@ -121,5 +131,5 @@ class User {
 /// sản phẩm thật (sản phẩm thật nên dùng bcrypt/argon2 phía máy chủ).
 String hashPassword(String rawPassword, String email) {
   final salt = email.trim().toLowerCase();
-  return sha256Hex('fitlife::$salt::$rawPassword');
+  return sha256Hex('healthflow::$salt::$rawPassword');
 }

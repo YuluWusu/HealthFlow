@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Bảng màu và cấu hình giao diện dùng chung của FitLife.
+/// Bảng màu và cấu hình giao diện dùng chung của HealthFlow.
 ///
 /// Màu chủ đạo lấy theo bản thiết kế: xanh lá đậm cho hành động chính,
 /// nền xám xanh rất nhạt cho toàn ứng dụng, các màu phụ dùng cho thẻ chỉ số.

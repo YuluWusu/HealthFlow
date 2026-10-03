@@ -83,7 +83,7 @@ class WelcomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           const Text(
-            'Bằng cách tiếp tục, bạn đồng ý với Điều khoản sử dụng\nvà Chính sách bảo mật của FitLife.',
+            'Bằng cách tiếp tục, bạn đồng ý với Điều khoản sử dụng\nvà Chính sách bảo mật của HealthFlow.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11,
