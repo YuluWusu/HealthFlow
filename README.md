@@ -1,4 +1,4 @@
-# HealthFlow 🩺
+# HealthFlow 🌾
 
 A Flutter-based personal healthcare and wellness application designed to help users manage their health, nutrition, and workout activities in one place.
 
