@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
+/// Thanh điều hướng dưới cùng với 5 mục theo bản thiết kế.
 class AppBottomNav extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemTapped;
@@ -14,39 +16,38 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const items = [
+      _NavItem(icon: Icons.home_outlined, selectedIcon: Icons.home_rounded, label: 'Trang chủ'),
       _NavItem(
-        icon: Icons.home_rounded,
-        label: 'Trang chủ',
-      ),
-      _NavItem(
-        icon: Icons.favorite_rounded,
+        icon: Icons.favorite_border_rounded,
+        selectedIcon: Icons.favorite_rounded,
         label: 'Sức khỏe',
       ),
       _NavItem(
-        icon: Icons.fitness_center_rounded,
-        label: 'Luyện tập',
+        icon: Icons.fitness_center_outlined,
+        selectedIcon: Icons.fitness_center_rounded,
+        label: 'Tập luyện',
       ),
       _NavItem(
-        icon: Icons.restaurant_rounded,
+        icon: Icons.restaurant_outlined,
+        selectedIcon: Icons.restaurant_rounded,
         label: 'Dinh dưỡng',
+      ),
+      _NavItem(
+        icon: Icons.settings_outlined,
+        selectedIcon: Icons.settings_rounded,
+        label: 'Cài đặt',
       ),
     ];
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 15,
-            offset: const Offset(0, -3),
-          ),
-        ],
+        boxShadow: AppTheme.softShadow(opacity: 0.06, blur: 18),
       ),
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 66,
+          height: 68,
           child: Row(
             children: List.generate(items.length, (index) {
               final isSelected = selectedIndex == index;
@@ -60,7 +61,7 @@ class AppBottomNav extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        item.icon,
+                        isSelected ? item.selectedIcon : item.icon,
                         size: 23,
                         color: isSelected
                             ? AppTheme.primary
@@ -69,11 +70,12 @@ class AppBottomNav extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: isSelected
-                              ? FontWeight.w700
-                              : FontWeight.w500,
+                          fontSize: 10.5,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
                           color: isSelected
                               ? AppTheme.primary
                               : AppTheme.textSecondary,
@@ -93,10 +95,12 @@ class AppBottomNav extends StatelessWidget {
 
 class _NavItem {
   final IconData icon;
+  final IconData selectedIcon;
   final String label;
 
   const _NavItem({
     required this.icon,
+    required this.selectedIcon,
     required this.label,
   });
 }
