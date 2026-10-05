@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/app_scope.dart';
 import 'data/auth_repository.dart';
 import 'data/auth_scope.dart';
+import 'data/nutrition_repository.dart';
+import 'data/prefs_nutrition_store.dart';
 import 'screens/main_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const HealthFlowApp());
+  final prefs = await SharedPreferences.getInstance();
+  runApp(HealthFlowApp(prefs: prefs));
 }
 
 /// Ứng dụng HealthFlow.
@@ -17,7 +21,11 @@ void main() {
 /// Các repository được tạo một lần ở đây rồi truyền xuống qua [AuthScope] và
 /// [AppScope], nên không màn hình nào phải tự khởi tạo lại dữ liệu.
 class HealthFlowApp extends StatefulWidget {
-  const HealthFlowApp({super.key});
+  const HealthFlowApp({super.key, this.prefs});
+
+  /// Chỉ dùng để lưu nhật ký dinh dưỡng. Để trống thì lưu trong bộ nhớ tạm
+  /// (dùng cho kiểm thử).
+  final SharedPreferences? prefs;
 
   @override
   State<HealthFlowApp> createState() => _HealthFlowAppState();
@@ -31,7 +39,12 @@ class _HealthFlowAppState extends State<HealthFlowApp> {
   void initState() {
     super.initState();
     _auth = AuthRepository();
-    _data = AppData();
+    final prefs = widget.prefs;
+    _data = AppData(
+      nutrition: prefs == null
+          ? null
+          : NutritionRepository(store: PrefsNutritionStore(prefs)),
+    );
     _auth.restoreSession();
   }
 
