@@ -1,7 +1,7 @@
 /// Nhóm món ăn dùng cho thanh chọn nhanh trong màn hình "Thêm món ăn".
 enum FoodCategory {
-  vietnamese('vietnamese', 'Việt Nam'),
-  asian('asian', 'Tây'),
+  vietnamese('vietnamese', 'Món Việt'),
+  asian('asian', 'Món Tây'),
   drink('drink', 'Đồ uống'),
   other('other', 'Khác');
 
@@ -137,7 +137,13 @@ class MealEntry {
     required MealSlot slot,
     required DateTime eatenAt,
     double portion = 1,
+    int? caloriesOverride,
   }) {
+    // Người dùng tự nhập calo: các chất dinh dưỡng được co giãn theo cùng tỉ
+    // lệ để tỉ lệ protein/carb/fat của món vẫn giữ nguyên.
+    final base = food.calories * portion;
+    final scale =
+        (caloriesOverride != null && base > 0) ? caloriesOverride / base : 1.0;
     return MealEntry(
       id: id,
       userId: userId,
@@ -145,10 +151,10 @@ class MealEntry {
       foodName: food.name,
       slot: slot,
       portion: portion,
-      calories: (food.calories * portion).round(),
-      protein: food.protein * portion,
-      carbs: food.carbs * portion,
-      fat: food.fat * portion,
+      calories: caloriesOverride ?? base.round(),
+      protein: food.protein * portion * scale,
+      carbs: food.carbs * portion * scale,
+      fat: food.fat * portion * scale,
       eatenAt: eatenAt,
     );
   }
