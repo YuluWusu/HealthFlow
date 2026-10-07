@@ -1,0 +1,3939 @@
+[
+ {
+  "id": "vn-001",
+  "name": "Phở Bò Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 460,
+  "ingredients": [
+   "Bánh phở tươi (150g)",
+   "Thịt bò băm chay (60g)",
+   "Nấm hương tươi (30g)",
+   "Nước dùng chay rau củ (200g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 303,
+  "protein": 18.9,
+  "fat": 2.9,
+  "carbs": 50.2,
+  "fiber": 5.5,
+  "calcium": 131,
+  "iron": 4.7
+ },
+ {
+  "id": "vn-002",
+  "name": "Phở Gà Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 460,
+  "ingredients": [
+   "Bánh phở tươi (150g)",
+   "Chả lụa chay (50g)",
+   "Nấm đùi gà (40g)",
+   "Nước dùng chay rau củ (200g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 288,
+  "protein": 14.4,
+  "fat": 3.4,
+  "carbs": 50.1,
+  "fiber": 4.3,
+  "calcium": 114,
+  "iron": 3.6
+ },
+ {
+  "id": "vn-003",
+  "name": "Bún Riêu Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 510,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Đậu phụ (60g)",
+   "Cà chua (40g)",
+   "Nấm rơm (30g)",
+   "Nước dùng chay rau củ (200g)",
+   "Rau muống (30g)"
+  ],
+  "calories": 276,
+  "protein": 13.0,
+  "fat": 4.2,
+  "carbs": 47.9,
+  "fiber": 2.5,
+  "calcium": 112,
+  "iron": 3.7
+ },
+ {
+  "id": "vn-004",
+  "name": "Bún Bò Huế Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 480,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Chả lụa chay (40g)",
+   "Nấm đùi gà (40g)",
+   "Thịt bò băm chay (30g)",
+   "Nước dùng chay rau củ (200g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 309,
+  "protein": 15.8,
+  "fat": 3.4,
+  "carbs": 54.6,
+  "fiber": 4.5,
+  "calcium": 120,
+  "iron": 3.9
+ },
+ {
+  "id": "vn-005",
+  "name": "Bún Thang Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 450,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Chả lụa chay (30g)",
+   "Đậu phụ (40g)",
+   "Nấm hương tươi (30g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 282,
+  "protein": 12.8,
+  "fat": 4.1,
+  "carbs": 49.0,
+  "fiber": 2.9,
+  "calcium": 86,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-006",
+  "name": "Bún Mắm Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 470,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Đậu phụ (50g)",
+   "Cá chay (40g)",
+   "Mướp đắng (Khổ qua) (30g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 292,
+  "protein": 13.9,
+  "fat": 4.6,
+  "carbs": 49.0,
+  "fiber": 2.9,
+  "calcium": 91,
+  "iron": 3.4
+ },
+ {
+  "id": "vn-007",
+  "name": "Hủ Tiếu Nam Vang Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 440,
+  "ingredients": [
+   "Bún tươi (140g)",
+   "Chả lụa chay (40g)",
+   "Nấm đùi gà (30g)",
+   "Giá đỗ (30g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 260,
+  "protein": 11.1,
+  "fat": 2.4,
+  "carbs": 49.0,
+  "fiber": 3.4,
+  "calcium": 93,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-008",
+  "name": "Bánh Cánh Cua Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 450,
+  "ingredients": [
+   "Bột lọc / Bột năng (120g)",
+   "Đậu phụ (60g)",
+   "Nấm rơm (40g)",
+   "Cà chua (30g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 525,
+  "protein": 10.4,
+  "fat": 3.9,
+  "carbs": 111.8,
+  "fiber": 1.8,
+  "calcium": 83,
+  "iron": 3.3
+ },
+ {
+  "id": "vn-009",
+  "name": "Mì Quảng Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 345,
+  "ingredients": [
+   "Bánh phở tươi (140g)",
+   "Đậu phụ (50g)",
+   "Nấm đùi gà (40g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Nước dùng chay rau củ (100g)"
+  ],
+  "calories": 323,
+  "protein": 16.4,
+  "fat": 10.3,
+  "carbs": 41.5,
+  "fiber": 3.2,
+  "calcium": 74,
+  "iron": 3.4
+ },
+ {
+  "id": "vn-010",
+  "name": "Cao Lầu Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 280,
+  "ingredients": [
+   "Bún tươi (140g)",
+   "Thịt heo quay chay (50g)",
+   "Đậu phụ (40g)",
+   "Giá đỗ (30g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 291,
+  "protein": 15.7,
+  "fat": 5.6,
+  "carbs": 44.9,
+  "fiber": 3.3,
+  "calcium": 85,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-011",
+  "name": "Bánh Mì Chay Bơ Tỏi",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 185,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Chả lụa chay (40g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Rau thơm & Hành lá (10g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 369,
+  "protein": 13.1,
+  "fat": 7.6,
+  "carbs": 62.0,
+  "fiber": 3.4,
+  "calcium": 74,
+  "iron": 2.8
+ },
+ {
+  "id": "vn-012",
+  "name": "Bánh Mì Nấm Đùi Gà",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 220,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Nấm đùi gà (60g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Cà chua (20g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 297,
+  "protein": 10.0,
+  "fat": 1.1,
+  "carbs": 62.5,
+  "fiber": 4.0,
+  "calcium": 61,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-013",
+  "name": "Bánh Mì Chả Lụa Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 200,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Chả lụa chay (60g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 350,
+  "protein": 15.5,
+  "fat": 3.6,
+  "carbs": 64.0,
+  "fiber": 3.8,
+  "calcium": 86,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-014",
+  "name": "Bánh Xèo Chay",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 235,
+  "ingredients": [
+   "Vỏ bánh xèo (100g)",
+   "Đậu phụ (40g)",
+   "Giá đỗ (50g)",
+   "Nấm rơm (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 384,
+  "protein": 11.1,
+  "fat": 19.9,
+  "carbs": 39.9,
+  "fiber": 2.7,
+  "calcium": 62,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-015",
+  "name": "Bánh Khọt Chay",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 160,
+  "ingredients": [
+   "Vỏ bánh xèo (90g)",
+   "Đậu phụ (30g)",
+   "Nấm hương tươi (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 290,
+  "protein": 6.6,
+  "fat": 13.9,
+  "carbs": 34.2,
+  "fiber": 2.0,
+  "calcium": 34,
+  "iron": 1.9
+ },
+ {
+  "id": "vn-016",
+  "name": "Bánh Cuốn Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 250,
+  "ingredients": [
+   "Vỏ bánh cuốn (120g)",
+   "Nấm hương tươi (40g)",
+   "Củ cải trắng (30g)",
+   "Giá đỗ (30g)",
+   "Chả lụa chay (30g)"
+  ],
+  "calories": 215,
+  "protein": 8.7,
+  "fat": 2.1,
+  "carbs": 40.2,
+  "fiber": 3.0,
+  "calcium": 63,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-017",
+  "name": "Bánh Bèo Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 165,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Đậu phụ (30g)",
+   "Bánh mì (20g)",
+   "Rau thơm & Hành lá (10g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 479,
+  "protein": 5.5,
+  "fat": 6.9,
+  "carbs": 98.1,
+  "fiber": 0.9,
+  "calcium": 36,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-018",
+  "name": "Bánh Lọc Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 175,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Nấm rơm (40g)",
+   "Đậu phụ (30g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 436,
+  "protein": 5.2,
+  "fat": 7.0,
+  "carbs": 87.5,
+  "fiber": 0.8,
+  "calcium": 33,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-019",
+  "name": "Bánh Nậm Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 155,
+  "ingredients": [
+   "Bột lọc / Bột năng (90g)",
+   "Nấm hương tươi (30g)",
+   "Đậu phụ (30g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 399,
+  "protein": 4.4,
+  "fat": 6.8,
+  "carbs": 79.2,
+  "fiber": 1.1,
+  "calcium": 26,
+  "iron": 1.4
+ },
+ {
+  "id": "vn-020",
+  "name": "Bánh Ít Trần Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 160,
+  "ingredients": [
+   "Bột lọc / Bột năng (90g)",
+   "Đậu phụ (40g)",
+   "Măng tươi / Măng chua (20g)",
+   "Lạc hạt / Đậu phụng (10g)"
+  ],
+  "calories": 413,
+  "protein": 7.9,
+  "fat": 6.8,
+  "carbs": 79.6,
+  "fiber": 0.8,
+  "calcium": 33,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-021",
+  "name": "Cơm Tấm Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 320,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt heo quay chay (50g)",
+   "Chả lụa chay (40g)",
+   "Tàu hũ ky (Váng đậu) (20g)",
+   "Dưa leo / Dưa chuột (30g)"
+  ],
+  "calories": 466,
+  "protein": 25.9,
+  "fat": 10.4,
+  "carbs": 65.3,
+  "fiber": 3.5,
+  "calcium": 120,
+  "iron": 4.3
+ },
+ {
+  "id": "vn-022",
+  "name": "Cơm Chiên Dương Châu Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 270,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Củ cải trắng (30g)",
+   "Chả lụa chay (30g)",
+   "Cà chua (20g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 372,
+  "protein": 8.8,
+  "fat": 11.9,
+  "carbs": 55.7,
+  "fiber": 1.7,
+  "calcium": 47,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-023",
+  "name": "Cơm Chiên Hạt Cát Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 260,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Nấm đùi gà (40g)",
+   "Giá đỗ (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 351,
+  "protein": 7.5,
+  "fat": 10.7,
+  "carbs": 54.8,
+  "fiber": 2.2,
+  "calcium": 35,
+  "iron": 2.3
+ },
+ {
+  "id": "vn-024",
+  "name": "Cơm Lam Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 210,
+  "ingredients": [
+   "Xôi nếp (180g)",
+   "Lạc hạt / Đậu phụng (20g)",
+   "Vừng đen / Vừng trắng (10g)"
+  ],
+  "calories": 549,
+  "protein": 15.1,
+  "fat": 14.6,
+  "carbs": 89.1,
+  "fiber": 2.5,
+  "calcium": 140,
+  "iron": 3.5
+ },
+ {
+  "id": "vn-025",
+  "name": "Xôi Đậu Xanh Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 220,
+  "ingredients": [
+   "Xôi nếp (160g)",
+   "Chè đậu xanh (50g)",
+   "Vừng đen / Vừng trắng (10g)"
+  ],
+  "calories": 463,
+  "protein": 10.8,
+  "fat": 6.0,
+  "carbs": 91.1,
+  "fiber": 2.8,
+  "calcium": 136,
+  "iron": 3.6
+ },
+ {
+  "id": "vn-026",
+  "name": "Xôi Gấc Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 200,
+  "ingredients": [
+   "Xôi nếp (180g)",
+   "Đường kính (15g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 482,
+  "protein": 7.6,
+  "fat": 6.1,
+  "carbs": 99.1,
+  "fiber": 1.6,
+  "calcium": 29,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-027",
+  "name": "Xôi Dừa Lạc Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 200,
+  "ingredients": [
+   "Xôi nếp (160g)",
+   "Lạc hạt / Đậu phụng (30g)",
+   "Vừng đen / Vừng trắng (10g)"
+  ],
+  "calories": 564,
+  "protein": 17.0,
+  "fat": 18.9,
+  "carbs": 81.3,
+  "fiber": 2.5,
+  "calcium": 144,
+  "iron": 3.5
+ },
+ {
+  "id": "vn-028",
+  "name": "Xôi Vò Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 220,
+  "ingredients": [
+   "Xôi nếp (150g)",
+   "Chè đậu xanh (60g)",
+   "Đường kính (10g)"
+  ],
+  "calories": 439,
+  "protein": 8.8,
+  "fat": 1.4,
+  "carbs": 97.5,
+  "fiber": 2.6,
+  "calcium": 39,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-029",
+  "name": "Cơm Nắm Vừng Lạc",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 210,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Lạc hạt / Đậu phụng (20g)",
+   "Vừng đen / Vừng trắng (10g)"
+  ],
+  "calories": 405,
+  "protein": 12.4,
+  "fat": 14.1,
+  "carbs": 55.6,
+  "fiber": 1.6,
+  "calcium": 129,
+  "iron": 3.3
+ },
+ {
+  "id": "vn-030",
+  "name": "Cơm Cháy Chà Bông Chay",
+  "vegetarian": true,
+  "group": "Món cơm/xôi",
+  "servingGrams": 180,
+  "ingredients": [
+   "Cơm trắng (120g)",
+   "Tàu hũ ky (Váng đậu) (30g)",
+   "Chả lụa chay (20g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 416,
+  "protein": 19.1,
+  "fat": 18.7,
+  "carbs": 41.2,
+  "fiber": 1.3,
+  "calcium": 78,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-031",
+  "name": "Đậu Phụ Sốt Cà Chua",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 200,
+  "ingredients": [
+   "Đậu phụ (120g)",
+   "Cà chua (60g)",
+   "Dầu ăn (10g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 218,
+  "protein": 13.6,
+  "fat": 16.6,
+  "carbs": 3.9,
+  "fiber": 1.1,
+  "calcium": 42,
+  "iron": 3.0
+ },
+ {
+  "id": "vn-032",
+  "name": "Đậu Phụ Nhồi Nấm Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Đậu phụ (120g)",
+   "Nấm hương tươi (40g)",
+   "Củ hành tây (20g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 225,
+  "protein": 14.2,
+  "fat": 16.6,
+  "carbs": 4.8,
+  "fiber": 1.8,
+  "calcium": 40,
+  "iron": 3.1
+ },
+ {
+  "id": "vn-033",
+  "name": "Đậu Phụ Chiên Sả Ớt",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 155,
+  "ingredients": [
+   "Đậu phụ (130g)",
+   "Dầu ăn (15g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 261,
+  "protein": 14.4,
+  "fat": 22.0,
+  "carbs": 1.5,
+  "fiber": 0.7,
+  "calcium": 37,
+  "iron": 3.0
+ },
+ {
+  "id": "vn-034",
+  "name": "Đậu Phụ Kho Nấm Rơm",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 170,
+  "ingredients": [
+   "Đậu phụ (100g)",
+   "Nấm rơm (60g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 203,
+  "protein": 13.1,
+  "fat": 15.8,
+  "carbs": 2.7,
+  "fiber": 1.1,
+  "calcium": 41,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-035",
+  "name": "Nấm Đùi Gà Kho Tiêu",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 155,
+  "ingredients": [
+   "Nấm đùi gà (140g)",
+   "Dầu ăn (10g)",
+   "Đường kính (5g)"
+  ],
+  "calories": 159,
+  "protein": 3.5,
+  "fat": 10.4,
+  "carbs": 13.4,
+  "fiber": 3.1,
+  "calcium": 21,
+  "iron": 1.4
+ },
+ {
+  "id": "vn-036",
+  "name": "Nấm Rơm Xào Sả Ớt",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 162,
+  "ingredients": [
+   "Nấm rơm (140g)",
+   "Dầu ăn (12g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 154,
+  "protein": 5.2,
+  "fat": 13.0,
+  "carbs": 5.2,
+  "fiber": 1.7,
+  "calcium": 45,
+  "iron": 1.8
+ },
+ {
+  "id": "vn-037",
+  "name": "Nấm Hương Sốt Dầu Hào Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 170,
+  "ingredients": [
+   "Nấm hương tươi (130g)",
+   "Củ hành tây (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 146,
+  "protein": 3.2,
+  "fat": 10.3,
+  "carbs": 9.6,
+  "fiber": 3.8,
+  "calcium": 28,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-038",
+  "name": "Cà Tím Kho Lạc",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 140,
+  "ingredients": [
+   "Cà chua (100g)",
+   "Lạc hạt / Đậu phụng (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 280,
+  "protein": 8.8,
+  "fat": 23.5,
+  "carbs": 8.9,
+  "fiber": 1.6,
+  "calcium": 32,
+  "iron": 1.1
+ },
+ {
+  "id": "vn-039",
+  "name": "Khổ Qua Kho Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Mướp đắng (Khổ qua) (120g)",
+   "Đậu phụ (40g)",
+   "Nấm hương tươi (20g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 155,
+  "protein": 5.9,
+  "fat": 12.3,
+  "carbs": 5.0,
+  "fiber": 1.9,
+  "calcium": 34,
+  "iron": 1.8
+ },
+ {
+  "id": "vn-040",
+  "name": "Rau Muống Xào Tỏi Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 167,
+  "ingredients": [
+   "Rau muống (150g)",
+   "Dầu ăn (12g)",
+   "Rau thơm & Hành lá (5g)"
+  ],
+  "calories": 144,
+  "protein": 4.9,
+  "fat": 12.6,
+  "carbs": 3.4,
+  "fiber": 1.6,
+  "calcium": 153,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-041",
+  "name": "Cải Thảo Xào Nấm Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 180,
+  "ingredients": [
+   "Bắp cải (120g)",
+   "Nấm đùi gà (50g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 137,
+  "protein": 2.8,
+  "fat": 10.2,
+  "carbs": 10.0,
+  "fiber": 4.1,
+  "calcium": 56,
+  "iron": 1.1
+ },
+ {
+  "id": "vn-042",
+  "name": "Su Su Xào Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Su su (150g)",
+   "Nấm hương tươi (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 128,
+  "protein": 1.9,
+  "fat": 10.2,
+  "carbs": 8.3,
+  "fiber": 2.5,
+  "calcium": 30,
+  "iron": 0.9
+ },
+ {
+  "id": "vn-043",
+  "name": "Củ Cải Kho Tàu Hũ Ky",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 170,
+  "ingredients": [
+   "Củ cải trắng (120g)",
+   "Tàu hũ ky (Váng đậu) (40g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 303,
+  "protein": 19.0,
+  "fat": 20.1,
+  "carbs": 11.6,
+  "fiber": 1.6,
+  "calcium": 108,
+  "iron": 2.3
+ },
+ {
+  "id": "vn-044",
+  "name": "Bầu Luộc Chấm Chao",
+  "vegetarian": true,
+  "group": "Món luộc",
+  "servingGrams": 200,
+  "ingredients": [
+   "Bầu / Bí đao (180g)",
+   "Đậu phụ (20g)"
+  ],
+  "calories": 44,
+  "protein": 3.3,
+  "fat": 1.3,
+  "carbs": 5.2,
+  "fiber": 1.0,
+  "calcium": 37,
+  "iron": 1.2
+ },
+ {
+  "id": "vn-045",
+  "name": "Mướp Hương Xào Nấm",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Bầu / Bí đao (140g)",
+   "Nấm rơm (40g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 122,
+  "protein": 2.3,
+  "fat": 10.4,
+  "carbs": 5.2,
+  "fiber": 1.1,
+  "calcium": 36,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-046",
+  "name": "Canh Chua Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 300,
+  "ingredients": [
+   "Đậu phụ (50g)",
+   "Cà chua (40g)",
+   "Giá đỗ (30g)",
+   "Bầu / Bí đao (30g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 95,
+  "protein": 8.7,
+  "fat": 3.0,
+  "carbs": 8.7,
+  "fiber": 1.7,
+  "calcium": 61,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-047",
+  "name": "Canh Khổ Qua Nhồi Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 310,
+  "ingredients": [
+   "Mướp đắng (Khổ qua) (100g)",
+   "Đậu phụ (40g)",
+   "Nấm hương tươi (20g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 84,
+  "protein": 6.9,
+  "fat": 2.5,
+  "carbs": 8.6,
+  "fiber": 2.1,
+  "calcium": 58,
+  "iron": 2.3
+ },
+ {
+  "id": "vn-048",
+  "name": "Canh Nấm Bắp Cải Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 290,
+  "ingredients": [
+   "Nấm đùi gà (50g)",
+   "Bắp cải (60g)",
+   "Cà chua (30g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 61,
+  "protein": 3.4,
+  "fat": 0.4,
+  "carbs": 11.9,
+  "fiber": 3.3,
+  "calcium": 62,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-049",
+  "name": "Canh Củ Cải Cà Rốt",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 260,
+  "ingredients": [
+   "Củ cải trắng (80g)",
+   "Nấm hương tươi (30g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 47,
+  "protein": 2.5,
+  "fat": 0.3,
+  "carbs": 8.7,
+  "fiber": 1.8,
+  "calcium": 56,
+  "iron": 1.2
+ },
+ {
+  "id": "vn-050",
+  "name": "Canh Rau Muống Nấu Me",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 300,
+  "ingredients": [
+   "Rau muống (120g)",
+   "Cà chua (30g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 56,
+  "protein": 5.2,
+  "fat": 0.7,
+  "carbs": 8.0,
+  "fiber": 1.9,
+  "calcium": 151,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-051",
+  "name": "Canh Bí Đao Nấu Nấm",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 310,
+  "ingredients": [
+   "Bầu / Bí đao (120g)",
+   "Nấm rơm (40g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 52,
+  "protein": 3.4,
+  "fat": 0.6,
+  "carbs": 8.9,
+  "fiber": 1.5,
+  "calcium": 60,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-052",
+  "name": "Canh Măng Chua Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 320,
+  "ingredients": [
+   "Măng tươi / Măng chua (100g)",
+   "Đậu phụ (40g)",
+   "Cà chua (30g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 82,
+  "protein": 7.4,
+  "fat": 2.7,
+  "carbs": 7.4,
+  "fiber": 1.9,
+  "calcium": 54,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-053",
+  "name": "Lẩu Nấm Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 450,
+  "ingredients": [
+   "Nấm đùi gà (60g)",
+   "Nấm rơm (50g)",
+   "Nấm hương tươi (40g)",
+   "Đậu phụ (50g)",
+   "Bắp cải (50g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 140,
+  "protein": 11.9,
+  "fat": 3.6,
+  "carbs": 16.2,
+  "fiber": 4.9,
+  "calcium": 97,
+  "iron": 3.8
+ },
+ {
+  "id": "vn-054",
+  "name": "Lẩu Thái Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 430,
+  "ingredients": [
+   "Đậu phụ (50g)",
+   "Nấm kim chi (40g)",
+   "Cà chua (40g)",
+   "Bún tươi (100g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 210,
+  "protein": 10.1,
+  "fat": 3.4,
+  "carbs": 35.5,
+  "fiber": 2.7,
+  "calcium": 69,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-055",
+  "name": "Lẩu Chao Chay",
+  "vegetarian": true,
+  "group": "Món canh/lẩu",
+  "servingGrams": 460,
+  "ingredients": [
+   "Khoai môn / Khoai lệ phố (60g)",
+   "Đậu phụ (60g)",
+   "Nấm rơm (40g)",
+   "Bún tươi (100g)",
+   "Nước dùng chay rau củ (200g)"
+  ],
+  "calories": 275,
+  "protein": 12.2,
+  "fat": 4.0,
+  "carbs": 48.3,
+  "fiber": 2.5,
+  "calcium": 90,
+  "iron": 3.5
+ },
+ {
+  "id": "vn-056",
+  "name": "Gỏi Ngó Sen Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 175,
+  "ingredients": [
+   "Măng tươi / Măng chua (80g)",
+   "Củ cải trắng (40g)",
+   "Chả lụa chay (30g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 148,
+  "protein": 9.6,
+  "fat": 8.3,
+  "carbs": 8.7,
+  "fiber": 2.2,
+  "calcium": 57,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-057",
+  "name": "Gỏi Đu Đủ Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 165,
+  "ingredients": [
+   "Su su (80g)",
+   "Dưa leo / Dưa chuột (40g)",
+   "Đậu phụ (30g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 136,
+  "protein": 8.4,
+  "fat": 8.4,
+  "carbs": 7.3,
+  "fiber": 1.7,
+  "calcium": 40,
+  "iron": 1.4
+ },
+ {
+  "id": "vn-058",
+  "name": "Gỏi Bắp Cải Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 155,
+  "ingredients": [
+   "Bắp cải (100g)",
+   "Chả lụa chay (30g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 153,
+  "protein": 9.2,
+  "fat": 8.2,
+  "carbs": 11.7,
+  "fiber": 3.6,
+  "calcium": 74,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-059",
+  "name": "Nộm Dưa Leo Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 170,
+  "ingredients": [
+   "Dưa leo / Dưa chuột (120g)",
+   "Đậu phụ (30g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Vừng đen / Vừng trắng (5g)"
+  ],
+  "calories": 161,
+  "protein": 9.4,
+  "fat": 10.7,
+  "carbs": 7.0,
+  "fiber": 1.5,
+  "calcium": 94,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-060",
+  "name": "Nộm Giá Đỗ Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 165,
+  "ingredients": [
+   "Giá đỗ (120g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 143,
+  "protein": 10.7,
+  "fat": 6.9,
+  "carbs": 9.6,
+  "fiber": 3.0,
+  "calcium": 63,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-061",
+  "name": "Chè Đậu Xanh Bột Lọc",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 170,
+  "ingredients": [
+   "Chè đậu xanh (120g)",
+   "Bột lọc / Bột năng (30g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 352,
+  "protein": 5.2,
+  "fat": 1.0,
+  "carbs": 80.5,
+  "fiber": 2.6,
+  "calcium": 34,
+  "iron": 1.9
+ },
+ {
+  "id": "vn-062",
+  "name": "Chè Đậu Đỏ Dừa",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 165,
+  "ingredients": [
+   "Chè đậu đỏ (140g)",
+   "Đường kính (20g)",
+   "Vừng đen / Vừng trắng (5g)"
+  ],
+  "calories": 318,
+  "protein": 7.3,
+  "fat": 3.2,
+  "carbs": 64.8,
+  "fiber": 3.7,
+  "calcium": 91,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-063",
+  "name": "Chè Trôi Nước Chay",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 170,
+  "ingredients": [
+   "Xôi nếp (100g)",
+   "Chè đậu xanh (40g)",
+   "Đường kính (25g)",
+   "Vừng đen / Vừng trắng (5g)"
+  ],
+  "calories": 394,
+  "protein": 6.9,
+  "fat": 3.2,
+  "carbs": 84.1,
+  "fiber": 1.9,
+  "calcium": 75,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-064",
+  "name": "Chè Bưởi Chay",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 145,
+  "ingredients": [
+   "Bột lọc / Bột năng (60g)",
+   "Chè đậu xanh (60g)",
+   "Đường kính (25g)"
+  ],
+  "calories": 393,
+  "protein": 2.8,
+  "fat": 0.5,
+  "carbs": 93.8,
+  "fiber": 1.4,
+  "calcium": 24,
+  "iron": 1.2
+ },
+ {
+  "id": "vn-065",
+  "name": "Chè Sương Sa Hạt Lựu",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 140,
+  "ingredients": [
+   "Rau câu / Thạch (80g)",
+   "Bột lọc / Bột năng (40g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 251,
+  "protein": 0.6,
+  "fat": 0.1,
+  "carbs": 61.9,
+  "fiber": 0.5,
+  "calcium": 14,
+  "iron": 0.4
+ },
+ {
+  "id": "vn-066",
+  "name": "Chè Ba Màu Chay",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 160,
+  "ingredients": [
+   "Chè đậu xanh (50g)",
+   "Chè đậu đỏ (50g)",
+   "Rau câu / Thạch (40g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 240,
+  "protein": 4.5,
+  "fat": 0.7,
+  "carbs": 53.9,
+  "fiber": 2.5,
+  "calcium": 32,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-067",
+  "name": "Chè Bắp Chay",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 150,
+  "ingredients": [
+   "Khoai lang luộc (100g)",
+   "Bột lọc / Bột năng (30g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 303,
+  "protein": 1.0,
+  "fat": 0.2,
+  "carbs": 74.2,
+  "fiber": 1.4,
+  "calcium": 34,
+  "iron": 0.8
+ },
+ {
+  "id": "vn-068",
+  "name": "Chè Khoai Môn Chay",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 150,
+  "ingredients": [
+   "Khoai môn / Khoai lệ phố (100g)",
+   "Xôi nếp (30g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 252,
+  "protein": 2.8,
+  "fat": 0.4,
+  "carbs": 59.4,
+  "fiber": 1.5,
+  "calcium": 33,
+  "iron": 1.1
+ },
+ {
+  "id": "vn-069",
+  "name": "Chè Bột Lọc Bọc Dừa",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 130,
+  "ingredients": [
+   "Bột lọc / Bột năng (80g)",
+   "Lạc hạt / Đậu phụng (30g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 531,
+  "protein": 8.7,
+  "fat": 13.4,
+  "carbs": 93.3,
+  "fiber": 0.9,
+  "calcium": 32,
+  "iron": 1.1
+ },
+ {
+  "id": "vn-070",
+  "name": "Chè Thạch Dừa Chay",
+  "vegetarian": true,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 140,
+  "ingredients": [
+   "Rau câu / Thạch (120g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 127,
+  "protein": 0.6,
+  "fat": 0.1,
+  "carbs": 31.3,
+  "fiber": 0.6,
+  "calcium": 12,
+  "iron": 0.2
+ },
+ {
+  "id": "vn-071",
+  "name": "Bánh Khoai Môn Chiên Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 145,
+  "ingredients": [
+   "Khoai môn / Khoai lệ phố (100g)",
+   "Bột lọc / Bột năng (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 350,
+  "protein": 1.6,
+  "fat": 15.2,
+  "carbs": 51.3,
+  "fiber": 1.3,
+  "calcium": 32,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-072",
+  "name": "Bánh Khoai Lang Chiên Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 145,
+  "ingredients": [
+   "Khoai lang luộc (100g)",
+   "Bột lọc / Bột năng (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 359,
+  "protein": 1.0,
+  "fat": 15.2,
+  "carbs": 54.3,
+  "fiber": 1.4,
+  "calcium": 34,
+  "iron": 0.8
+ },
+ {
+  "id": "vn-073",
+  "name": "Bánh Chuối Chiên Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 135,
+  "ingredients": [
+   "Khoai lang luộc (90g)",
+   "Bột lọc / Bột năng (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 347,
+  "protein": 0.9,
+  "fat": 15.2,
+  "carbs": 51.5,
+  "fiber": 1.2,
+  "calcium": 32,
+  "iron": 0.7
+ },
+ {
+  "id": "vn-074",
+  "name": "Bánh Cam Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 130,
+  "ingredients": [
+   "Xôi nếp (80g)",
+   "Chè đậu xanh (30g)",
+   "Vừng đen / Vừng trắng (10g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 356,
+  "protein": 6.6,
+  "fat": 15.3,
+  "carbs": 47.9,
+  "fiber": 1.7,
+  "calcium": 118,
+  "iron": 2.6
+ },
+ {
+  "id": "vn-075",
+  "name": "Bánh Táo Rùa Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 135,
+  "ingredients": [
+   "Xôi nếp (90g)",
+   "Chè đậu xanh (30g)",
+   "Đường kính (15g)"
+  ],
+  "calories": 291,
+  "protein": 5.0,
+  "fat": 0.8,
+  "carbs": 65.7,
+  "fiber": 1.4,
+  "calcium": 22,
+  "iron": 1.3
+ },
+ {
+  "id": "vn-076",
+  "name": "Bánh Phu Thê Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 125,
+  "ingredients": [
+   "Bột lọc / Bột năng (80g)",
+   "Chè đậu xanh (30g)",
+   "Đường kính (15g)"
+  ],
+  "calories": 382,
+  "protein": 1.7,
+  "fat": 0.3,
+  "carbs": 92.4,
+  "fiber": 0.8,
+  "calcium": 20,
+  "iron": 0.9
+ },
+ {
+  "id": "vn-077",
+  "name": "Bánh Đúc Nóng Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 175,
+  "ingredients": [
+   "Bánh phở tươi (120g)",
+   "Thịt bò băm chay (30g)",
+   "Nấm hương tươi (20g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 232,
+  "protein": 10.2,
+  "fat": 6.5,
+  "carbs": 32.8,
+  "fiber": 2.9,
+  "calcium": 51,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-078",
+  "name": "Bánh Đúc Cẩm Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 145,
+  "ingredients": [
+   "Bánh phở tươi (120g)",
+   "Lạc hạt / Đậu phụng (20g)",
+   "Vừng đen / Vừng trắng (5g)"
+  ],
+  "calories": 281,
+  "protein": 10.8,
+  "fat": 11.8,
+  "carbs": 32.8,
+  "fiber": 1.9,
+  "calcium": 86,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-079",
+  "name": "Bánh Tét Chay Nhân Đậu",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 195,
+  "ingredients": [
+   "Xôi nếp (140g)",
+   "Chè đậu xanh (50g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 409,
+  "protein": 8.0,
+  "fat": 6.2,
+  "carbs": 80.0,
+  "fiber": 2.3,
+  "calcium": 35,
+  "iron": 2.0
+ },
+ {
+  "id": "vn-080",
+  "name": "Bánh Chưng Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 230,
+  "ingredients": [
+   "Xôi nếp (150g)",
+   "Chè đậu xanh (60g)",
+   "Nấm hương tươi (20g)"
+  ],
+  "calories": 406,
+  "protein": 9.3,
+  "fat": 1.4,
+  "carbs": 88.6,
+  "fiber": 3.1,
+  "calcium": 42,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-081",
+  "name": "Bánh Gai Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 165,
+  "ingredients": [
+   "Xôi nếp (100g)",
+   "Chè đậu xanh (40g)",
+   "Vừng đen / Vừng trắng (10g)",
+   "Đường kính (15g)"
+  ],
+  "calories": 382,
+  "protein": 7.9,
+  "fat": 5.6,
+  "carbs": 75.1,
+  "fiber": 2.1,
+  "calcium": 124,
+  "iron": 3.0
+ },
+ {
+  "id": "vn-082",
+  "name": "Bánh Dày Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 160,
+  "ingredients": [
+   "Xôi nếp (120g)",
+   "Chả lụa chay (40g)"
+  ],
+  "calories": 304,
+  "protein": 9.8,
+  "fat": 2.5,
+  "carbs": 60.2,
+  "fiber": 1.9,
+  "calcium": 43,
+  "iron": 1.9
+ },
+ {
+  "id": "vn-083",
+  "name": "Bánh Giò Chay",
+  "vegetarian": true,
+  "group": "Món bánh",
+  "servingGrams": 165,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Nấm hương tươi (30g)",
+   "Đậu phụ (30g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 434,
+  "protein": 4.4,
+  "fat": 6.8,
+  "carbs": 87.8,
+  "fiber": 1.1,
+  "calcium": 27,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-084",
+  "name": "Súp Nấm Tóc Tiên Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 240,
+  "ingredients": [
+   "Nấm đùi gà (40g)",
+   "Nấm hương tươi (30g)",
+   "Bột lọc / Bột năng (20g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 117,
+  "protein": 3.0,
+  "fat": 0.3,
+  "carbs": 25.4,
+  "fiber": 2.1,
+  "calcium": 41,
+  "iron": 1.4
+ },
+ {
+  "id": "vn-085",
+  "name": "Súp Bắp Non Chay",
+  "vegetarian": true,
+  "group": "Món nước",
+  "servingGrams": 250,
+  "ingredients": [
+   "Khoai lang luộc (50g)",
+   "Nấm rơm (30g)",
+   "Bột lọc / Bột năng (20g)",
+   "Nước dùng chay rau củ (150g)"
+  ],
+  "calories": 161,
+  "protein": 2.8,
+  "fat": 0.5,
+  "carbs": 36.6,
+  "fiber": 1.5,
+  "calcium": 53,
+  "iron": 1.4
+ },
+ {
+  "id": "vn-086",
+  "name": "Miến Xào Nấm Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 180,
+  "ingredients": [
+   "Miến dong (100g)",
+   "Nấm hương tươi (40g)",
+   "Củ cải trắng (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 439,
+  "protein": 1.8,
+  "fat": 10.3,
+  "carbs": 85.2,
+  "fiber": 1.8,
+  "calcium": 43,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-087",
+  "name": "Miến Trộn Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 175,
+  "ingredients": [
+   "Miến dong (100g)",
+   "Chả lụa chay (30g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 459,
+  "protein": 8.7,
+  "fat": 8.3,
+  "carbs": 88.2,
+  "fiber": 1.8,
+  "calcium": 63,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-088",
+  "name": "Hủ Tiếu Xào Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 200,
+  "ingredients": [
+   "Bún tươi (120g)",
+   "Đậu phụ (40g)",
+   "Giá đỗ (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 273,
+  "protein": 8.0,
+  "fat": 12.4,
+  "carbs": 32.7,
+  "fiber": 1.4,
+  "calcium": 35,
+  "iron": 1.8
+ },
+ {
+  "id": "vn-089",
+  "name": "Phở Xào Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 220,
+  "ingredients": [
+   "Bánh phở tươi (140g)",
+   "Nấm đùi gà (40g)",
+   "Bắp cải (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 272,
+  "protein": 6.4,
+  "fat": 10.8,
+  "carbs": 37.7,
+  "fiber": 3.0,
+  "calcium": 46,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-090",
+  "name": "Bún Xào Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 210,
+  "ingredients": [
+   "Bún tươi (140g)",
+   "Chả lụa chay (30g)",
+   "Giá đỗ (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 296,
+  "protein": 7.6,
+  "fat": 11.7,
+  "carbs": 40.6,
+  "fiber": 1.9,
+  "calcium": 46,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-091",
+  "name": "Mì Xào Giòn Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 185,
+  "ingredients": [
+   "Bánh mì (90g)",
+   "Nấm rơm (40g)",
+   "Bắp cải (40g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 395,
+  "protein": 9.1,
+  "fat": 16.0,
+  "carbs": 54.6,
+  "fiber": 3.4,
+  "calcium": 60,
+  "iron": 2.3
+ },
+ {
+  "id": "vn-092",
+  "name": "Bánh Tráng Trộn Chay",
+  "vegetarian": true,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 100,
+  "ingredients": [
+   "Bánh phở tươi (60g)",
+   "Chả lụa chay (20g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 226,
+  "protein": 8.7,
+  "fat": 12.9,
+  "carbs": 18.7,
+  "fiber": 1.4,
+  "calcium": 34,
+  "iron": 1.2
+ },
+ {
+  "id": "vn-093",
+  "name": "Bánh Tráng Nướng Chay",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 85,
+  "ingredients": [
+   "Bánh phở tươi (50g)",
+   "Đậu phụ (20g)",
+   "Rau thơm & Hành lá (10g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 124,
+  "protein": 4.2,
+  "fat": 6.3,
+  "carbs": 12.7,
+  "fiber": 0.7,
+  "calcium": 21,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-094",
+  "name": "Khoai Môn Lệ Phố Chay",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 145,
+  "ingredients": [
+   "Khoai môn / Khoai lệ phố (100g)",
+   "Chè đậu xanh (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 287,
+  "protein": 2.8,
+  "fat": 15.4,
+  "carbs": 34.2,
+  "fiber": 1.8,
+  "calcium": 36,
+  "iron": 1.2
+ },
+ {
+  "id": "vn-095",
+  "name": "Cà Rốt Rán Chay",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 120,
+  "ingredients": [
+   "Củ cải trắng (80g)",
+   "Bột lọc / Bột năng (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 209,
+  "protein": 0.8,
+  "fat": 10.1,
+  "carbs": 28.8,
+  "fiber": 0.7,
+  "calcium": 28,
+  "iron": 0.5
+ },
+ {
+  "id": "vn-096",
+  "name": "Nấm Kim Chi Chiên Giòn",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 145,
+  "ingredients": [
+   "Nấm kim chi (100g)",
+   "Bột lọc / Bột năng (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 277,
+  "protein": 2.9,
+  "fat": 15.5,
+  "carbs": 31.3,
+  "fiber": 2.8,
+  "calcium": 14,
+  "iron": 1.1
+ },
+ {
+  "id": "vn-097",
+  "name": "Đậu Phụ Lướt Ván",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 155,
+  "ingredients": [
+   "Đậu phụ (140g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 268,
+  "protein": 15.3,
+  "fat": 22.5,
+  "carbs": 1.0,
+  "fiber": 0.6,
+  "calcium": 34,
+  "iron": 3.1
+ },
+ {
+  "id": "vn-098",
+  "name": "Chả Lá Lốt Chay",
+  "vegetarian": true,
+  "group": "Món kho/xào",
+  "servingGrams": 140,
+  "ingredients": [
+   "Đậu phụ (100g)",
+   "Nấm hương tươi (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 195,
+  "protein": 11.6,
+  "fat": 15.4,
+  "carbs": 2.3,
+  "fiber": 1.1,
+  "calcium": 29,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-099",
+  "name": "Chả Giò Chay (Nem Ran Chay)",
+  "vegetarian": true,
+  "group": "Món chiên/nướng",
+  "servingGrams": 135,
+  "ingredients": [
+   "Miến dong (30g)",
+   "Đậu phụ (40g)",
+   "Củ cải trắng (30g)",
+   "Nấm hương tươi (20g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 284,
+  "protein": 5.2,
+  "fat": 17.2,
+  "carbs": 27.0,
+  "fiber": 1.1,
+  "calcium": 30,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-100",
+  "name": "Phở Bò Tái / Nạm",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 440,
+  "ingredients": [
+   "Bánh phở tươi (150g)",
+   "Thịt bò nạc (70g)",
+   "Nước dùng xương bò (200g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 317,
+  "protein": 26.0,
+  "fat": 6.5,
+  "carbs": 38.7,
+  "fiber": 1.8,
+  "calcium": 88,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-101",
+  "name": "Phở Gà Ta",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 440,
+  "ingredients": [
+   "Bánh phở tươi (150g)",
+   "Thịt gà ta (70g)",
+   "Nước dùng gà (200g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 362,
+  "protein": 23.0,
+  "fat": 12.4,
+  "carbs": 38.1,
+  "fiber": 1.8,
+  "calcium": 70,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-102",
+  "name": "Phở Bò Sốt Vang",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 440,
+  "ingredients": [
+   "Bánh phở tươi (150g)",
+   "Thịt bò nạc (80g)",
+   "Cà chua (30g)",
+   "Nước dùng xương bò (180g)"
+  ],
+  "calories": 325,
+  "protein": 27.7,
+  "fat": 6.6,
+  "carbs": 38.7,
+  "fiber": 1.7,
+  "calcium": 79,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-103",
+  "name": "Phở Cuốn Hà Nội",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 225,
+  "ingredients": [
+   "Bánh phở tươi (120g)",
+   "Thịt bò nạc (60g)",
+   "Giá đỗ (20g)",
+   "Rau thơm & Hành lá (20g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 274,
+  "protein": 19.6,
+  "fat": 8.0,
+  "carbs": 30.9,
+  "fiber": 1.9,
+  "calcium": 57,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-104",
+  "name": "Bún Riêu Cua Đồng",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 460,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Cua đồng (60g)",
+   "Đậu phụ (40g)",
+   "Cà chua (30g)",
+   "Nước dùng xương heo (180g)"
+  ],
+  "calories": 312,
+  "protein": 17.7,
+  "fat": 8.1,
+  "carbs": 42.4,
+  "fiber": 1.1,
+  "calcium": 3077,
+  "iron": 5.0
+ },
+ {
+  "id": "vn-105",
+  "name": "Bún Bò Huế",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 470,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Thịt bò nạc (50g)",
+   "Thịt heo ba chỉ (40g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Nước dùng xương bò (200g)"
+  ],
+  "calories": 423,
+  "protein": 29.3,
+  "fat": 16.3,
+  "carbs": 40.3,
+  "fiber": 0.8,
+  "calcium": 68,
+  "iron": 3.0
+ },
+ {
+  "id": "vn-106",
+  "name": "Bún Thang Hà Nội",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 445,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Thịt gà ta (40g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Trứng gà (25g)",
+   "Nước dùng gà (200g)"
+  ],
+  "calories": 366,
+  "protein": 21.1,
+  "fat": 13.0,
+  "carbs": 39.9,
+  "fiber": 0.8,
+  "calcium": 61,
+  "iron": 2.6
+ },
+ {
+  "id": "vn-107",
+  "name": "Bún Chả Hà Nội",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 320,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Thịt heo ba chỉ (70g)",
+   "Thịt heo nạc (50g)",
+   "Dưa cải muối (30g)",
+   "Nước mắm (20g)"
+  ],
+  "calories": 429,
+  "protein": 25.0,
+  "fat": 18.9,
+  "carbs": 40.2,
+  "fiber": 1.1,
+  "calcium": 48,
+  "iron": 2.8
+ },
+ {
+  "id": "vn-108",
+  "name": "Bún Mọc",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 430,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Chả lụa / Giò lụa (60g)",
+   "Nấm hương tươi (20g)",
+   "Nước dùng xương heo (200g)"
+  ],
+  "calories": 309,
+  "protein": 15.7,
+  "fat": 9.2,
+  "carbs": 41.1,
+  "fiber": 1.2,
+  "calcium": 54,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-109",
+  "name": "Bún Ốc Hà Nội",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 450,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Tôm tươi (50g)",
+   "Đậu phụ (40g)",
+   "Cà chua (30g)",
+   "Nước dùng xương heo (180g)"
+  ],
+  "calories": 300,
+  "protein": 19.1,
+  "fat": 6.6,
+  "carbs": 41.6,
+  "fiber": 1.1,
+  "calcium": 92,
+  "iron": 2.6
+ },
+ {
+  "id": "vn-110",
+  "name": "Bún Cá Lóc",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 450,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Cá lóc / Cá quả (80g)",
+   "Rau muống (40g)",
+   "Nước dùng xương heo (180g)"
+  ],
+  "calories": 302,
+  "protein": 21.6,
+  "fat": 6.2,
+  "carbs": 40.5,
+  "fiber": 1.1,
+  "calcium": 152,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-111",
+  "name": "Bún Mắm Miền Tây",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 450,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Thịt heo ba chỉ (40g)",
+   "Tôm tươi (40g)",
+   "Cá lóc / Cá quả (40g)",
+   "Nước dùng xương heo (180g)"
+  ],
+  "calories": 391,
+  "protein": 26.7,
+  "fat": 13.9,
+  "carbs": 40.0,
+  "fiber": 0.8,
+  "calcium": 111,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-112",
+  "name": "Bún Đậu Mắm Tôm",
+  "vegetarian": false,
+  "group": "Món luộc",
+  "servingGrams": 325,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Đậu phụ (80g)",
+   "Thịt heo ba chỉ (50g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Mắm tôm (15g)"
+  ],
+  "calories": 423,
+  "protein": 26.3,
+  "fat": 18.0,
+  "carbs": 39.3,
+  "fiber": 1.1,
+  "calcium": 64,
+  "iron": 3.8
+ },
+ {
+  "id": "vn-113",
+  "name": "Bún Thịt Nướng",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 290,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Thịt heo ba chỉ (80g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Giá đỗ (30g)",
+   "Nước mắm (15g)"
+  ],
+  "calories": 477,
+  "protein": 22.2,
+  "fat": 24.2,
+  "carbs": 43.0,
+  "fiber": 1.7,
+  "calcium": 50,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-114",
+  "name": "Bún Hải Sản",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 440,
+  "ingredients": [
+   "Bún tươi (150g)",
+   "Tôm tươi (40g)",
+   "Mực tươi (40g)",
+   "Cà chua (30g)",
+   "Nước dùng gà (180g)"
+  ],
+  "calories": 272,
+  "protein": 19.0,
+  "fat": 3.2,
+  "carbs": 41.1,
+  "fiber": 1.0,
+  "calcium": 77,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-115",
+  "name": "Hủ Tiếu Nam Vang",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 435,
+  "ingredients": [
+   "Bún tươi (140g)",
+   "Thịt heo nạc (40g)",
+   "Tôm tươi (30g)",
+   "Trứng gà (25g)",
+   "Nước dùng xương heo (200g)"
+  ],
+  "calories": 327,
+  "protein": 21.8,
+  "fat": 10.0,
+  "carbs": 37.6,
+  "fiber": 0.7,
+  "calcium": 81,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-116",
+  "name": "Hủ Tiếu Mì Sa Tế",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 410,
+  "ingredients": [
+   "Bún tươi (140g)",
+   "Thịt bò nạc (60g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Nước dùng xương bò (180g)"
+  ],
+  "calories": 280,
+  "protein": 20.1,
+  "fat": 5.3,
+  "carbs": 38.3,
+  "fiber": 0.9,
+  "calcium": 64,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-117",
+  "name": "Bánh Cánh Cua Tôm",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 390,
+  "ingredients": [
+   "Bột lọc / Bột năng (120g)",
+   "Cua đồng (50g)",
+   "Tôm tươi (40g)",
+   "Nước dùng xương heo (180g)"
+  ],
+  "calories": 548,
+  "protein": 17.0,
+  "fat": 5.7,
+  "carbs": 105.6,
+  "fiber": 0.2,
+  "calcium": 2591,
+  "iron": 3.9
+ },
+ {
+  "id": "vn-118",
+  "name": "Bánh Cánh Chả Cát",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 370,
+  "ingredients": [
+   "Bột lọc / Bột năng (120g)",
+   "Cá lóc / Cá quả (70g)",
+   "Nước dùng xương heo (180g)"
+  ],
+  "calories": 538,
+  "protein": 16.6,
+  "fat": 5.6,
+  "carbs": 104.3,
+  "fiber": 0.2,
+  "calcium": 103,
+  "iron": 1.8
+ },
+ {
+  "id": "vn-119",
+  "name": "Mì Quảng Gà",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 360,
+  "ingredients": [
+   "Bánh phở tươi (140g)",
+   "Thịt gà ta (80g)",
+   "Trứng gà (25g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Nước dùng gà (100g)"
+  ],
+  "calories": 465,
+  "protein": 29.8,
+  "fat": 21.7,
+  "carbs": 36.6,
+  "fiber": 1.8,
+  "calcium": 72,
+  "iron": 3.5
+ },
+ {
+  "id": "vn-120",
+  "name": "Mì Quảng Tôm Thịt",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 335,
+  "ingredients": [
+   "Bánh phở tươi (140g)",
+   "Tôm tươi (40g)",
+   "Thịt heo ba chỉ (40g)",
+   "Lạc hạt / Đậu phụng (15g)",
+   "Nước dùng xương heo (100g)"
+  ],
+  "calories": 412,
+  "protein": 24.6,
+  "fat": 18.3,
+  "carbs": 36.9,
+  "fiber": 1.8,
+  "calcium": 85,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-121",
+  "name": "Cao Lầu Hội An",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 260,
+  "ingredients": [
+   "Bún tươi (140g)",
+   "Thịt heo nạc (70g)",
+   "Giá đỗ (30g)",
+   "Rau thơm & Hành lá (20g)"
+  ],
+  "calories": 270,
+  "protein": 17.7,
+  "fat": 5.3,
+  "carbs": 38.6,
+  "fiber": 1.6,
+  "calcium": 45,
+  "iron": 1.9
+ },
+ {
+  "id": "vn-122",
+  "name": "Miến Gà Ta",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 420,
+  "ingredients": [
+   "Miến dong (100g)",
+   "Thịt gà ta (80g)",
+   "Măng tươi / Măng chua (40g)",
+   "Nước dùng gà (200g)"
+  ],
+  "calories": 540,
+  "protein": 20.6,
+  "fat": 13.2,
+  "carbs": 83.7,
+  "fiber": 1.0,
+  "calcium": 63,
+  "iron": 3.3
+ },
+ {
+  "id": "vn-123",
+  "name": "Miến Lươn Đồng",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 390,
+  "ingredients": [
+   "Miến dong (100g)",
+   "Cá lóc / Cá quả (70g)",
+   "Rau thơm & Hành lá (20g)",
+   "Nước dùng xương heo (200g)"
+  ],
+  "calories": 460,
+  "protein": 17.4,
+  "fat": 6.2,
+  "carbs": 84.3,
+  "fiber": 0.9,
+  "calcium": 127,
+  "iron": 3.0
+ },
+ {
+  "id": "vn-124",
+  "name": "Miến Xào Cua",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 210,
+  "ingredients": [
+   "Miến dong (100g)",
+   "Cua đồng (60g)",
+   "Giá đỗ (40g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 491,
+  "protein": 10.2,
+  "fat": 12.2,
+  "carbs": 85.3,
+  "fiber": 1.4,
+  "calcium": 3067,
+  "iron": 4.9
+ },
+ {
+  "id": "vn-125",
+  "name": "Bánh Mì Patê Thịt Đỏ",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 220,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Thịt heo ba chỉ (50g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 443,
+  "protein": 21.1,
+  "fat": 14.0,
+  "carbs": 58.2,
+  "fiber": 2.6,
+  "calcium": 59,
+  "iron": 3.1
+ },
+ {
+  "id": "vn-126",
+  "name": "Bánh Mì Thịt Nướng",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 210,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Thịt heo nạc (70g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 370,
+  "protein": 21.6,
+  "fat": 5.8,
+  "carbs": 58.0,
+  "fiber": 2.6,
+  "calcium": 55,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-127",
+  "name": "Bánh Mì Xíu Mại",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 210,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Thịt heo nạc (70g)",
+   "Cà chua (30g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 371,
+  "protein": 21.6,
+  "fat": 5.8,
+  "carbs": 58.4,
+  "fiber": 2.6,
+  "calcium": 52,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-128",
+  "name": "Bánh Mì Bò Né",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 240,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Thịt bò nạc (80g)",
+   "Trứng gà (50g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 530,
+  "protein": 32.2,
+  "fat": 19.2,
+  "carbs": 56.9,
+  "fiber": 2.2,
+  "calcium": 83,
+  "iron": 4.5
+ },
+ {
+  "id": "vn-129",
+  "name": "Bánh Mì Cơm Chà Bông",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 155,
+  "ingredients": [
+   "Bánh mì (100g)",
+   "Chả lụa / Giò lụa (50g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 378,
+  "protein": 15.5,
+  "fat": 9.8,
+  "carbs": 56.9,
+  "fiber": 2.2,
+  "calcium": 44,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-130",
+  "name": "Bánh Xèo Tôm Thịt",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 225,
+  "ingredients": [
+   "Vỏ bánh xèo (100g)",
+   "Thịt heo ba chỉ (40g)",
+   "Tôm tươi (30g)",
+   "Giá đỗ (40g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 461,
+  "protein": 17.0,
+  "fat": 26.4,
+  "carbs": 38.4,
+  "fiber": 2.0,
+  "calcium": 68,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-131",
+  "name": "Bánh Khọt Tôm Nhảy",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 160,
+  "ingredients": [
+   "Vỏ bánh xèo (90g)",
+   "Tôm tươi (50g)",
+   "Rau thơm & Hành lá (10g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 296,
+  "protein": 11.7,
+  "fat": 12.7,
+  "carbs": 33.4,
+  "fiber": 1.2,
+  "calcium": 68,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-132",
+  "name": "Bánh Cuốn Nhân Thịt",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 240,
+  "ingredients": [
+   "Vỏ bánh cuốn (120g)",
+   "Thịt heo nạc (50g)",
+   "Nấm hương tươi (20g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Giá đỗ (20g)"
+  ],
+  "calories": 270,
+  "protein": 18.0,
+  "fat": 6.6,
+  "carbs": 34.7,
+  "fiber": 1.5,
+  "calcium": 37,
+  "iron": 2.0
+ },
+ {
+  "id": "vn-133",
+  "name": "Bánh Bèo Nhân Tôm Thịt",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 155,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Tôm tươi (30g)",
+   "Thịt heo nạc (20g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 447,
+  "protein": 9.6,
+  "fat": 6.8,
+  "carbs": 86.3,
+  "fiber": 0.2,
+  "calcium": 40,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-134",
+  "name": "Bánh Lọc Nhân Tôm Thịt",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 170,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Tôm tươi (40g)",
+   "Thịt heo ba chỉ (30g)"
+  ],
+  "calories": 461,
+  "protein": 12.5,
+  "fat": 6.9,
+  "carbs": 86.4,
+  "fiber": 0.2,
+  "calcium": 49,
+  "iron": 1.3
+ },
+ {
+  "id": "vn-135",
+  "name": "Bánh Nậm Nhân Tôm Thịt",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 140,
+  "ingredients": [
+   "Bột lọc / Bột năng (90g)",
+   "Tôm tươi (30g)",
+   "Thịt heo nạc (20g)"
+  ],
+  "calories": 367,
+  "protein": 9.5,
+  "fat": 1.8,
+  "carbs": 77.7,
+  "fiber": 0.2,
+  "calcium": 39,
+  "iron": 0.9
+ },
+ {
+  "id": "vn-136",
+  "name": "Bánh Bắp Nhân Thịt",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 140,
+  "ingredients": [
+   "Bột lọc / Bột năng (90g)",
+   "Thịt heo nạc (40g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 374,
+  "protein": 8.2,
+  "fat": 2.9,
+  "carbs": 77.9,
+  "fiber": 0.3,
+  "calcium": 22,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-137",
+  "name": "Bánh Đúc Nóng Thịt Băm",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 195,
+  "ingredients": [
+   "Bánh phở tươi (120g)",
+   "Thịt heo nạc (50g)",
+   "Nấm hương tươi (20g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 259,
+  "protein": 14.3,
+  "fat": 9.1,
+  "carbs": 29.8,
+  "fiber": 1.7,
+  "calcium": 31,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-138",
+  "name": "Bánh Giò Nhân Thịt Trứng Cút",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 185,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Thịt heo nạc (50g)",
+   "Trứng gà (20g)",
+   "Nấm hương tươi (15g)"
+  ],
+  "calories": 454,
+  "protein": 12.7,
+  "fat": 5.8,
+  "carbs": 86.9,
+  "fiber": 0.6,
+  "calcium": 32,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-139",
+  "name": "Cơm Tấm Sườn Nướng",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 310,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt heo ba chỉ (90g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Nước mắm (10g)"
+  ],
+  "calories": 476,
+  "protein": 20.5,
+  "fat": 19.9,
+  "carbs": 52.0,
+  "fiber": 0.9,
+  "calcium": 35,
+  "iron": 3.0
+ },
+ {
+  "id": "vn-140",
+  "name": "Cơm Tấm Sườn Chả Trứng",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 350,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt heo ba chỉ (70g)",
+   "Trứng gà (40g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Dưa leo / Dưa chuột (30g)"
+  ],
+  "calories": 520,
+  "protein": 25.9,
+  "fat": 22.3,
+  "carbs": 52.0,
+  "fiber": 0.9,
+  "calcium": 58,
+  "iron": 4.0
+ },
+ {
+  "id": "vn-141",
+  "name": "Cơm Gà Xối Mỡ",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 345,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt gà ta (120g)",
+   "Dầu ăn (15g)",
+   "Dưa leo / Dưa chuột (30g)"
+  ],
+  "calories": 612,
+  "protein": 29.5,
+  "fat": 31.2,
+  "carbs": 51.7,
+  "fiber": 0.9,
+  "calcium": 39,
+  "iron": 3.3
+ },
+ {
+  "id": "vn-142",
+  "name": "Cơm Gà Hội An",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 305,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt gà ta (80g)",
+   "Củ hành tây (30g)",
+   "Rau thơm & Hành lá (15g)"
+  ],
+  "calories": 410,
+  "protein": 21.7,
+  "fat": 11.1,
+  "carbs": 54.4,
+  "fiber": 1.5,
+  "calcium": 44,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-143",
+  "name": "Cơm Chiên Cua Hải Sản",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 285,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Cua đồng (40g)",
+   "Tôm tươi (30g)",
+   "Trứng gà (25g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 421,
+  "protein": 18.0,
+  "fat": 14.8,
+  "carbs": 52.0,
+  "fiber": 0.7,
+  "calcium": 2071,
+  "iron": 4.3
+ },
+ {
+  "id": "vn-144",
+  "name": "Cơm Chiên Mắm Ruốc",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 255,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt heo ba chỉ (40g)",
+   "Trứng gà (25g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 465,
+  "protein": 14.4,
+  "fat": 21.8,
+  "carbs": 50.9,
+  "fiber": 0.7,
+  "calcium": 35,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-145",
+  "name": "Cơm Sườn Bò Nướng",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 310,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt bò nạc (100g)",
+   "Dưa leo / Dưa chuột (30g)"
+  ],
+  "calories": 366,
+  "protein": 28.2,
+  "fat": 4.5,
+  "carbs": 51.7,
+  "fiber": 0.9,
+  "calcium": 48,
+  "iron": 3.2
+ },
+ {
+  "id": "vn-146",
+  "name": "Cơm Rang Dưa Bò",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 300,
+  "ingredients": [
+   "Cơm trắng (180g)",
+   "Thịt bò nạc (60g)",
+   "Dưa cải muối (50g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 409,
+  "protein": 19.3,
+  "fat": 13.0,
+  "carbs": 52.3,
+  "fiber": 1.3,
+  "calcium": 57,
+  "iron": 3.1
+ },
+ {
+  "id": "vn-147",
+  "name": "Xôi Mặn Thập Cẩm",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 250,
+  "ingredients": [
+   "Xôi nếp (160g)",
+   "Chả lụa / Giò lụa (30g)",
+   "Thịt heo ba chỉ (30g)",
+   "Trứng gà (25g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 537,
+  "protein": 19.1,
+  "fat": 17.5,
+  "carbs": 75.2,
+  "fiber": 1.4,
+  "calcium": 47,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-148",
+  "name": "Xôi Gà Xé",
+  "vegetarian": false,
+  "group": "Món cơm/xôi",
+  "servingGrams": 245,
+  "ingredients": [
+   "Xôi nếp (160g)",
+   "Thịt gà ta (60g)",
+   "Củ hành tây (20g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 508,
+  "protein": 19.1,
+  "fat": 13.8,
+  "carbs": 76.7,
+  "fiber": 1.8,
+  "calcium": 37,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-149",
+  "name": "Thịt Kho Tàu Trứng Vịt",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Thịt heo ba chỉ (120g)",
+   "Trứng gà (50g)",
+   "Đường kính (10g)",
+   "Nước mắm (10g)"
+  ],
+  "calories": 429,
+  "protein": 26.1,
+  "fat": 31.1,
+  "carbs": 10.5,
+  "fiber": 0.0,
+  "calcium": 41,
+  "iron": 3.3
+ },
+ {
+  "id": "vn-150",
+  "name": "Thịt Luộc Chấm Mắm Tôm",
+  "vegetarian": false,
+  "group": "Món luộc",
+  "servingGrams": 185,
+  "ingredients": [
+   "Thịt heo ba chỉ (140g)",
+   "Mắm tôm (15g)",
+   "Dưa leo / Dưa chuột (30g)"
+  ],
+  "calories": 379,
+  "protein": 25.6,
+  "fat": 30.4,
+  "carbs": 0.9,
+  "fiber": 0.2,
+  "calcium": 38,
+  "iron": 2.6
+ },
+ {
+  "id": "vn-151",
+  "name": "Thịt Bò Xào Cần Tây",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 170,
+  "ingredients": [
+   "Thịt bò nạc (120g)",
+   "Củ hành tây (40g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 258,
+  "protein": 28.2,
+  "fat": 14.7,
+  "carbs": 3.7,
+  "fiber": 0.7,
+  "calcium": 37,
+  "iron": 2.0
+ },
+ {
+  "id": "vn-152",
+  "name": "Thịt Bò Bơ Tỏi",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 165,
+  "ingredients": [
+   "Thịt bò nạc (130g)",
+   "Dầu ăn (15g)",
+   "Củ hành tây (20g)"
+  ],
+  "calories": 308,
+  "protein": 30.2,
+  "fat": 20.0,
+  "carbs": 1.9,
+  "fiber": 0.3,
+  "calcium": 34,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-153",
+  "name": "Thịt Bò Sốt Vang ăn Bánh Mì",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 270,
+  "ingredients": [
+   "Thịt bò nạc (120g)",
+   "Cà chua (40g)",
+   "Củ hành tây (30g)",
+   "Bánh mì (80g)"
+  ],
+  "calories": 384,
+  "protein": 34.6,
+  "fat": 5.4,
+  "carbs": 49.8,
+  "fiber": 2.6,
+  "calcium": 69,
+  "iron": 3.6
+ },
+ {
+  "id": "vn-154",
+  "name": "Cá Lóc Kho Tộ",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 200,
+  "ingredients": [
+   "Cá lóc / Cá quả (150g)",
+   "Thịt heo ba chỉ (30g)",
+   "Đường kính (10g)",
+   "Nước mắm (10g)"
+  ],
+  "calories": 267,
+  "protein": 32.8,
+  "fat": 10.5,
+  "carbs": 10.3,
+  "fiber": 0.0,
+  "calcium": 140,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-155",
+  "name": "Cá Thu Sốt Cà Chua",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 210,
+  "ingredients": [
+   "Cá hố / Cá thu (140g)",
+   "Cà chua (60g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 269,
+  "protein": 27.7,
+  "fat": 16.8,
+  "carbs": 2.5,
+  "fiber": 0.5,
+  "calcium": 70,
+  "iron": 1.9
+ },
+ {
+  "id": "vn-156",
+  "name": "Cá Chiên Giòn Mắm Tỏi",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 175,
+  "ingredients": [
+   "Cá lóc / Cá quả (150g)",
+   "Dầu ăn (15g)",
+   "Nước mắm (10g)"
+  ],
+  "calories": 284,
+  "protein": 27.8,
+  "fat": 19.0,
+  "carbs": 0.4,
+  "fiber": 0.0,
+  "calcium": 137,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-157",
+  "name": "Tôm Rim Mặn Sweet",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 165,
+  "ingredients": [
+   "Tôm tươi (140g)",
+   "Đường kính (10g)",
+   "Nước mắm (10g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 203,
+  "protein": 25.2,
+  "fat": 6.2,
+  "carbs": 11.5,
+  "fiber": 0.0,
+  "calcium": 113,
+  "iron": 1.4
+ },
+ {
+  "id": "vn-158",
+  "name": "Tôm Hấp Sả Dừa",
+  "vegetarian": false,
+  "group": "Món luộc",
+  "servingGrams": 160,
+  "ingredients": [
+   "Tôm tươi (150g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 126,
+  "protein": 26.6,
+  "fat": 1.4,
+  "carbs": 1.9,
+  "fiber": 0.1,
+  "calcium": 124,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-159",
+  "name": "Mực Xào Sa Tế",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Mực tươi (140g)",
+   "Củ hành tây (40g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 208,
+  "protein": 23.3,
+  "fat": 11.3,
+  "carbs": 3.7,
+  "fiber": 0.7,
+  "calcium": 29,
+  "iron": 0.9
+ },
+ {
+  "id": "vn-160",
+  "name": "Mực Hấp Gừng",
+  "vegetarian": false,
+  "group": "Món luộc",
+  "servingGrams": 160,
+  "ingredients": [
+   "Mực tươi (150g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 112,
+  "protein": 24.6,
+  "fat": 1.4,
+  "carbs": 0.5,
+  "fiber": 0.1,
+  "calcium": 27,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-161",
+  "name": "Gà Rán Nước Mắm",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 183,
+  "ingredients": [
+   "Thịt gà ta (150g)",
+   "Dầu ăn (15g)",
+   "Nước mắm (10g)",
+   "Đường kính (8g)"
+  ],
+  "calories": 468,
+  "protein": 31.0,
+  "fat": 34.6,
+  "carbs": 8.3,
+  "fiber": 0.0,
+  "calcium": 20,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-162",
+  "name": "Gà Luộc Lá Chanh",
+  "vegetarian": false,
+  "group": "Món luộc",
+  "servingGrams": 170,
+  "ingredients": [
+   "Thịt gà ta (160g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 321,
+  "protein": 32.7,
+  "fat": 21.0,
+  "carbs": 0.5,
+  "fiber": 0.1,
+  "calcium": 25,
+  "iron": 2.5
+ },
+ {
+  "id": "vn-163",
+  "name": "Gà Kho Gừng",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 165,
+  "ingredients": [
+   "Thịt gà ta (150g)",
+   "Nước mắm (10g)",
+   "Đường kính (5g)"
+  ],
+  "calories": 322,
+  "protein": 31.0,
+  "fat": 19.6,
+  "carbs": 5.3,
+  "fiber": 0.0,
+  "calcium": 20,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-164",
+  "name": "Vịt Quay Mắc Mật",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 175,
+  "ingredients": [
+   "Thịt vịt (160g)",
+   "Dầu ăn (10g)",
+   "Đường kính (5g)"
+  ],
+  "calories": 537,
+  "protein": 28.5,
+  "fat": 44.9,
+  "carbs": 5.0,
+  "fiber": 0.0,
+  "calcium": 24,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-165",
+  "name": "Vịt Om Sấu",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 290,
+  "ingredients": [
+   "Thịt vịt (150g)",
+   "Khoai môn / Khoai lệ phố (40g)",
+   "Nước dùng xương heo (100g)"
+  ],
+  "calories": 472,
+  "protein": 29.1,
+  "fat": 34.8,
+  "carbs": 10.8,
+  "fiber": 0.5,
+  "calcium": 46,
+  "iron": 3.3
+ },
+ {
+  "id": "vn-166",
+  "name": "Chả Lụa Kẹp Bánh Dày",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 160,
+  "ingredients": [
+   "Chả lụa / Giò lụa (60g)",
+   "Xôi nếp (100g)"
+  ],
+  "calories": 292,
+  "protein": 13.3,
+  "fat": 5.5,
+  "carbs": 47.2,
+  "fiber": 0.9,
+  "calcium": 25,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-167",
+  "name": "Chả Lá Lốt Thịt Bò",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 150,
+  "ingredients": [
+   "Thịt bò nạc (110g)",
+   "Thịt heo ba chỉ (30g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 307,
+  "protein": 30.4,
+  "fat": 20.7,
+  "carbs": 0.0,
+  "fiber": 0.0,
+  "calcium": 28,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-168",
+  "name": "Chả Giò (Nem Ran) Mặn",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 135,
+  "ingredients": [
+   "Thịt heo nạc (50g)",
+   "Tôm tươi (30g)",
+   "Miến dong (20g)",
+   "Trứng gà (20g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 324,
+  "protein": 17.2,
+  "fat": 20.9,
+  "carbs": 16.8,
+  "fiber": 0.1,
+  "calcium": 44,
+  "iron": 1.6
+ },
+ {
+  "id": "vn-169",
+  "name": "Sườn Xào Chua Ngọt",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 190,
+  "ingredients": [
+   "Thịt heo ba chỉ (140g)",
+   "Cà chua (30g)",
+   "Đường kính (10g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 499,
+  "protein": 23.3,
+  "fat": 40.1,
+  "carbs": 11.2,
+  "fiber": 0.2,
+  "calcium": 16,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-170",
+  "name": "Rau Muống Xào Thịt Bò",
+  "vegetarian": false,
+  "group": "Món kho/xào",
+  "servingGrams": 210,
+  "ingredients": [
+   "Rau muống (140g)",
+   "Thịt bò nạc (60g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 198,
+  "protein": 18.3,
+  "fat": 12.9,
+  "carbs": 2.9,
+  "fiber": 1.4,
+  "calcium": 154,
+  "iron": 2.9
+ },
+ {
+  "id": "vn-171",
+  "name": "Khổ Qua Nhồi Thịt",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 345,
+  "ingredients": [
+   "Mướp đắng (Khổ qua) (120g)",
+   "Thịt heo nạc (60g)",
+   "Nấm hương tươi (15g)",
+   "Nước dùng xương heo (150g)"
+  ],
+  "calories": 151,
+  "protein": 15.5,
+  "fat": 7.4,
+  "carbs": 5.4,
+  "fiber": 1.6,
+  "calcium": 46,
+  "iron": 1.9
+ },
+ {
+  "id": "vn-172",
+  "name": "Canh Chua Cá Lóc",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 350,
+  "ingredients": [
+   "Cá lóc / Cá quả (100g)",
+   "Cà chua (40g)",
+   "Giá đỗ (30g)",
+   "Bầu / Bí đao (30g)",
+   "Nước dùng xương heo (150g)"
+  ],
+  "calories": 164,
+  "protein": 22.9,
+  "fat": 5.9,
+  "carbs": 5.0,
+  "fiber": 1.1,
+  "calcium": 130,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-173",
+  "name": "Canh Cua Mồng Tơi",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 310,
+  "ingredients": [
+   "Cua đồng (60g)",
+   "Rau muống (100g)",
+   "Nước dùng xương heo (150g)"
+  ],
+  "calories": 118,
+  "protein": 13.3,
+  "fat": 5.4,
+  "carbs": 4.2,
+  "fiber": 1.0,
+  "calcium": 3142,
+  "iron": 4.7
+ },
+ {
+  "id": "vn-174",
+  "name": "Canh Sườn Nấu Củ Cải",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 310,
+  "ingredients": [
+   "Thịt heo ba chỉ (80g)",
+   "Củ cải trắng (80g)",
+   "Nước dùng xương heo (150g)"
+  ],
+  "calories": 264,
+  "protein": 16.5,
+  "fat": 20.3,
+  "carbs": 3.9,
+  "fiber": 0.6,
+  "calcium": 49,
+  "iron": 2.0
+ },
+ {
+  "id": "vn-175",
+  "name": "Canh Ngao Nấu Mồng Tơi",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 310,
+  "ingredients": [
+   "Tôm tươi (60g)",
+   "Rau muống (100g)",
+   "Nước dùng gà (150g)"
+  ],
+  "calories": 105,
+  "protein": 16.0,
+  "fat": 2.7,
+  "carbs": 3.4,
+  "fiber": 1.0,
+  "calcium": 162,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-176",
+  "name": "Canh Gà Nấu Lá Giang",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 290,
+  "ingredients": [
+   "Thịt gà ta (100g)",
+   "Rau muống (40g)",
+   "Nước dùng gà (150g)"
+  ],
+  "calories": 241,
+  "protein": 23.8,
+  "fat": 15.1,
+  "carbs": 1.6,
+  "fiber": 0.4,
+  "calcium": 67,
+  "iron": 2.4
+ },
+ {
+  "id": "vn-177",
+  "name": "Lẩu Bò Thập Cẩm",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 480,
+  "ingredients": [
+   "Thịt bò nạc (80g)",
+   "Chả lụa / Giò lụa (40g)",
+   "Rau muống (60g)",
+   "Bún tươi (100g)",
+   "Nước dùng xương bò (200g)"
+  ],
+  "calories": 330,
+  "protein": 32.2,
+  "fat": 9.8,
+  "carbs": 28.8,
+  "fiber": 1.1,
+  "calcium": 126,
+  "iron": 3.6
+ },
+ {
+  "id": "vn-178",
+  "name": "Lẩu Gà Lá É",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 440,
+  "ingredients": [
+   "Thịt gà ta (100g)",
+   "Nấm đùi gà (40g)",
+   "Bún tươi (100g)",
+   "Nước dùng gà (200g)"
+  ],
+  "calories": 367,
+  "protein": 26.0,
+  "fat": 15.8,
+  "carbs": 29.1,
+  "fiber": 1.4,
+  "calcium": 50,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-179",
+  "name": "Lẩu Hải Sản Chua Cay",
+  "vegetarian": false,
+  "group": "Món canh/lẩu",
+  "servingGrams": 440,
+  "ingredients": [
+   "Tôm tươi (50g)",
+   "Mực tươi (50g)",
+   "Cá lóc / Cá quả (40g)",
+   "Bún tươi (100g)",
+   "Nước dùng xương heo (200g)"
+  ],
+  "calories": 282,
+  "protein": 29.5,
+  "fat": 6.2,
+  "carbs": 27.3,
+  "fiber": 0.5,
+  "calcium": 118,
+  "iron": 2.1
+ },
+ {
+  "id": "vn-180",
+  "name": "Gỏi Tôm Thịt Ngó Sen",
+  "vegetarian": false,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 165,
+  "ingredients": [
+   "Tôm tươi (50g)",
+   "Thịt heo ba chỉ (40g)",
+   "Măng tươi / Măng chua (60g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 240,
+  "protein": 20.5,
+  "fat": 15.9,
+  "carbs": 3.8,
+  "fiber": 1.0,
+  "calcium": 62,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-181",
+  "name": "Gỏi Gà Bắp Cải",
+  "vegetarian": false,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 195,
+  "ingredients": [
+   "Thịt gà ta (80g)",
+   "Bắp cải (80g)",
+   "Củ hành tây (20g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 273,
+  "protein": 21.6,
+  "fat": 17.3,
+  "carbs": 8.8,
+  "fiber": 2.7,
+  "calcium": 56,
+  "iron": 2.0
+ },
+ {
+  "id": "vn-182",
+  "name": "Gỏi Bò Bóp Thấu",
+  "vegetarian": false,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 175,
+  "ingredients": [
+   "Thịt bò nạc (90g)",
+   "Củ hành tây (40g)",
+   "Dưa leo / Dưa chuột (30g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 221,
+  "protein": 25.6,
+  "fat": 10.3,
+  "carbs": 6.9,
+  "fiber": 1.3,
+  "calcium": 47,
+  "iron": 2.0
+ },
+ {
+  "id": "vn-183",
+  "name": "Nộm Giá Đỗ Thịt Bò",
+  "vegetarian": false,
+  "group": "Món gỏi/nộm",
+  "servingGrams": 175,
+  "ingredients": [
+   "Giá đỗ (100g)",
+   "Thịt bò nạc (60g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 206,
+  "protein": 23.3,
+  "fat": 9.2,
+  "carbs": 7.6,
+  "fiber": 2.4,
+  "calcium": 62,
+  "iron": 2.7
+ },
+ {
+  "id": "vn-184",
+  "name": "Trứng Chiên Thịt Băm",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 130,
+  "ingredients": [
+   "Trứng gà (80g)",
+   "Thịt heo nạc (40g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 264,
+  "protein": 16.9,
+  "fat": 21.2,
+  "carbs": 0.4,
+  "fiber": 0.0,
+  "calcium": 47,
+  "iron": 2.6
+ },
+ {
+  "id": "vn-185",
+  "name": "Trứng Cuộn Bác",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 120,
+  "ingredients": [
+   "Trứng gà (100g)",
+   "Rau thơm & Hành lá (10g)",
+   "Dầu ăn (10g)"
+  ],
+  "calories": 241,
+  "protein": 11.8,
+  "fat": 20.6,
+  "carbs": 1.0,
+  "fiber": 0.1,
+  "calcium": 61,
+  "iron": 2.8
+ },
+ {
+  "id": "vn-186",
+  "name": "Trứng Vịt Lộn Luộc Rau Ram",
+  "vegetarian": false,
+  "group": "Món luộc",
+  "servingGrams": 130,
+  "ingredients": [
+   "Trứng vịt lộn (120g)",
+   "Rau thơm & Hành lá (10g)"
+  ],
+  "calories": 221,
+  "protein": 16.5,
+  "fat": 14.9,
+  "carbs": 5.3,
+  "fiber": 0.1,
+  "calcium": 104,
+  "iron": 4.0
+ },
+ {
+  "id": "vn-187",
+  "name": "Bánh Bao Nhân Thịt Trứng Cút",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 180,
+  "ingredients": [
+   "Vỏ bánh bao (110g)",
+   "Thịt heo nạc (50g)",
+   "Trứng gà (20g)"
+  ],
+  "calories": 341,
+  "protein": 19.0,
+  "fat": 6.9,
+  "carbs": 49.6,
+  "fiber": 1.1,
+  "calcium": 39,
+  "iron": 2.2
+ },
+ {
+  "id": "vn-188",
+  "name": "Bánh Giò Hà Nội",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 160,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Thịt heo nạc (40g)",
+   "Củ cải trắng (20g)"
+  ],
+  "calories": 409,
+  "protein": 8.3,
+  "fat": 2.9,
+  "carbs": 86.7,
+  "fiber": 0.4,
+  "calcium": 24,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-189",
+  "name": "Chè Bơ Nước Dừa",
+  "vegetarian": false,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 160,
+  "ingredients": [
+   "Khoai lang luộc (100g)",
+   "Rau câu / Thạch (40g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 214,
+  "protein": 1.0,
+  "fat": 0.2,
+  "carbs": 52.2,
+  "fiber": 1.5,
+  "calcium": 34,
+  "iron": 0.7
+ },
+ {
+  "id": "vn-190",
+  "name": "Chè Khúc Bạch",
+  "vegetarian": false,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 140,
+  "ingredients": [
+   "Rau câu / Thạch (100g)",
+   "Lạc hạt / Đậu phụng (20g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 234,
+  "protein": 6.0,
+  "fat": 9.0,
+  "carbs": 32.5,
+  "fiber": 1.0,
+  "calcium": 24,
+  "iron": 0.6
+ },
+ {
+  "id": "vn-191",
+  "name": "Chè Sương Sa Hạt Lựu Mặn",
+  "vegetarian": false,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 150,
+  "ingredients": [
+   "Rau câu / Thạch (100g)",
+   "Bột lọc / Bột năng (30g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 224,
+  "protein": 0.7,
+  "fat": 0.1,
+  "carbs": 55.2,
+  "fiber": 0.6,
+  "calcium": 14,
+  "iron": 0.3
+ },
+ {
+  "id": "vn-192",
+  "name": "Chè Long Nhãn Hạt Sen",
+  "vegetarian": false,
+  "group": "Món tráng miệng/chè",
+  "servingGrams": 125,
+  "ingredients": [
+   "Chè đậu xanh (100g)",
+   "Đường kính (25g)"
+  ],
+  "calories": 239,
+  "protein": 4.2,
+  "fat": 0.8,
+  "carbs": 53.8,
+  "fiber": 2.1,
+  "calcium": 25,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-193",
+  "name": "Bánh Chuối Nếp Nướng",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 195,
+  "ingredients": [
+   "Xôi nếp (120g)",
+   "Khoai lang luộc (60g)",
+   "Lạc hạt / Đậu phụng (15g)"
+  ],
+  "calories": 409,
+  "protein": 9.6,
+  "fat": 7.5,
+  "carbs": 75.6,
+  "fiber": 2.2,
+  "calcium": 47,
+  "iron": 1.8
+ },
+ {
+  "id": "vn-194",
+  "name": "Bánh Da Lợn",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 140,
+  "ingredients": [
+   "Bột lọc / Bột năng (80g)",
+   "Chè đậu xanh (40g)",
+   "Đường kính (20g)"
+  ],
+  "calories": 415,
+  "protein": 2.1,
+  "fat": 0.4,
+  "carbs": 100.3,
+  "fiber": 1.0,
+  "calcium": 22,
+  "iron": 1.0
+ },
+ {
+  "id": "vn-195",
+  "name": "Bánh Bột Lọc Trần Huế",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 170,
+  "ingredients": [
+   "Bột lọc / Bột năng (100g)",
+   "Tôm tươi (40g)",
+   "Thịt heo ba chỉ (30g)"
+  ],
+  "calories": 461,
+  "protein": 12.5,
+  "fat": 6.9,
+  "carbs": 86.4,
+  "fiber": 0.2,
+  "calcium": 49,
+  "iron": 1.3
+ },
+ {
+  "id": "vn-196",
+  "name": "Bánh Đúc Thịt Băm Nóng",
+  "vegetarian": false,
+  "group": "Món bánh",
+  "servingGrams": 175,
+  "ingredients": [
+   "Bánh phở tươi (120g)",
+   "Thịt heo nạc (50g)",
+   "Dầu ăn (5g)"
+  ],
+  "calories": 252,
+  "protein": 13.8,
+  "fat": 9.1,
+  "carbs": 28.8,
+  "fiber": 1.2,
+  "calcium": 28,
+  "iron": 1.5
+ },
+ {
+  "id": "vn-197",
+  "name": "Súp Cua Gà Xé",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 275,
+  "ingredients": [
+   "Cua đồng (40g)",
+   "Thịt gà ta (40g)",
+   "Trứng gà (25g)",
+   "Bột lọc / Bột năng (20g)",
+   "Nước dùng gà (150g)"
+  ],
+  "calories": 255,
+  "protein": 18.3,
+  "fat": 11.0,
+  "carbs": 18.9,
+  "fiber": 0.0,
+  "calcium": 2053,
+  "iron": 3.6
+ },
+ {
+  "id": "vn-198",
+  "name": "Súp Hải Sản Tóc Tiên",
+  "vegetarian": false,
+  "group": "Món nước",
+  "servingGrams": 255,
+  "ingredients": [
+   "Tôm tươi (30g)",
+   "Mực tươi (30g)",
+   "Trứng gà (25g)",
+   "Bột lọc / Bột năng (20g)",
+   "Nước dùng xương heo (150g)"
+  ],
+  "calories": 196,
+  "protein": 15.9,
+  "fat": 6.2,
+  "carbs": 18.5,
+  "fiber": 0.0,
+  "calcium": 63,
+  "iron": 1.7
+ },
+ {
+  "id": "vn-199",
+  "name": "Chả Mực Hạ Long",
+  "vegetarian": false,
+  "group": "Món chiên/nướng",
+  "servingGrams": 175,
+  "ingredients": [
+   "Mực tươi (130g)",
+   "Thịt heo ba chỉ (30g)",
+   "Dầu ăn (15g)"
+  ],
+  "calories": 307,
+  "protein": 26.1,
+  "fat": 22.6,
+  "carbs": 0.0,
+  "fiber": 0.0,
+  "calcium": 21,
+  "iron": 1.2
+ }
+]
