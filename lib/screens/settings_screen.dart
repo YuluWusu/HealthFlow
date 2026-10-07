@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../data/auth_repository.dart';
 import '../data/auth_scope.dart';
@@ -10,6 +11,8 @@ import '../models/user.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_card.dart';
 import '../widgets/error_banner.dart';
+import 'health_goal_screen.dart';
+import 'profile_detail_screen.dart';
 
 /// Màn hình 10 trong bản thiết kế: cài đặt tài khoản.
 ///
@@ -40,7 +43,7 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
         children: [
-          _ProfileHeader(user: user, onEdit: () => _editProfile(context, user)),
+          _ProfileHeader(user: user, onEdit: () => _editDisplayName(context, user)),
           const SizedBox(height: 22),
           const _SectionLabel('Tài khoản'),
           AppCard(
@@ -51,27 +54,39 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.person_outline_rounded,
                   title: 'Thông tin cá nhân',
                   subtitle: 'Họ tên, email đăng nhập',
-                  onTap: () => _editProfile(context, user),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfileDetailScreen())),
                 ),
                 const Divider(height: 1, indent: 64),
                 SettingsTile(
                   icon: Icons.flag_outlined,
                   title: 'Mục tiêu sức khỏe',
-                  subtitle:
-                      '${user.healthGoal} · ${user.dailyCalorieGoal} kcal/ngày',
+                  subtitle: '${user.healthGoal} · ${user.dailyCalorieGoal} kcal/ngày',
                   iconColor: AppTheme.blue,
-                  onTap: () => _editHealthGoal(context, user),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const HealthGoalScreen())),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          const _SectionLabel('Quyền ứng dụng'),
+          AppCard(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              children: [
+                _SwitchTile(
+                  icon: Icons.notifications_active_outlined,
+                  title: 'Cho phép thông báo',
+                  subtitle: 'Nhắc nhở lịch tập và uống nước',
+                  iconColor: AppTheme.orange,
+                  initialValue: true,
                 ),
                 const Divider(height: 1, indent: 64),
-                SettingsTile(
-                  icon: Icons.notifications_none_rounded,
-                  title: 'Thông báo',
-                  subtitle: 'Nhắc uống nước, giờ tập, bữa ăn',
-                  iconColor: AppTheme.orange,
-                  onTap: () => _showMessage(
-                    context,
-                    'Tính năng nhắc nhở sẽ được bổ sung cùng phần thông báo đẩy.',
-                  ),
+                _SwitchTile(
+                  icon: Icons.camera_alt_outlined,
+                  title: 'Cho phép chụp camera',
+                  subtitle: 'Sử dụng máy ảnh để chụp avatar',
+                  iconColor: AppTheme.primary,
+                  initialValue: true,
                 ),
               ],
             ),
@@ -87,6 +102,7 @@ class SettingsScreen extends StatelessWidget {
                   title: 'Đổi mật khẩu',
                   subtitle: 'Cập nhật mật khẩu đăng nhập',
                   iconColor: AppTheme.purple,
+                  showChevron: false,
                   onTap: () => _changePassword(context, user),
                 ),
                 const Divider(height: 1, indent: 64),
@@ -94,6 +110,7 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.help_outline_rounded,
                   title: 'Trợ giúp & hỗ trợ',
                   iconColor: AppTheme.blue,
+                  showChevron: false,
                   onTap: () => _showHelp(context),
                 ),
               ],
@@ -106,6 +123,7 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.logout_rounded,
               title: 'Đăng xuất',
               isDestructive: true,
+              showChevron: false,
               onTap: () => _confirmLogout(context),
             ),
           ),
@@ -125,8 +143,8 @@ class SettingsScreen extends StatelessWidget {
   // Hộp thoại chỉnh sửa
   // ---------------------------------------------------------------------
 
-  /// Chỉnh họ tên và mục tiêu sức khỏe.
-  Future<void> _editProfile(BuildContext context, User user) async {
+  /// Chỉnh sửa tên hiển thị (bút chì cạnh avatar).
+  Future<void> _editDisplayName(BuildContext context, User user) async {
     final auth = AuthScope.of(context, listen: false);
     final nameController = TextEditingController(text: user.fullName);
     final controller = _DialogController();
@@ -140,7 +158,7 @@ class SettingsScreen extends StatelessWidget {
               controller.clear();
               if (nameController.text.trim().isEmpty) {
                 setDialogState(
-                  () => controller.message = 'Họ và tên không được để trống.',
+                  () => controller.message = 'Họ và tên hiển thị không được để trống.',
                 );
                 return;
               }
@@ -150,7 +168,7 @@ class SettingsScreen extends StatelessWidget {
                 action: () => auth.updateProfile(
                   fullName: nameController.text,
                 ),
-                successMessage: 'Đã cập nhật thông tin cá nhân.',
+                successMessage: 'Đã cập nhật tên hiển thị.',
               );
             }
 
@@ -158,7 +176,7 @@ class SettingsScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: const Text('Thông tin cá nhân'),
+              title: const Text('Đổi tên hiển thị'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -168,12 +186,10 @@ class SettingsScreen extends StatelessWidget {
                       controller: nameController,
                       onChanged: (_) => setDialogState(controller.clear),
                       decoration: const InputDecoration(
-                        labelText: 'Họ và tên',
+                        labelText: 'Tên hiển thị',
                         prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    _ReadOnlyField(label: 'Email', value: user.email),
                     if (controller.message != null) ...[
                       const SizedBox(height: 12),
                       ErrorBanner(message: controller.message!),
@@ -197,139 +213,6 @@ class SettingsScreen extends StatelessWidget {
     nameController.dispose();
   }
 
-  /// Chỉnh chiều cao, cân nặng và mục tiêu năng lượng mỗi ngày.
-  Future<void> _editHealthGoal(BuildContext context, User user) async {
-    final auth = AuthScope.of(context, listen: false);
-    final heightController =
-        TextEditingController(text: user.heightCm.toStringAsFixed(0));
-    final weightController = TextEditingController(text: user.weightKg.toStringAsFixed(1));
-    final goalController =
-        TextEditingController(text: user.dailyCalorieGoal.toString());
-    final controller = _DialogController();
-
-    String selectedGoal = user.healthGoal;
-    const goals = ['Giảm cân', 'Giữ dáng', 'Tăng cân', 'Tăng cơ'];
-
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            void submit() {
-              controller.clear();
-
-              final height = double.tryParse(heightController.text.trim());
-              final weight = double.tryParse(weightController.text.trim());
-              final goal = int.tryParse(goalController.text.trim());
-
-              if (height == null || height < 100 || height > 230) {
-                setDialogState(
-                  () => controller.message =
-                      'Chiều cao cần nằm trong khoảng 100 - 230 cm.',
-                );
-                return;
-              }
-              if (weight == null || weight < 25 || weight > 250) {
-                setDialogState(
-                  () => controller.message =
-                      'Cân nặng cần nằm trong khoảng 25 - 250 kg.',
-                );
-                return;
-              }
-              if (goal == null || goal < 1000 || goal > 5000) {
-                setDialogState(
-                  () => controller.message =
-                      'Mục tiêu năng lượng cần nằm trong khoảng 1000 - 5000 kcal.',
-                );
-                return;
-              }
-
-              Navigator.of(dialogContext).pop();
-              _run(
-                context,
-                action: () => auth.updateProfile(
-                  heightCm: height,
-                  weightKg: weight,
-                  dailyCalorieGoal: goal,
-                  healthGoal: selectedGoal,
-                ),
-                successMessage: 'Đã cập nhật mục tiêu sức khỏe.',
-              );
-            }
-
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: const Text('Mục tiêu sức khỏe'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedGoal,
-                      decoration: const InputDecoration(
-                        labelText: 'Mục tiêu',
-                        prefixIcon: Icon(Icons.flag_outlined, size: 20),
-                      ),
-                      items: goals
-                          .map(
-                            (goal) => DropdownMenuItem(
-                              value: goal,
-                              child: Text(goal),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setDialogState(() => selectedGoal = value);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 14),
-                    _NumberField(
-                      controller: heightController,
-                      label: 'Chiều cao (cm)',
-                      icon: Icons.height_rounded,
-                    ),
-                    const SizedBox(height: 14),
-                    _NumberField(
-                      controller: weightController,
-                      label: 'Cân nặng (kg)',
-                      icon: Icons.monitor_weight_outlined,
-                      allowDecimal: true,
-                    ),
-                    const SizedBox(height: 14),
-                    _NumberField(
-                      controller: goalController,
-                      label: 'Mục tiêu năng lượng (kcal/ngày)',
-                      icon: Icons.local_fire_department_outlined,
-                    ),
-                    if (controller.message != null) ...[
-                      const SizedBox(height: 12),
-                      ErrorBanner(message: controller.message!),
-                    ],
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Hủy'),
-                ),
-                ElevatedButton(onPressed: submit, child: const Text('Lưu')),
-              ],
-            );
-          },
-        );
-      },
-    );
-
-    heightController.dispose();
-    weightController.dispose();
-    goalController.dispose();
-  }
 
   /// Đổi mật khẩu: phải nhập đúng mật khẩu hiện tại.
   Future<void> _changePassword(BuildContext context, User user) async {
@@ -557,19 +440,9 @@ class _ProfileHeader extends StatelessWidget {
                 CircleAvatar(
                   radius: 32,
                   backgroundColor: AppTheme.lightGreen,
-                  backgroundImage: user.avatarPath != null
+                  backgroundImage: user.avatarPath != null && user.avatarPath!.isNotEmpty
                       ? FileImage(File(user.avatarPath!))
-                      : null,
-                  child: user.avatarPath == null
-                      ? Text(
-                          user.initial,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primary,
-                          ),
-                        )
-                      : null,
+                      : const AssetImage('assets/images/avatar.jpg') as ImageProvider,
                 ),
                 Positioned(
                   right: 0,
@@ -715,16 +588,19 @@ class _ProfileHeader extends StatelessWidget {
     );
   }
 
-  void _pickAvatarFromGallery(BuildContext context) {
-    // Hiện tại chưa tích hợp image_picker package.
-    // Khi tích hợp, gọi ImagePicker().pickImage(source: ImageSource.gallery)
-    // rồi truyền đường dẫn file vào auth.updateProfile(avatarPath: ...).
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Vui lòng thêm package image_picker để chọn ảnh từ thư viện.'),
-      ),
-    );
+  Future<void> _pickAvatarFromGallery(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      if (!context.mounted) return;
+      final auth = AuthScope.of(context, listen: false);
+      auth.updateProfile(avatarPath: pickedFile.path).then((_) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã cập nhật ảnh đại diện.')),
+        );
+      });
+    }
   }
 
   void _removeAvatar(BuildContext context) {
@@ -734,6 +610,56 @@ class _ProfileHeader extends StatelessWidget {
         const SnackBar(content: Text('Đã xóa ảnh đại diện.')),
       );
     });
+  }
+}
+
+class _SwitchTile extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color iconColor;
+  final bool initialValue;
+
+  const _SwitchTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.iconColor,
+    required this.initialValue,
+  });
+
+  @override
+  State<_SwitchTile> createState() => _SwitchTileState();
+}
+
+class _SwitchTileState extends State<_SwitchTile> {
+  late bool _value;
+
+  @override
+  void initState() {
+    super.initState();
+    _value = widget.initialValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsTile(
+      icon: widget.icon,
+      title: widget.title,
+      subtitle: widget.subtitle,
+      iconColor: widget.iconColor,
+      showChevron: false,
+      trailing: Switch(
+        value: _value,
+        activeColor: AppTheme.primary,
+        onChanged: (val) {
+          setState(() => _value = val);
+        },
+      ),
+      onTap: () {
+        setState(() => _value = !_value);
+      },
+    );
   }
 }
 

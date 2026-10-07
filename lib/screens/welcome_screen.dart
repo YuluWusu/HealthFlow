@@ -1,104 +1,45 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
-import '../widgets/app_buttons.dart';
-import '../widgets/fitlife_logo.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
 
-/// Màn hình 1 trong bản thiết kế: màn hình chào mừng.
-///
-/// Trên cùng là phần phong cảnh (vẽ bằng gradien), phía dưới là thẻ trắng
-/// chứa lời chào và hai nút Đăng nhập / Đăng ký.
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Trên màn hình thấp, phần phong cảnh co lại để nhường chỗ cho nội
-          // dung; nếu vẫn không đủ thì phần thẻ trắng tự cuộn được.
-          final heroHeight = constraints.maxHeight < 620
-              ? constraints.maxHeight * 0.34
-              : constraints.maxHeight * 0.45;
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
 
-          return Column(
-            children: [
-              SizedBox(height: heroHeight, child: const _HeroBackground()),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: _buildCard(context),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
-  /// Thẻ trắng chứa lời chào và hai nút hành động.
-  Widget _buildCard(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(26, 24, 26, 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const FitLifeBrand(logoSize: 58, titleSize: 29),
-          const SizedBox(height: 24),
-          const Text(
-            'Chào mừng bạn!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Cùng xây dựng thói quen tốt\nvì một cuộc sống khỏe mạnh hơn',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13.5,
-              height: 1.5,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 26),
-          PrimaryButton(
-            label: 'Đăng nhập',
-            onPressed: () => _openLogin(context),
-          ),
-          const SizedBox(height: 12),
-          SecondaryButton(
-            label: 'Đăng ký',
-            onPressed: () => _openRegister(context),
-          ),
-          const SizedBox(height: 18),
-          const Text(
-            'Bằng cách tiếp tục, bạn đồng ý với Điều khoản sử dụng\nvà Chính sách bảo mật của HealthFlow.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 11,
-              height: 1.5,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
+  final List<Map<String, String>> _pages = [
+    {
+      'title': 'Lịch sử',
+      'subtitle': 'Lưu lại hành trình và mọi buổi tập của bạn',
+      'image': 'assets/images/welcome_bg.jpg',
+    },
+    {
+      'title': 'Lộ trình',
+      'subtitle': 'Học các kỹ năng và rèn luyện từng bước một',
+      'image': 'assets/images/auth_bg.jpg',
+    },
+    {
+      'title': 'HealthFlow',
+      'subtitle': 'Trở thành phiên bản hoàn hảo nhất của chính mình!',
+      'image': 'assets/images/avatar.jpg',
+    },
+  ];
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   void _openLogin(BuildContext context) {
-    // Đăng nhập/đăng ký xong thì chính route đó tự đóng (xem LoginScreen),
-    // để lộ ra AuthGate đã chuyển sang màn hình chính.
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
     );
@@ -109,95 +50,167 @@ class WelcomeScreen extends StatelessWidget {
       MaterialPageRoute<void>(builder: (_) => const RegisterScreen()),
     );
   }
-}
-
-/// Phần phong cảnh phía trên, vẽ hoàn toàn bằng gradien và hình khối nên
-/// không cần tệp ảnh đi kèm.
-class _HeroBackground extends StatelessWidget {
-  const _HeroBackground();
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: AppTheme.heroGradient,
-              stops: AppTheme.heroStops,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        top: false, // Để ảnh tròn ăn lên sát mép trên
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) => setState(() => _currentPage = index),
+                itemCount: _pages.length,
+                itemBuilder: (context, index) {
+                  final page = _pages[index];
+                  return Column(
+                    children: [
+                      // Vùng ảnh tròn cắt đỉnh
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: MediaQuery.of(context).size.width * 0.9,
+                          ),
+                          Positioned(
+                            top: -MediaQuery.of(context).size.width * 0.08,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.85,
+                              height: MediaQuery.of(context).size.width * 0.85,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                ],
+                                image: DecorationImage(
+                                  image: AssetImage(page['image']!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Tiêu đề & phụ đề
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Column(
+                          children: [
+                            Text(
+                              page['title']!,
+                              style: const TextStyle(
+                                fontSize: 42,
+                                fontWeight: FontWeight.w900,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.black,
+                                letterSpacing: -1,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              page['subtitle']!,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: AppTheme.textSecondary,
+                                height: 1.4,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ),
-        // Vầng sáng mặt trời.
-        Positioned(
-          top: 46,
-          right: 58,
-          child: Container(
-            width: 76,
-            height: 76,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0xFFFFE9AE).withValues(alpha: 0.75),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFFFD98A).withValues(alpha: 0.55),
-                  blurRadius: 40,
-                  spreadRadius: 14,
-                ),
-              ],
+            // Bottom bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Nút Đăng nhập
+                  TextButton(
+                    onPressed: () => _openLogin(context),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      textStyle: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    child: const Text('LOGIN'),
+                  ),
+                  // Dấu chấm điều hướng
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(_pages.length, (index) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentPage == index
+                              ? AppTheme.primary
+                              : Colors.grey.withValues(alpha: 0.5),
+                        ),
+                      );
+                    }),
+                  ),
+                  // Nút Đăng ký
+                  ElevatedButton(
+                    onPressed: () => _openRegister(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 28, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                    child: const Text(
+                      'SIGNUP',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
-        // Dải đồi phía sau.
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: ClipPath(
-            clipper: _HillClipper(),
-            child: Container(
-              height: 120,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF8FBF9B), Color(0xFF6FA87F)],
+            // Điều khoản sử dụng ở dưới cùng
+            const Padding(
+              padding: EdgeInsets.only(bottom: 24, left: 16, right: 16),
+              child: Text(
+                'Bằng cách tiếp tục, bạn đồng ý với Điều khoản sử dụng\nvà Chính sách bảo mật của HealthFlow.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  height: 1.5,
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ),
-          ),
+          ],
         ),
-        // Khối nội dung thương hiệu đặt trên nền phong cảnh.
-      ],
+      ),
     );
   }
-}
-
-/// Cắt dải màu thành hình đồi thoải, tạo cảm giác phong cảnh.
-class _HillClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..moveTo(0, size.height * 0.55)
-      ..quadraticBezierTo(
-        size.width * 0.25,
-        size.height * 0.10,
-        size.width * 0.52,
-        size.height * 0.42,
-      )
-      ..quadraticBezierTo(
-        size.width * 0.78,
-        size.height * 0.72,
-        size.width,
-        size.height * 0.28,
-      )
-      ..lineTo(size.width, size.height)
-      ..lineTo(0, size.height)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

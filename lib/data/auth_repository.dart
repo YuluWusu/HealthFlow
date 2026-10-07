@@ -107,8 +107,6 @@ class AuthRepository extends ChangeNotifier {
       await _health.insert(metric);
     }
 
-    _currentUser = user;
-    notifyListeners();
     return user;
   }
 

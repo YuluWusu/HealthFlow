@@ -64,6 +64,7 @@ class NutritionScreen extends StatelessWidget {
           listenable: app.nutrition,
           builder: (context, _) {
             return TabBarView(
+              physics: const ClampingScrollPhysics(),
               children: [
                 _TodayTab(nutrition: app.nutrition),
                 _MenuTab(nutrition: app.nutrition),

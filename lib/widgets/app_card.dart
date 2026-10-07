@@ -53,7 +53,9 @@ class SettingsTile extends StatelessWidget {
   final VoidCallback? onTap;
   final Color iconColor;
   final String? trailingText;
+  final Widget? trailing;
   final bool isDestructive;
+  final bool showChevron;
 
   const SettingsTile({
     super.key,
@@ -63,7 +65,9 @@ class SettingsTile extends StatelessWidget {
     this.onTap,
     this.iconColor = AppTheme.primary,
     this.trailingText,
+    this.trailing,
     this.isDestructive = false,
+    this.showChevron = true,
   });
 
   @override
@@ -125,7 +129,9 @@ class SettingsTile extends StatelessWidget {
                     color: AppTheme.textSecondary,
                   ),
                 ),
-              if (onTap != null)
+              if (trailing != null)
+                trailing!
+              else if (onTap != null && showChevron)
                 const Padding(
                   padding: EdgeInsets.only(left: 6),
                   child: Icon(

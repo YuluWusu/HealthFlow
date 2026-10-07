@@ -43,6 +43,7 @@ class WorkoutScreen extends StatelessWidget {
           listenable: app.workout,
           builder: (context, _) {
             return TabBarView(
+              physics: const ClampingScrollPhysics(),
               children: [
                 _OverviewTab(workout: app.workout),
                 _CatalogTab(workout: app.workout),

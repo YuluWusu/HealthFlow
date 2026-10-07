@@ -49,6 +49,7 @@ class HealthScreen extends StatelessWidget {
             }
 
             return TabBarView(
+              physics: const ClampingScrollPhysics(),
               children: [
                 _OverviewTab(health: app.health, user: user),
                 _ChartTab(health: app.health),

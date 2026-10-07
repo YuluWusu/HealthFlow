@@ -139,25 +139,36 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        // Ảnh đại diện: chữ cái đầu của tên, bấm vào mở tab Cài đặt.
+        // Nút thông báo
+        Container(
+          margin: const EdgeInsets.only(right: 14),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            shape: BoxShape.circle,
+            boxShadow: AppTheme.softShadow(opacity: 0.04),
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.textPrimary, size: 22),
+            onPressed: () {
+               // Có thể hiển thị bottom sheet thông báo ở đây
+            },
+          ),
+        ),
+        // Ảnh đại diện: tải từ assets, nếu lỗi thì hiện chữ cái đầu.
         InkWell(
           onTap: () => onNavigate?.call(4),
           borderRadius: BorderRadius.circular(30),
           child: Container(
-            width: 48,
-            height: 48,
+            padding: const EdgeInsets.all(2), // Viền mỏng
             decoration: const BoxDecoration(
-              color: AppTheme.lightGreen,
+              color: AppTheme.primary,
               shape: BoxShape.circle,
             ),
-            alignment: Alignment.center,
-            child: Text(
-              user?.initial ?? '?',
-              style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.primary,
-              ),
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: AppTheme.lightGreen,
+              backgroundImage: const AssetImage('assets/images/avatar.jpg'),
+              onBackgroundImageError: (_, __) {}, // Bỏ qua lỗi nếu chưa có ảnh
             ),
           ),
         ),
@@ -298,23 +309,34 @@ class _CalorieCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppTheme.primary, AppTheme.primaryDark],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primary.withValues(alpha: 0.20),
+                color: AppTheme.primary.withValues(alpha: 0.30),
                 blurRadius: 20,
-                offset: const Offset(0, 9),
+                offset: const Offset(0, 10),
               ),
             ],
+            image: const DecorationImage(
+              image: AssetImage('assets/images/calorie_bg.jpg'),
+              fit: BoxFit.cover,
+            ),
           ),
-          child: Column(
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.primaryDark.withValues(alpha: 0.85),
+                  AppTheme.primary.withValues(alpha: 0.95),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -431,6 +453,7 @@ class _CalorieCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
           ),
         ),
       ),

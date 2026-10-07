@@ -41,16 +41,30 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppTheme.textPrimary),
           tooltip: 'Quay lại',
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(26, 4, 26, 26),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Hình nền mờ cho trang đăng nhập / đăng ký
+          Image.asset(
+            'assets/images/auth_bg.jpg', // Thay ảnh thực tế của bạn vào đây
+            fit: BoxFit.cover,
+            opacity: const AlwaysStoppedAnimation(0.15), // Mờ đi để không làm rối giao diện
+            errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(26, 16, 26, 26),
           child: Form(
             key: _formKey,
             child: Column(
@@ -227,6 +241,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+      ],
+    ),
     );
   }
 

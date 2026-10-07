@@ -60,12 +60,17 @@ class AppBottomNav extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        isSelected ? item.selectedIcon : item.icon,
-                        size: 23,
-                        color: isSelected
-                            ? AppTheme.primary
-                            : AppTheme.textSecondary,
+                      AnimatedScale(
+                        scale: isSelected ? 1.15 : 1.0,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutBack,
+                        child: Icon(
+                          isSelected ? item.selectedIcon : item.icon,
+                          size: 23,
+                          color: isSelected
+                              ? AppTheme.primary
+                              : AppTheme.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(

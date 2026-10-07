@@ -45,18 +45,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.of(context).maybePop(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           tooltip: 'Quay lại',
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(26, 4, 26, 26),
-          child: Form(
-            key: _formKey,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/images/auth_bg.jpg',
+            fit: BoxFit.cover,
+            opacity: const AlwaysStoppedAnimation(0.15),
+            errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(26, 16, 26, 26),
+              child: Form(
+                key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -200,6 +213,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
+        ),
+        ],
       ),
     );
   }
@@ -311,10 +326,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         confirmPassword: _confirmController.text,
       );
-      // AuthGate ở gốc đã đổi sang màn hình chính; đóng các màn hình đăng
-      // nhập/đăng ký đang mở để lộ ra màn hình chính.
       if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Đăng ký thành công'),
+            content: const Text('Tài khoản của bạn đã được tạo thành công. Vui lòng đăng nhập để tiếp tục.'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Đăng nhập ngay'),
+              ),
+            ],
+          ),
+        );
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+          );
+        }
       }
     } on AuthException catch (error) {
       if (!mounted) return;
