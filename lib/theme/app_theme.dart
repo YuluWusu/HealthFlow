@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 class AppTheme {
   const AppTheme._();
 
+  /// Font chữ chung (Be Vietnam Pro): dấu tiếng Việt cân đối, nét mềm hơn Roboto.
+  static const String fontFamily = 'BeVietnamPro';
+
   static const Color primary = Color(0xFF23865B);
   static const Color primaryDark = Color(0xFF176B46);
   static const Color background = Color(0xFFF5F8F6);
@@ -53,6 +56,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: fontFamily,
       scaffoldBackgroundColor: background,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primary,
