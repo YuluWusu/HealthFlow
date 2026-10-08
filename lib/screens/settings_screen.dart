@@ -80,6 +80,14 @@ class SettingsScreen extends StatelessWidget {
                   iconColor: AppTheme.orange,
                   initialValue: true,
                 ),
+                const Divider(height: 1, indent: 64),
+                _SwitchTile(
+                  icon: Icons.camera_alt_outlined,
+                  title: 'Cho phép chụp camera',
+                  subtitle: 'Sử dụng máy ảnh để chụp avatar',
+                  iconColor: AppTheme.primary,
+                  initialValue: true,
+                ),
               ],
             ),
           ),
@@ -552,7 +560,12 @@ class _ProfileHeader extends StatelessWidget {
                   title: const Text('Chụp ảnh mới'),
                   onTap: () {
                     Navigator.of(sheetContext).pop();
-                    _pickAvatarFromCamera(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Tính năng chụp ảnh sẽ được bổ sung sau.'),
+                      ),
+                    );
                   },
                 ),
                 if (user.avatarPath != null)
@@ -578,21 +591,6 @@ class _ProfileHeader extends StatelessWidget {
   Future<void> _pickAvatarFromGallery(BuildContext context) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      if (!context.mounted) return;
-      final auth = AuthScope.of(context, listen: false);
-      auth.updateProfile(avatarPath: pickedFile.path).then((_) {
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã cập nhật ảnh đại diện.')),
-        );
-      });
-    }
-  }
-
-  Future<void> _pickAvatarFromCamera(BuildContext context) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       if (!context.mounted) return;
       final auth = AuthScope.of(context, listen: false);

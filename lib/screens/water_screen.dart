@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, HapticFeedback;
@@ -33,6 +36,7 @@ class _WaterScreenState extends State<WaterScreen> {
 
   @override
   void dispose() {
+    _hideToast();
     _custom.dispose();
     super.dispose();
   }
@@ -50,23 +54,78 @@ class _WaterScreenState extends State<WaterScreen> {
     if (ml <= 0) return;
     final user = AuthScope.of(context, listen: false).currentUser;
     if (user == null) return;
-    final messenger = ScaffoldMessenger.of(context);
     HapticFeedback.selectionClick();
     await nutrition.addWater(userId: user.id, deltaMl: ml);
-    messenger
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          content: Text('Đã thêm $ml ml nước.'),
-          action: SnackBarAction(
-            label: 'Hoàn tác',
-            onPressed: () => nutrition.undoWater(userId: user.id),
-          ),
-        ),
+    if (!mounted) return;
+    _showToast(
+      'Đã thêm $ml ml nước',
+      actionLabel: 'Hoàn tác',
+      onAction: () => nutrition.undoWater(userId: user.id),
+    );
+  }
+
+  OverlayEntry? _toast;
+  Timer? _toastTimer;
+
+  void _hideToast() {
+    _toastTimer?.cancel();
+    _toast?.remove();
+    _toast = null;
+  }
+
+  /// Thông báo nhỏ dạng pop-up, tự biến mất sau ~2 giây và không bám sang màn khác.
+  void _showToast(String message, {String? actionLabel, VoidCallback? onAction}) {
+    _hideToast();
+    final entry = OverlayEntry(
+      builder: (_) => _Toast(
+        message: message,
+        actionLabel: actionLabel,
+        onAction: () {
+          _hideToast();
+          onAction?.call();
+        },
+      ),
+    );
+    _toast = entry;
+    Overlay.of(context).insert(entry);
+    _toastTimer = Timer(const Duration(milliseconds: 2200), _hideToast);
+  }
+
+  /// Bớt một lượng nước đã ghi nhầm.
+  Future<void> _remove(NutritionRepository nutrition) async {
+    final user = AuthScope.of(context, listen: false).currentUser;
+    if (user == null) return;
+    final ml = await showModalBottomSheet<int>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => _RemoveSheet(
+        currentMl: nutrition.waterMl,
+        canUndo: nutrition.canUndoWater,
+      ),
+    );
+    if (ml == null || !mounted) return;
+    if (ml < 0) {
+      final undone = await nutrition.undoWater(userId: user.id);
+      if (!mounted || undone == 0) return;
+      _showToast(undone > 0
+          ? 'Đã bỏ lần thêm $undone ml'
+          : 'Đã khôi phục ${-undone} ml');
+      return;
+    }
+    final amount = ml.clamp(0, nutrition.waterMl).toInt();
+    if (amount <= 0) return;
+    await nutrition.addWater(userId: user.id, deltaMl: -amount);
+    if (mounted) {
+      _showToast(
+        'Đã bớt $amount ml nước',
+        actionLabel: 'Hoàn tác',
+        onAction: () => nutrition.undoWater(userId: user.id),
       );
+    }
   }
 
   Future<void> _addCustom(NutritionRepository nutrition) async {
@@ -78,10 +137,11 @@ class _WaterScreenState extends State<WaterScreen> {
     if (mounted) setState(() {});
   }
 
-  Future<void> _undo(NutritionRepository nutrition) async {
-    final user = AuthScope.of(context, listen: false).currentUser;
-    if (user == null) return;
-    await nutrition.undoWater(userId: user.id);
+  /// Xóa số đang gõ trong ô nhập tay (không đụng tới lượng nước đã ghi).
+  void _clearCustom() {
+    HapticFeedback.selectionClick();
+    _custom.clear();
+    setState(() {});
   }
 
   Future<void> _editCup(NutritionRepository nutrition) async {
@@ -102,7 +162,12 @@ class _WaterScreenState extends State<WaterScreen> {
     final goal = NutritionRepository.waterGoalFor(user?.weightKg ?? 55);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: AppTheme.lightBlue,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.of(context).maybePop(),
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
@@ -121,9 +186,17 @@ class _WaterScreenState extends State<WaterScreen> {
               if (e.waterMl > 0) e,
           ];
 
-          return ListView(
+          final progress = goal <= 0
+              ? 0.0
+              : (nutrition.waterMl / goal).clamp(0.0, 1.0).toDouble();
+          final topPad = MediaQuery.of(context).padding.top + kToolbarHeight;
+
+          return Stack(
+            children: [
+              Positioned.fill(child: _WaterBackground(progress: progress)),
+              ListView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(20, 6, 20, 32),
+            padding: EdgeInsets.fromLTRB(20, topPad + 6, 20, 32),
             children: [
               _ProgressCard(ml: nutrition.waterMl, goal: goal),
               const SizedBox(height: 22),
@@ -163,14 +236,14 @@ class _WaterScreenState extends State<WaterScreen> {
               const _SectionLabel('Nhập số khác'),
               const SizedBox(height: 10),
               _buildCustomRow(nutrition),
-              if (nutrition.canUndoWater) ...[
+              if (nutrition.waterMl > 0) ...[
                 const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
-                    onPressed: () => _undo(nutrition),
-                    icon: const Icon(Icons.undo_rounded, size: 18),
-                    label: const Text('Hoàn tác lần thêm gần nhất'),
+                    onPressed: () => _remove(nutrition),
+                    icon: const Icon(Icons.edit_note_rounded, size: 20),
+                    label: const Text('Uống nhầm? Chỉnh lại lượng nước'),
                     style: TextButton.styleFrom(
                       foregroundColor: AppTheme.textSecondary,
                     ),
@@ -183,6 +256,8 @@ class _WaterScreenState extends State<WaterScreen> {
                 const SizedBox(height: 10),
                 _DrinkList(entries: fromDrinks),
               ],
+            ],
+          ),
             ],
           );
         },
@@ -216,6 +291,14 @@ class _WaterScreenState extends State<WaterScreen> {
                   decoration: InputDecoration(
                     hintText: _customInLiters ? 'Ví dụ 1,5' : 'Ví dụ 350',
                     suffixText: _customInLiters ? 'lít' : 'ml',
+                    suffixIcon: _custom.text.isEmpty
+                        ? null
+                        : IconButton(
+                            onPressed: _clearCustom,
+                            tooltip: 'Xóa số đã nhập',
+                            icon: const Icon(Icons.cancel_rounded, size: 20),
+                            color: AppTheme.textSecondary,
+                          ),
                     isDense: true,
                     filled: true,
                     fillColor: AppTheme.background,
@@ -662,4 +745,321 @@ class _CupDialogState extends State<_CupDialog> {
       ],
     );
   }
+}
+
+
+/// Pop-up nhỏ ở đầu màn hình, tự trượt vào rồi mờ đi.
+class _Toast extends StatelessWidget {
+  const _Toast({required this.message, this.actionLabel, this.onAction});
+
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top + 64;
+    return Positioned(
+      top: top,
+      left: 24,
+      right: 24,
+      child: Material(
+        color: Colors.transparent,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          builder: (_, t, child) => Opacity(
+            opacity: t,
+            child: Transform.translate(offset: Offset(0, (1 - t) * -12), child: child),
+          ),
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+              decoration: BoxDecoration(
+                color: AppTheme.textPrimary,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: AppTheme.softShadow(opacity: 0.18, blur: 16),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.water_drop_rounded,
+                      color: AppTheme.blue, size: 18),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      message,
+                      style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                    ),
+                  ),
+                  if (actionLabel != null) ...[
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: onAction,
+                      child: Text(
+                        actionLabel!,
+                        style: const TextStyle(
+                          color: AppTheme.blue,
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bảng chọn lượng nước muốn bớt. Trả về số ml, hoặc -1 nếu chọn hoàn tác thao tác gần nhất.
+class _RemoveSheet extends StatefulWidget {
+  const _RemoveSheet({required this.currentMl, required this.canUndo});
+
+  final int currentMl;
+  final bool canUndo;
+
+  @override
+  State<_RemoveSheet> createState() => _RemoveSheetState();
+}
+
+class _RemoveSheetState extends State<_RemoveSheet> {
+  final _c = TextEditingController();
+  bool _liters = false;
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  int get _ml {
+    final v = double.tryParse(_c.text.trim().replaceAll(',', '.'));
+    if (v == null || v <= 0) return 0;
+    return (_liters ? v * 1000 : v).round().clamp(0, widget.currentMl).toInt();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ml = _ml;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        20, 20, 20, 20 + MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Chỉnh lại lượng nước',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Hôm nay đã ghi ${widget.currentMl} ml. Nhập số muốn bớt đi nhé.',
+            style: const TextStyle(fontSize: 12.5, color: AppTheme.textSecondary),
+          ),
+          const SizedBox(height: 14),
+          if (widget.canUndo)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).pop(-1),
+                icon: const Icon(Icons.undo_rounded, size: 18),
+                label: const Text('Quay lại như trước'),
+              ),
+            ),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _c,
+                  autofocus: true,
+                  onChanged: (_) => setState(() {}),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+                  ],
+                  decoration: InputDecoration(
+                    hintText: _liters ? 'Ví dụ 0,5' : 'Ví dụ 250',
+                    suffixText: _liters ? 'lít' : 'ml',
+                    isDense: true,
+                    filled: true,
+                    fillColor: AppTheme.background,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              _UnitChip(
+                label: 'ml',
+                selected: !_liters,
+                onTap: () => setState(() => _liters = false),
+              ),
+              const SizedBox(width: 6),
+              _UnitChip(
+                label: 'lít',
+                selected: _liters,
+                onTap: () => setState(() => _liters = true),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: FilledButton(
+              onPressed: ml > 0 ? () => Navigator.of(context).pop(ml) : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(ml > 0 ? 'Bớt $ml ml' : 'Nhập lượng muốn bớt'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+/// Nền nước: dải màu xanh nhạt, sóng chuyển động và bong bóng nổi lên.
+/// Mực sóng dâng cao dần theo tiến độ uống nước trong ngày.
+class _WaterBackground extends StatefulWidget {
+  const _WaterBackground({required this.progress});
+
+  final double progress;
+
+  @override
+  State<_WaterBackground> createState() => _WaterBackgroundState();
+}
+
+class _WaterBackgroundState extends State<_WaterBackground>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 14),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(end: widget.progress),
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.easeOutCubic,
+          builder: (_, level, __) => CustomPaint(
+            painter: _WavePainter(_c, level),
+            size: Size.infinite,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WavePainter extends CustomPainter {
+  _WavePainter(this.t, this.level) : super(repaint: t);
+
+  final Animation<double> t;
+  final double level;
+
+  static const _bubbles = [
+    // x (0..1), bán kính, tốc độ (số nguyên để vòng lặp liền mạch), lệch pha
+    [0.10, 7.0, 1.0, 0.00],
+    [0.24, 4.5, 2.0, 0.35],
+    [0.38, 9.0, 1.0, 0.62],
+    [0.52, 5.0, 2.0, 0.10],
+    [0.66, 8.0, 1.0, 0.80],
+    [0.78, 4.0, 2.0, 0.55],
+    [0.90, 6.5, 1.0, 0.28],
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final v = t.value;
+
+    // Nền chuyển màu từ xanh nhạt sang trắng ngà.
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFDCEBFA), Color(0xFFEAF3FC), Color(0xFFF5F8F6)],
+          stops: [0.0, 0.45, 1.0],
+        ).createShader(Offset.zero & size),
+    );
+
+    // Mực nước: từ 12% đến 40% chiều cao màn hình.
+    final baseY = h * (1 - (0.12 + 0.28 * level));
+
+    // Bong bóng nổi từ đáy lên mặt nước.
+    for (final b in _bubbles) {
+      final p = (v * b[2] + b[3]) % 1.0;
+      final y = h - p * (h - baseY + 10);
+      final x = w * b[0] + math.sin((v * b[2] + b[3]) * 2 * math.pi * 2) * 10;
+      final r = b[1];
+      final fade = math.sin(p * math.pi).clamp(0.0, 1.0);
+      canvas.drawCircle(
+        Offset(x, y),
+        r,
+        Paint()..color = AppTheme.blue.withValues(alpha: 0.12 * fade),
+      );
+      canvas.drawCircle(
+        Offset(x, y),
+        r,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2
+          ..color = AppTheme.blue.withValues(alpha: 0.30 * fade),
+      );
+    }
+
+    // Ba lớp sóng với pha và biên độ khác nhau.
+    _wave(canvas, size, baseY + 14, 16, 1, v * 2 * math.pi, 0.10);
+    _wave(canvas, size, baseY + 6, 13, 2, -v * 2 * math.pi + 1.2, 0.14);
+    _wave(canvas, size, baseY, 10, 1, v * 2 * math.pi * 2 + 2.4, 0.20);
+  }
+
+  void _wave(Canvas canvas, Size size, double y, double amp, int cycles,
+      double phase, double alpha) {
+    final path = Path()..moveTo(0, size.height);
+    path.lineTo(0, y);
+    for (double x = 0; x <= size.width; x += 4) {
+      final dy = math.sin(x / size.width * 2 * math.pi * (cycles + 0.5) + phase);
+      path.lineTo(x, y + dy * amp);
+    }
+    path.lineTo(size.width, size.height);
+    path.close();
+    canvas.drawPath(path, Paint()..color = AppTheme.blue.withValues(alpha: alpha));
+  }
+
+  @override
+  bool shouldRepaint(_WavePainter old) => old.level != level;
 }
