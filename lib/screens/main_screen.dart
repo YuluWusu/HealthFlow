@@ -61,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
     _dataLoaded = true;
 
     final app = AppScope.of(context);
-    app.health.load(user.id);
+    app.health.load(user.id, heightCm: user.heightCm);
     app.nutrition.loadCatalog();
     app.workout.loadCatalog();
     app.nutrition.loadDay(

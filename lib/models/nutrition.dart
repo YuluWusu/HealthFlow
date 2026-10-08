@@ -159,34 +159,6 @@ class MealEntry {
     );
   }
 
-  /// Bản sao với vài trường được đổi (dùng khi chép bữa hôm qua, sửa món...).
-  MealEntry copyWith({
-    String? id,
-    String? foodId,
-    String? foodName,
-    MealSlot? slot,
-    double? portion,
-    int? calories,
-    double? protein,
-    double? carbs,
-    double? fat,
-    DateTime? eatenAt,
-  }) {
-    return MealEntry(
-      id: id ?? this.id,
-      userId: userId,
-      foodId: foodId ?? this.foodId,
-      foodName: foodName ?? this.foodName,
-      slot: slot ?? this.slot,
-      portion: portion ?? this.portion,
-      calories: calories ?? this.calories,
-      protein: protein ?? this.protein,
-      carbs: carbs ?? this.carbs,
-      fat: fat ?? this.fat,
-      eatenAt: eatenAt ?? this.eatenAt,
-    );
-  }
-
   String get portionLabel {
     if (portion == 1) return '1 phần';
     if (portion == 0.5) return '1/2 phần';
@@ -262,10 +234,6 @@ class NutritionSummary {
   }
 
   int get caloriePercent => (calorieProgress * 100).round();
-
-  /// Phần trăm thực so với mục tiêu, không bị chặn ở 100% (dùng khi ăn lố).
-  int get rawPercent =>
-      calorieGoal <= 0 ? 0 : (calories / calorieGoal * 100).round();
 
   /// Phần trăm năng lượng đến từ từng nhóm chất, dùng cho biểu đồ tròn.
   double get proteinPercent => _macroPercent(protein * 4);

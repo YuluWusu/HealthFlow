@@ -5,7 +5,6 @@ import '../data/auth_scope.dart';
 import '../data/nutrition_repository.dart';
 import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
-import '../theme/food_images.dart';
 
 /// Màn hình 7 trong bản thiết kế: thêm món ăn vào nhật ký.
 ///
@@ -292,12 +291,14 @@ class _FoodListTile extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                FoodThumb(
-                  food: food,
-                  size: 50,
-                  radius: 14,
-                  background: _backgroundFor(food.category),
-                  fallback: Icon(
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: _backgroundFor(food.category),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
                     _iconFor(food.category),
                     color: _colorFor(food.category),
                     size: 25,
@@ -571,16 +572,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               colors: [Color(0xFF2E9E6B), Color(0xFF7FC79C)],
             ),
           ),
-          child: Image.asset(
-            'assets/images/hero_food.png',
-            fit: BoxFit.cover,
-            cacheWidth: 1080,
-            errorBuilder: (_, __, ___) => const Center(
-              child: Icon(
-                Icons.ramen_dining_rounded,
-                size: 96,
-                color: Colors.white24,
-              ),
+          child: const Center(
+            child: Icon(
+              Icons.ramen_dining_rounded,
+              size: 96,
+              color: Colors.white24,
             ),
           ),
         ),

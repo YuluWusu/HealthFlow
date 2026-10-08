@@ -1,4 +1,5 @@
 import '../utils/sha256.dart';
+import '../utils/health_assessor.dart';
 
 /// Tài khoản người dùng của ứng dụng HealthFlow.
 ///
@@ -42,21 +43,11 @@ class User {
   });
 
   /// Chỉ số khối cơ thể, tính từ chiều cao và cân nặng hiện tại.
-  double get bmi {
-    if (heightCm <= 0) return 0;
-    final heightM = heightCm / 100;
-    return weightKg / (heightM * heightM);
-  }
+  double get bmi => HealthAssessor.calculateBmi(weightKg, heightCm) ?? 0;
 
-  /// Xếp loại BMI theo chuẩn dùng trong bản thiết kế.
-  String get bmiLabel {
-    final value = bmi;
-    if (value <= 0) return 'Chưa có dữ liệu';
-    if (value < 18.5) return 'Thiếu cân';
-    if (value < 25) return 'Bình thường';
-    if (value < 30) return 'Thừa cân';
-    return 'Béo phì';
-  }
+  /// Xếp loại BMI theo chuẩn WHO Châu Á, dùng chung với module Health
+  /// (xem [HealthAssessor.bmi]).
+  String get bmiLabel => HealthAssessor.bmi(bmi).label;
 
   /// Chữ cái đầu của tên, dùng làm ảnh đại diện thay thế.
   String get initial {
