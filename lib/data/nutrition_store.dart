@@ -1,3 +1,4 @@
+import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
 
 /// Lớp lưu trữ dinh dưỡng: danh mục món ăn và nhật ký ăn uống.
@@ -15,11 +16,35 @@ abstract class NutritionStore {
   Future<void> insertEntry(MealEntry entry);
 
   Future<void> deleteEntry(String entryId);
+
+  /// Ghi đè một bản ghi đã có (đổi món/khẩu phần tại chỗ). Cùng `id`.
+  Future<void> updateEntry(MealEntry entry);
+
+  /// Combo bữa ăn người dùng đã lưu.
+  Future<List<MealCombo>> combos(String userId);
+
+  Future<void> saveCombo(MealCombo combo);
+
+  Future<void> deleteCombo(String comboId);
+
+  /// Lượng nước đã uống (ml) trong một ngày.
+  Future<int> waterMl(String userId, DateTime day);
+
+  Future<void> setWaterMl(String userId, DateTime day, int ml);
+}
+
+/// Khóa theo (người dùng, ngày) cho bảng nước uống.
+String waterDayKey(String userId, DateTime day) {
+  final m = day.month.toString().padLeft(2, '0');
+  final d = day.day.toString().padLeft(2, '0');
+  return '$userId|${day.year}-$m-$d';
 }
 
 class InMemoryNutritionStore implements NutritionStore {
   final List<FoodItem> _catalog = seedCatalog();
   final List<MealEntry> _entries = [];
+  final List<MealCombo> _combos = [];
+  final Map<String, int> _water = {};
 
   @override
   Future<List<FoodItem>> catalog() async => List.unmodifiable(_catalog);
@@ -54,6 +79,38 @@ class InMemoryNutritionStore implements NutritionStore {
   @override
   Future<void> deleteEntry(String entryId) async {
     _entries.removeWhere((entry) => entry.id == entryId);
+  }
+
+  @override
+  Future<void> updateEntry(MealEntry entry) async {
+    final i = _entries.indexWhere((e) => e.id == entry.id);
+    if (i >= 0) _entries[i] = entry;
+  }
+
+  @override
+  Future<List<MealCombo>> combos(String userId) async {
+    return _combos.where((c) => c.userId == userId).toList();
+  }
+
+  @override
+  Future<void> saveCombo(MealCombo combo) async {
+    _combos.removeWhere((c) => c.id == combo.id);
+    _combos.add(combo);
+  }
+
+  @override
+  Future<void> deleteCombo(String comboId) async {
+    _combos.removeWhere((c) => c.id == comboId);
+  }
+
+  @override
+  Future<int> waterMl(String userId, DateTime day) async {
+    return _water[waterDayKey(userId, day)] ?? 0;
+  }
+
+  @override
+  Future<void> setWaterMl(String userId, DateTime day, int ml) async {
+    _water[waterDayKey(userId, day)] = ml;
   }
 
   static bool _isSameDay(DateTime a, DateTime b) {
