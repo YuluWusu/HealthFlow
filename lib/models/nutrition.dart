@@ -91,6 +91,32 @@ class FoodItem {
   }
 }
 
+/// Lượng nước (ml) trong MỘT phần của món, dùng để cộng vào mục "Nước uống".
+///
+/// Chỉ món thuộc nhóm [FoodCategory.drink] mới tính. Ưu tiên đọc dung tích
+/// ghi trong nhãn khẩu phần (`250ml`, `0,5 l`...); không có thì dùng bảng
+/// dung tích mặc định của vài đồ uống quen thuộc, cuối cùng mặc định 250 ml.
+int drinkMlOf(FoodItem food) {
+  if (food.category != FoodCategory.drink) return 0;
+
+  final label = food.servingLabel.toLowerCase();
+  final ml = RegExp(r'(\d+(?:[.,]\d+)?)\s*ml').firstMatch(label);
+  if (ml != null) {
+    return double.parse(ml.group(1)!.replaceAll(',', '.')).round();
+  }
+  final liter = RegExp(r'(\d+(?:[.,]\d+)?)\s*(?:l|lít)\b').firstMatch(label);
+  if (liter != null) {
+    return (double.parse(liter.group(1)!.replaceAll(',', '.')) * 1000).round();
+  }
+
+  const defaults = <String, int>{
+    'food-sua-chua': 100,
+    'food-sinh-to-bo': 300,
+    'food-ca-phe-sua': 200,
+  };
+  return defaults[food.id] ?? 250;
+}
+
 /// Một món ăn người dùng đã thêm vào nhật ký dinh dưỡng của mình.
 class MealEntry {
   final String id;
@@ -112,6 +138,10 @@ class MealEntry {
   final double fat;
   final DateTime eatenAt;
 
+  /// Lượng nước (ml) mà món này đã cộng vào mục "Nước uống" (đồ uống > 0).
+  /// Lưu kèm để khi xóa/sửa món thì trừ lại đúng số đã cộng.
+  final int waterMl;
+
   const MealEntry({
     required this.id,
     required this.userId,
@@ -124,6 +154,7 @@ class MealEntry {
     required this.carbs,
     required this.fat,
     required this.eatenAt,
+    this.waterMl = 0,
   });
 
   /// Tạo bản ghi nhật ký từ một món trong danh mục.
@@ -156,6 +187,7 @@ class MealEntry {
       carbs: food.carbs * portion * scale,
       fat: food.fat * portion * scale,
       eatenAt: eatenAt,
+      waterMl: (drinkMlOf(food) * portion).round(),
     );
   }
 
@@ -171,6 +203,7 @@ class MealEntry {
     double? carbs,
     double? fat,
     DateTime? eatenAt,
+    int? waterMl,
   }) {
     return MealEntry(
       id: id ?? this.id,
@@ -184,6 +217,7 @@ class MealEntry {
       carbs: carbs ?? this.carbs,
       fat: fat ?? this.fat,
       eatenAt: eatenAt ?? this.eatenAt,
+      waterMl: waterMl ?? this.waterMl,
     );
   }
 
@@ -206,6 +240,7 @@ class MealEntry {
       'carbs': carbs,
       'fat': fat,
       'eaten_at': eatenAt.millisecondsSinceEpoch,
+      'water_ml': waterMl,
     };
   }
 
@@ -224,6 +259,7 @@ class MealEntry {
       eatenAt: DateTime.fromMillisecondsSinceEpoch(
         (map['eaten_at'] as num).toInt(),
       ),
+      waterMl: (map['water_ml'] as num?)?.toInt() ?? 0,
     );
   }
 }

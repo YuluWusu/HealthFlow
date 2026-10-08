@@ -14,6 +14,14 @@ class DayCalories {
   final int calories;
 }
 
+/// Lượng nước (ml) uống trong một ngày, dùng cho biểu đồ thống kê.
+class DayWater {
+  const DayWater(this.day, this.ml);
+
+  final DateTime day;
+  final int ml;
+}
+
 /// Truy vấn danh mục món ăn và nhật ký ăn uống.
 ///
 /// Danh mục gồm:
@@ -53,6 +61,11 @@ class NutritionRepository extends ChangeNotifier {
   // --- Nước uống của ngày đang xem ---
   int _waterMl = 0;
 
+  /// Dung tích "1 cốc nước" (ml) do người dùng tự đặt, mặc định 250 ml.
+  static const int defaultCupMl = 250;
+  int _cupMl = defaultCupMl;
+  int get cupMl => _cupMl;
+
   List<FoodItem> get catalog => _catalog;
   List<MealEntry> get todayEntries => _todayEntries;
   NutritionSummary get summary => _summary;
@@ -80,6 +93,16 @@ class NutritionRepository extends ChangeNotifier {
 
   /// Lượng nước (ml) đã uống trong ngày đang xem.
   int get waterMl => _waterMl;
+
+  /// Các lần cộng/trừ nước của ngày đang xem (mới nhất ở cuối) để hoàn tác.
+  final List<int> _waterLog = [];
+
+  /// Lượng nước của lần thêm gần nhất, dùng làm mặc định cho lần sau.
+  int _lastWaterStep = 250;
+  int get lastWaterStep => _lastWaterStep;
+
+  /// Còn lần thêm nước nào để hoàn tác không.
+  bool get canUndoWater => _waterLog.isNotEmpty;
 
   /// Mục tiêu nước/ngày ≈ 33 ml mỗi kg thể trọng, làm tròn 100 ml.
   static int waterGoalFor(double weightKg) {
@@ -119,7 +142,9 @@ class NutritionRepository extends ChangeNotifier {
 
   /// Chuyển sang xem một ngày khác và nạp lại nhật ký của ngày đó.
   Future<void> selectDay(DateTime day) async {
-    _selectedDay = _dateOnly(day);
+    final next = _dateOnly(day);
+    if (next != _selectedDay) _waterLog.clear();
+    _selectedDay = next;
     final userId = _userId;
     if (userId == null) {
       notifyListeners();
@@ -155,12 +180,17 @@ class NutritionRepository extends ChangeNotifier {
     DateTime? day,
   }) async {
     // Không truyền [day] thì dùng ngày đang xem (mặc định là hôm nay).
-    if (day != null) _selectedDay = _dateOnly(day);
+    if (day != null) {
+      final next = _dateOnly(day);
+      if (next != _selectedDay) _waterLog.clear();
+      _selectedDay = next;
+    }
     _userId = userId;
     _calorieGoal = calorieGoal;
     _todayEntries = await _store.entriesByDay(userId, _selectedDay);
     _summary = _buildSummary(_todayEntries, calorieGoal);
     _waterMl = await _store.waterMl(userId, _selectedDay);
+    _cupMl = await _store.waterCupMl(userId) ?? defaultCupMl;
     _combos = await _store.combos(userId);
     await _refreshSuggestions(userId);
     notifyListeners();
@@ -274,6 +304,7 @@ class NutritionRepository extends ChangeNotifier {
       caloriesOverride: customCalories,
     );
     await _store.insertEntry(entry);
+    await _shiftWater(userId, entry.eatenAt, entry.waterMl);
     await loadDay(userId: userId, calorieGoal: calorieGoal);
     return entry;
   }
@@ -297,12 +328,20 @@ class NutritionRepository extends ChangeNotifier {
     required String entryId,
     required int calorieGoal,
   }) async {
+    MealEntry? removed;
+    for (final e in _todayEntries) {
+      if (e.id == entryId) removed = e;
+    }
     // Cập nhật giao diện ngay (vuốt để xóa cần dòng biến mất tức thì), rồi mới
     // ghi xuống kho.
     _todayEntries = _todayEntries.where((e) => e.id != entryId).toList();
     _summary = _buildSummary(_todayEntries, calorieGoal);
     notifyListeners();
     await _store.deleteEntry(entryId);
+    // Xóa đồ uống thì trừ lại lượng nước đã cộng khi thêm.
+    if (removed != null) {
+      await _shiftWater(userId, removed.eatenAt, -removed.waterMl);
+    }
     await loadDay(userId: userId, calorieGoal: calorieGoal);
   }
 
@@ -312,6 +351,7 @@ class NutritionRepository extends ChangeNotifier {
     required int calorieGoal,
   }) async {
     await _store.insertEntry(entry);
+    await _shiftWater(entry.userId, entry.eatenAt, entry.waterMl);
     await loadDay(userId: entry.userId, calorieGoal: calorieGoal);
   }
 
@@ -331,6 +371,11 @@ class NutritionRepository extends ChangeNotifier {
       portion: portion,
     );
     await _store.updateEntry(updated);
+    await _shiftWater(
+      entry.userId,
+      entry.eatenAt,
+      updated.waterMl - entry.waterMl,
+    );
     await loadDay(userId: entry.userId, calorieGoal: calorieGoal);
   }
 
@@ -347,18 +392,20 @@ class NutritionRepository extends ChangeNotifier {
     if (items.isEmpty) return;
     final base = DateTime.now().microsecondsSinceEpoch;
     final eatenAt = _eatenAtForSelectedDay();
+    var water = 0;
     for (var i = 0; i < items.length; i++) {
-      await _store.insertEntry(
-        MealEntry.fromFood(
-          id: 'meal-${base + i}',
-          userId: userId,
-          food: items[i].food,
-          slot: slot,
-          portion: items[i].portion,
-          eatenAt: eatenAt,
-        ),
+      final entry = MealEntry.fromFood(
+        id: 'meal-${base + i}',
+        userId: userId,
+        food: items[i].food,
+        slot: slot,
+        portion: items[i].portion,
+        eatenAt: eatenAt,
       );
+      water += entry.waterMl;
+      await _store.insertEntry(entry);
     }
+    await _shiftWater(userId, eatenAt, water);
     await loadDay(userId: userId, calorieGoal: calorieGoal);
   }
 
@@ -420,11 +467,14 @@ class NutritionRepository extends ChangeNotifier {
     if (source.isEmpty) return 0;
     final base = DateTime.now().microsecondsSinceEpoch;
     final eatenAt = _eatenAtForSelectedDay();
+    var water = 0;
     for (var i = 0; i < source.length; i++) {
+      water += source[i].waterMl;
       await _store.insertEntry(
         source[i].copyWith(id: 'meal-${base + i}', eatenAt: eatenAt),
       );
     }
+    await _shiftWater(userId, eatenAt, water);
     await loadDay(userId: userId, calorieGoal: calorieGoal);
     return source.length;
   }
@@ -474,11 +524,68 @@ class NutritionRepository extends ChangeNotifier {
 
   // --- Nước uống ---
 
+  /// Cộng/trừ lượng nước của một ngày do việc thêm/xóa/sửa đồ uống.
+  /// Khác [addWater]: không đi vào danh sách hoàn tác của nút uống nước.
+  Future<void> _shiftWater(String userId, DateTime day, int deltaMl) async {
+    if (deltaMl == 0) return;
+    final d = _dateOnly(day);
+    final current = await _store.waterMl(userId, d);
+    final next = (current + deltaMl).clamp(0, 10000).toInt();
+    await _store.setWaterMl(userId, d, next);
+  }
+
+  /// Lượng nước (ml) mà các món trong [items] sẽ cộng vào mục nước uống.
+  static int waterOf(Iterable<PortionedFood> items) => items.fold(
+        0,
+        (sum, item) => sum + (drinkMlOf(item.food) * item.portion).round(),
+      );
+
+  /// Đặt dung tích "1 cốc nước" (ml), được lưu cho lần sau.
+  Future<void> setCupMl({required String userId, required int ml}) async {
+    _cupMl = ml.clamp(50, 2000).toInt();
+    notifyListeners();
+    await _store.setWaterCupMl(userId, _cupMl);
+  }
+
   /// Cộng/trừ nước của ngày đang xem (ví dụ +250 ml mỗi lần bấm ly nước).
   Future<void> addWater({required String userId, required int deltaMl}) async {
+    final before = _waterMl;
     _waterMl = (_waterMl + deltaMl).clamp(0, 10000).toInt();
+    final applied = _waterMl - before;
+    if (applied != 0) {
+      _waterLog.add(applied);
+      if (applied > 0) _lastWaterStep = applied;
+    }
     notifyListeners();
     await _store.setWaterMl(userId, _selectedDay, _waterMl);
+  }
+
+  /// Hoàn tác lần thêm/bớt nước gần nhất. Trả về số ml đã hoàn tác (có dấu).
+  Future<int> undoWater({required String userId}) async {
+    if (_waterLog.isEmpty) return 0;
+    final last = _waterLog.removeLast();
+    _waterMl = (_waterMl - last).clamp(0, 10000).toInt();
+    notifyListeners();
+    await _store.setWaterMl(userId, _selectedDay, _waterMl);
+    return last;
+  }
+
+  /// Lượng nước của [days] ngày liên tiếp kết thúc ở [endDay], xếp từ cũ đến mới.
+  /// Ngày không uống trả về 0.
+  Future<List<DayWater>> waterLastDays(
+    String userId,
+    DateTime endDay, {
+    int days = 7,
+  }) async {
+    final all = await _store.allWater(userId);
+    final end = _dateOnly(endDay);
+    return [
+      for (var i = days - 1; i >= 0; i--)
+        () {
+          final day = DateTime(end.year, end.month, end.day - i);
+          return DayWater(day, all[day] ?? 0);
+        }(),
+    ];
   }
 
   void clear() {
@@ -489,6 +596,8 @@ class NutritionRepository extends ChangeNotifier {
     _frequentFoods = const [];
     _combos = const [];
     _waterMl = 0;
+    _cupMl = defaultCupMl;
+    _waterLog.clear();
     _selectedDay = _dateOnly(DateTime.now());
     _userId = null;
     notifyListeners();

@@ -31,6 +31,31 @@ abstract class NutritionStore {
   Future<int> waterMl(String userId, DateTime day);
 
   Future<void> setWaterMl(String userId, DateTime day, int ml);
+
+  /// Toàn bộ lượng nước theo ngày của một người dùng (ngày chưa uống thì không có).
+  Future<Map<DateTime, int>> allWater(String userId);
+
+  /// Dung tích "1 cốc nước" (ml) do người dùng tự đặt; `null` nếu chưa đặt.
+  Future<int?> waterCupMl(String userId);
+
+  Future<void> setWaterCupMl(String userId, int ml);
+}
+
+/// Đọc các khóa dạng `userId|yyyy-mm-dd` của [userId] thành map theo ngày.
+Map<DateTime, int> parseWaterDays(String userId, Map<String, int> raw) {
+  final prefix = '$userId|';
+  final out = <DateTime, int>{};
+  for (final e in raw.entries) {
+    if (!e.key.startsWith(prefix)) continue;
+    final parts = e.key.substring(prefix.length).split('-');
+    if (parts.length != 3) continue;
+    final y = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    final d = int.tryParse(parts[2]);
+    if (y == null || m == null || d == null) continue;
+    out[DateTime(y, m, d)] = e.value;
+  }
+  return out;
 }
 
 /// Khóa theo (người dùng, ngày) cho bảng nước uống.
@@ -45,6 +70,7 @@ class InMemoryNutritionStore implements NutritionStore {
   final List<MealEntry> _entries = [];
   final List<MealCombo> _combos = [];
   final Map<String, int> _water = {};
+  final Map<String, int> _cups = {};
 
   @override
   Future<List<FoodItem>> catalog() async => List.unmodifiable(_catalog);
@@ -111,6 +137,18 @@ class InMemoryNutritionStore implements NutritionStore {
   @override
   Future<void> setWaterMl(String userId, DateTime day, int ml) async {
     _water[waterDayKey(userId, day)] = ml;
+  }
+
+  @override
+  Future<Map<DateTime, int>> allWater(String userId) async =>
+      parseWaterDays(userId, _water);
+
+  @override
+  Future<int?> waterCupMl(String userId) async => _cups[userId];
+
+  @override
+  Future<void> setWaterCupMl(String userId, int ml) async {
+    _cups[userId] = ml;
   }
 
   static bool _isSameDay(DateTime a, DateTime b) {
@@ -213,7 +251,7 @@ class InMemoryNutritionStore implements NutritionStore {
         protein: 8,
         carbs: 30,
         fat: 9,
-        servingLabel: '1 hộp',
+        servingLabel: '1 hộp (100ml)',
       ),
       FoodItem(
         id: 'food-sinh-to-bo',
@@ -223,7 +261,7 @@ class InMemoryNutritionStore implements NutritionStore {
         protein: 4,
         carbs: 24,
         fat: 14,
-        servingLabel: '1 ly',
+        servingLabel: '1 ly (300ml)',
       ),
       FoodItem(
         id: 'food-nuoc-cam',
@@ -243,7 +281,7 @@ class InMemoryNutritionStore implements NutritionStore {
         protein: 3,
         carbs: 18,
         fat: 4,
-        servingLabel: '1 ly',
+        servingLabel: '1 ly (200ml)',
       ),
       // Nhóm khác
       FoodItem(
