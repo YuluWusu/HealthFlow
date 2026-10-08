@@ -17,19 +17,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   final List<Map<String, String>> _pages = [
     {
-      'title': 'Lịch sử',
-      'subtitle': 'Lưu lại hành trình và mọi buổi tập của bạn',
-      'image': 'assets/images/welcome_bg.jpg',
+      'title': 'Thấu Hiểu Cơ Thể',
+      'subtitle':
+          'Theo dõi chỉ số sức khoẻ mỗi ngày.',
+      'image': 'assets/images/welcome_health.jpg',
     },
     {
-      'title': 'Lộ trình',
-      'subtitle': 'Học các kỹ năng và rèn luyện từng bước một',
-      'image': 'assets/images/auth_bg.jpg',
+      'title': 'Bứt Phá Giới Hạn',
+      'subtitle':
+          'Thiết lập mục tiêu, theo dõi tiến độ vận động.',
+      'image': 'assets/images/welcome_workout.jpg',
     },
     {
-      'title': 'HealthFlow',
-      'subtitle': 'Trở thành phiên bản hoàn hảo nhất của chính mình!',
-      'image': 'assets/images/avatar.jpg',
+      'title': 'Quản lý ăn uống',
+      'subtitle':
+          'Thiết kế thực đơn khoa học chỉ với vài cú chạm.',
+      'image': 'assets/images/welcome_food.jpg',
+    },
+    {
+      'title': 'Chào mừng đến với HealthFlow',
+      'subtitle':
+          'Trợ lý chăm sóc sức khỏe toàn diện nằm gọn trong túi bạn. Hãy cùng kiến tạo một phiên bản hoàn hảo hơn của chính mình ngay hôm nay!',
+      'image': 'assets/images/welcome_healthflow.png',
     },
   ];
 
@@ -66,42 +75,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
                   final page = _pages[index];
+                  final circleSize = MediaQuery.of(context).size.width * 0.75;
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Vùng ảnh tròn cắt đỉnh
-                      Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.topCenter,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: MediaQuery.of(context).size.width * 0.9,
-                          ),
-                          Positioned(
-                            top: -MediaQuery.of(context).size.width * 0.08,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width * 0.85,
-                              height: MediaQuery.of(context).size.width * 0.85,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 30,
-                                    offset: const Offset(0, 15),
-                                  ),
-                                ],
-                                image: DecorationImage(
-                                  image: AssetImage(page['image']!),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                      // Hình tròn căn giữa
+                      Container(
+                        width: circleSize,
+                        height: circleSize,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.18),
+                              blurRadius: 30,
+                              offset: const Offset(0, 15),
                             ),
+                          ],
+                          image: DecorationImage(
+                            image: AssetImage(page['image']!),
+                            fit: BoxFit.cover,
                           ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      // Tiêu đề & phụ đề
+                      const SizedBox(height: 40),
+                      // Tiêu đề & phụ đề nằm dưới hình tròn
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32),
                         child: Column(
@@ -109,11 +107,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             Text(
                               page['title']!,
                               style: const TextStyle(
-                                fontSize: 42,
+                                fontSize: 30,
                                 fontWeight: FontWeight.w900,
                                 fontStyle: FontStyle.italic,
                                 color: Colors.black,
-                                letterSpacing: -1,
+                                letterSpacing: -0.5,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -146,12 +144,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     onPressed: () => _openLogin(context),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.black,
+                      backgroundColor: Colors.grey.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 28, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      elevation: 0,
                       textStyle: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    child: const Text('LOGIN'),
+                    child: const Text('ĐĂNG NHẬP'),
                   ),
                   // Dấu chấm điều hướng
                   Row(
@@ -185,7 +190,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                     child: const Text(
-                      'SIGNUP',
+                      'ĐĂNG KÝ',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

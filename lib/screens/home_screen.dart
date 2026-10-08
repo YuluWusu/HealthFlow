@@ -31,6 +31,7 @@ class HomeScreen extends StatelessWidget {
     final app = AppScope.of(context);
 
     return Scaffold(
+      endDrawer: _buildNotificationDrawer(context),
       body: SafeArea(
         child: ListenableBuilder(
           listenable: Listenable.merge([
@@ -150,7 +151,7 @@ class HomeScreen extends StatelessWidget {
           child: IconButton(
             icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.textPrimary, size: 22),
             onPressed: () {
-               // Có thể hiển thị bottom sheet thông báo ở đây
+               Scaffold.of(context).openEndDrawer();
             },
           ),
         ),
@@ -219,6 +220,69 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildNotificationDrawer(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.notifications_active_rounded, color: AppTheme.primary),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Thông báo',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                children: const [
+                  _NotificationTile(
+                    title: 'Đã đến giờ uống nước!',
+                    subtitle: 'Hãy uống 1 cốc nước (250ml) để duy trì sự tỉnh táo.',
+                    time: '10 phút trước',
+                    icon: Icons.local_drink_rounded,
+                    color: AppTheme.blue,
+                  ),
+                  _NotificationTile(
+                    title: 'Mục tiêu hoàn thành',
+                    subtitle: 'Bạn đã đạt 100% mục tiêu calo hôm nay. Tuyệt vời!',
+                    time: '2 giờ trước',
+                    icon: Icons.emoji_events_rounded,
+                    color: AppTheme.orange,
+                  ),
+                  _NotificationTile(
+                    title: 'Nhắc nhở tập luyện',
+                    subtitle: 'Đừng quên bài tập Cardio 15 phút chiều nay nhé.',
+                    time: 'Hôm qua',
+                    icon: Icons.fitness_center_rounded,
+                    color: AppTheme.pink,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -945,3 +1009,57 @@ class _DailyTip extends StatelessWidget {
     );
   }
 }
+
+class _NotificationTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String time;
+  final IconData icon;
+  final Color color;
+
+  const _NotificationTile({
+    required this.title,
+    required this.subtitle,
+    required this.time,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.15),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.3),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              time,
+              style: TextStyle(fontSize: 11, color: AppTheme.primary.withValues(alpha: 0.8)),
+            ),
+          ],
+        ),
+      ),
+      onTap: () {},
+      isThreeLine: true,
+    );
+  }
+}
+
