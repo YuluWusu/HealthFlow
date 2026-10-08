@@ -193,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     GestureDetector(
                       onTap: _isSubmitting
                           ? null
-                          : () => Navigator.of(context).pushReplacement(
+                          : () => Navigator.of(context).push(
                                 MaterialPageRoute<void>(
                                   builder: (_) => const LoginScreen(),
                                 ),

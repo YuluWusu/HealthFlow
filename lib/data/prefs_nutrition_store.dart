@@ -20,6 +20,7 @@ class PrefsNutritionStore implements NutritionStore {
   static const _key = 'hf_meals_v1';
   static const _comboKey = 'hf_combos_v1';
   static const _waterKey = 'hf_water_v1';
+  static const _cupKey = 'hf_water_cup_v1';
 
   final SharedPreferences _prefs;
   late List<MealEntry> _entries;
@@ -69,6 +70,31 @@ class PrefsNutritionStore implements NutritionStore {
     } catch (_) {
       return <String, int>{};
     }
+  }
+
+  @override
+  Future<int?> waterCupMl(String userId) async {
+    final raw = _prefs.getString(_cupKey);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      return (map[userId] as num?)?.toInt();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> setWaterCupMl(String userId, int ml) async {
+    Map<String, dynamic> map = <String, dynamic>{};
+    final raw = _prefs.getString(_cupKey);
+    if (raw != null && raw.isNotEmpty) {
+      try {
+        map = Map<String, dynamic>.from(jsonDecode(raw) as Map);
+      } catch (_) {}
+    }
+    map[userId] = ml;
+    await _prefs.setString(_cupKey, jsonEncode(map));
   }
 
   Future<void> _persistCombos() => _prefs.setString(
@@ -160,4 +186,8 @@ class PrefsNutritionStore implements NutritionStore {
     _water[waterDayKey(userId, day)] = ml;
     await _persistWater();
   }
+
+  @override
+  Future<Map<DateTime, int>> allWater(String userId) async =>
+      parseWaterDays(userId, _water);
 }

@@ -9,8 +9,10 @@ import '../theme/food_images.dart';
 
 /// Màn hình 7 trong bản thiết kế: thêm món ăn vào nhật ký.
 ///
-/// Có ô tìm kiếm, các nhóm món ăn và danh sách món kèm nút thêm nhanh.
-/// Bấm vào một món để mở màn hình chi tiết và chọn khẩu phần.
+/// Có ô tìm kiếm, các nhóm món ăn và danh sách món chỉ gồm chữ (không ảnh).
+/// Bấm vào một món hoặc dấu + để mở màn hình chi tiết, chọn khẩu phần rồi bỏ
+/// vào giỏ. Thanh giỏ ở cuối màn hình hiện số món và tổng kcal; bấm "Tiếp
+/// tục" để ghi tất cả vào bữa đã chọn.
 class AddFoodScreen extends StatefulWidget {
   /// Buổi ăn mặc định khi thêm món.
   final MealSlot initialSlot;
@@ -63,6 +65,8 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             category: _selectedCategory,
           );
 
+          final cartCount = app.nutrition.cartCount;
+
           return Column(
             children: [
               Padding(
@@ -100,12 +104,20 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                           final food = foods[index];
                           return _FoodListTile(
                             food: food,
-                            onTap: () => _openDetail(app.nutrition, food),
-                            onAdd: () => _addFood(app.nutrition, food, 1),
+                            // Dấu + cũng mở trang chi tiết để chọn khẩu phần.
+                            onTap: () => _openDetail(food),
+                            onAdd: () => _openDetail(food),
                           );
                         },
                       ),
               ),
+              if (cartCount > 0)
+                _CartBar(
+                  count: cartCount,
+                  calories: app.nutrition.cartCalories,
+                  onOpen: () => _openCart(app.nutrition),
+                  onContinue: () => _commitCart(app.nutrition, _selectedSlot),
+                ),
             ],
           );
         },
@@ -186,38 +198,58 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     );
   }
 
-  Future<void> _openDetail(NutritionRepository nutrition, FoodItem food) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
+  /// Mở trang chi tiết; khi người dùng bỏ món vào giỏ, trang trả về bữa đã chọn.
+  Future<void> _openDetail(FoodItem food) async {
+    final slot = await Navigator.of(context).push<MealSlot>(
+      MaterialPageRoute<MealSlot>(
         builder: (_) => FoodDetailScreen(food: food, initialSlot: _selectedSlot),
       ),
     );
+    if (slot != null && mounted) setState(() => _selectedSlot = slot);
   }
 
-  Future<void> _addFood(
-    NutritionRepository nutrition,
-    FoodItem food,
-    double portion,
-  ) async {
-    final auth = AuthScope.of(context, listen: false);
-    final user = auth.currentUser;
-    if (user == null) return;
+  /// Mở giỏ để chỉnh số phần; bấm "Tiếp tục" trong giỏ sẽ ghi vào bữa.
+  Future<void> _openCart(NutritionRepository nutrition) async {
+    final picked = await showModalBottomSheet<MealSlot>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _CartSheet(nutrition: nutrition, initialSlot: _selectedSlot),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _selectedSlot = picked);
+    await _commitCart(nutrition, picked);
+  }
 
+  /// "Tiếp tục": ghi mọi món trong giỏ vào [slot] rồi quay về màn hình trước.
+  Future<void> _commitCart(NutritionRepository nutrition, MealSlot slot) async {
+    final user = AuthScope.of(context, listen: false).currentUser;
+    if (user == null || nutrition.cartCount == 0) return;
+
+    final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
+    final count = nutrition.cartCount;
+    final calories = nutrition.cartCalories;
+    final water = NutritionRepository.waterOf(nutrition.cart);
 
-    await nutrition.addFood(
+    await nutrition.commitCart(
       userId: user.id,
-      food: food,
-      slot: _selectedSlot,
+      slot: slot,
       calorieGoal: user.dailyCalorieGoal,
-      portion: portion,
     );
 
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text('Đã thêm ${food.name} vào ${_selectedSlot.label.toLowerCase()}.'),
-      ),
-    );
+    if (!mounted) return;
+    navigator.pop();
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            'Đã thêm $count món vào ${slot.label.toLowerCase()} · $calories kcal'
+            '${water > 0 ? ' · +$water ml nước' : ''}',
+          ),
+        ),
+      );
   }
 }
 
@@ -263,7 +295,7 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-/// Một dòng món ăn trong danh sách.
+/// Một dòng món ăn trong danh sách: chỉ có chữ, không ảnh.
 class _FoodListTile extends StatelessWidget {
   final FoodItem food;
   final VoidCallback onTap;
@@ -289,21 +321,9 @@ class _FoodListTile extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(16, 10, 6, 10),
             child: Row(
               children: [
-                FoodThumb(
-                  food: food,
-                  size: 50,
-                  radius: 14,
-                  background: _backgroundFor(food.category),
-                  fallback: Icon(
-                    _iconFor(food.category),
-                    color: _colorFor(food.category),
-                    size: 25,
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,7 +354,7 @@ class _FoodListTile extends StatelessWidget {
                     color: AppTheme.primary,
                     size: 27,
                   ),
-                  tooltip: 'Thêm ${food.name}',
+                  tooltip: 'Chọn ${food.name}',
                 ),
               ],
             ),
@@ -343,50 +363,297 @@ class _FoodListTile extends StatelessWidget {
       ),
     );
   }
+}
 
-  static IconData _iconFor(FoodCategory category) {
-    switch (category) {
-      case FoodCategory.vietnamese:
-        return Icons.ramen_dining_rounded;
-      case FoodCategory.asian:
-        return Icons.dinner_dining_rounded;
-      case FoodCategory.drink:
-        return Icons.local_cafe_rounded;
-      case FoodCategory.other:
-        return Icons.bakery_dining_rounded;
-    }
+/// Thanh giỏ ở cuối màn hình (kiểu Shopee): biểu tượng giỏ kèm số món, tổng
+/// kcal và nút "Tiếp tục". Chỉ có chữ và biểu tượng, không ảnh món.
+class _CartBar extends StatelessWidget {
+  final int count;
+  final int calories;
+  final VoidCallback onOpen;
+  final VoidCallback onContinue;
+
+  const _CartBar({
+    required this.count,
+    required this.calories,
+    required this.onOpen,
+    required this.onContinue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        20,
+        10,
+        20,
+        10 + MediaQuery.of(context).padding.bottom,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: AppTheme.softShadow(opacity: 0.08, blur: 16),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              onTap: onOpen,
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Badge(
+                      label: Text('$count'),
+                      backgroundColor: AppTheme.danger,
+                      child: const Icon(
+                        Icons.shopping_basket_rounded,
+                        color: AppTheme.primary,
+                        size: 30,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$calories kcal',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                            ),
+                          ),
+                          const Text(
+                            'Bấm để xem giỏ',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            height: 46,
+            child: ElevatedButton(
+              onPressed: onContinue,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 26),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: const Text(
+                'Tiếp tục',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Giỏ món (dạng sheet): chỉ chữ, chỉnh số phần, chọn bữa và bấm "Tiếp tục".
+class _CartSheet extends StatefulWidget {
+  final NutritionRepository nutrition;
+  final MealSlot initialSlot;
+
+  const _CartSheet({required this.nutrition, required this.initialSlot});
+
+  @override
+  State<_CartSheet> createState() => _CartSheetState();
+}
+
+class _CartSheetState extends State<_CartSheet> {
+  late MealSlot _slot = widget.initialSlot;
+
+  static double _down(double p) => p > 1 ? p - 1 : p - 0.5;
+  static double _up(double p) => p >= 1 ? p + 1 : p + 0.5;
+
+  static String _portionText(double p) {
+    final n = p % 1 == 0 ? '${p.toInt()}' : p.toStringAsFixed(1).replaceAll('.', ',');
+    return '$n phần';
   }
 
-  static Color _colorFor(FoodCategory category) {
-    switch (category) {
-      case FoodCategory.vietnamese:
-        return AppTheme.primary;
-      case FoodCategory.asian:
-        return AppTheme.blue;
-      case FoodCategory.drink:
-        return AppTheme.orange;
-      case FoodCategory.other:
-        return AppTheme.purple;
-    }
-  }
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
 
-  static Color _backgroundFor(FoodCategory category) {
-    switch (category) {
-      case FoodCategory.vietnamese:
-        return AppTheme.lightGreen;
-      case FoodCategory.asian:
-        return AppTheme.lightBlue;
-      case FoodCategory.drink:
-        return AppTheme.lightOrange;
-      case FoodCategory.other:
-        return AppTheme.lightPurple;
-    }
+    return ListenableBuilder(
+      listenable: widget.nutrition,
+      builder: (context, _) {
+        final cart = widget.nutrition.cart;
+        final water = NutritionRepository.waterOf(cart);
+
+        return Container(
+          constraints: BoxConstraints(maxHeight: media.size.height * 0.8),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Giỏ món (${cart.length})',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                    ),
+                    if (cart.isNotEmpty)
+                      TextButton(
+                        onPressed: widget.nutrition.clearCart,
+                        child: const Text('Xóa hết'),
+                      ),
+                  ],
+                ),
+                if (cart.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        'Giỏ đang trống. Bấm + cạnh món để thêm.',
+                        style: TextStyle(color: AppTheme.textSecondary),
+                      ),
+                    ),
+                  ),
+                Flexible(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      for (final item in cart)
+                        ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            item.food.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(
+                            '${item.calories} kcal · ${_portionText(item.portion)}',
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () =>
+                                    widget.nutrition.setCartPortion(
+                                  item.food.id,
+                                  _down(item.portion),
+                                ),
+                                icon: Icon(
+                                  item.portion <= 0.5
+                                      ? Icons.delete_outline_rounded
+                                      : Icons.remove_circle_outline_rounded,
+                                  color: item.portion <= 0.5
+                                      ? AppTheme.danger
+                                      : null,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () =>
+                                    widget.nutrition.setCartPortion(
+                                  item.food.id,
+                                  _up(item.portion),
+                                ),
+                                icon: const Icon(
+                                  Icons.add_circle_outline_rounded,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                if (water > 0) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'Đồ uống trong giỏ sẽ cộng $water ml vào nước uống.',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: AppTheme.blue,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                _SlotPicker(
+                  selected: _slot,
+                  onChanged: (slot) => setState(() => _slot = slot),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: cart.isEmpty
+                        ? null
+                        : () => Navigator.of(context).pop(_slot),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Tiếp tục · ${_slot.label}',
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 
 /// Màn hình 8 trong bản thiết kế: chi tiết món ăn.
 ///
-/// Cho chọn khẩu phần và số lượng trước khi thêm vào nhật ký.
+/// Cho chọn khẩu phần và số lượng, rồi bỏ món vào giỏ của màn hình trước
+/// (bấm "Tiếp tục" ở đó mới ghi vào nhật ký). Ảnh bìa là ảnh của chính món.
 class FoodDetailScreen extends StatefulWidget {
   final FoodItem food;
   final MealSlot initialSlot;
@@ -413,6 +680,16 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   /// Tổng khẩu phần = khẩu phần × số lượng.
   double get _totalPortion => _portion * _quantity;
 
+  /// "1 phần (460g)" đã có sẵn số 1 ở đầu thì giữ nguyên, tránh hiện "1 1 phần".
+  static final RegExp _leadingOne = RegExp(r'^1\s');
+
+  static String _fullLabel(String serving) =>
+      _leadingOne.hasMatch(serving) ? serving : '1 phần ($serving)';
+
+  static String _halfLabel(String serving) => _leadingOne.hasMatch(serving)
+      ? '1/2 ${serving.substring(2)}'
+      : '1/2 phần ($serving)';
+
   @override
   Widget build(BuildContext context) {
     final food = widget.food;
@@ -420,6 +697,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     final protein = food.protein * _totalPortion;
     final carbs = food.carbs * _totalPortion;
     final fat = food.fat * _totalPortion;
+    final waterMl = (drinkMlOf(food) * _totalPortion).round();
 
     return Scaffold(
       body: SafeArea(
@@ -504,6 +782,10 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             ),
                           ],
                         ),
+                        if (waterMl > 0) ...[
+                          const SizedBox(height: 12),
+                          _WaterNote(ml: waterMl),
+                        ],
                         const SizedBox(height: 22),
                         const Text(
                           'Điều chỉnh khẩu phần',
@@ -515,13 +797,13 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         _PortionOption(
-                          label: '1 ${food.servingLabel}',
+                          label: _fullLabel(food.servingLabel),
                           isSelected: _portion == 1,
                           onTap: () => setState(() => _portion = 1),
                         ),
                         const SizedBox(height: 8),
                         _PortionOption(
-                          label: '1/2 ${food.servingLabel}',
+                          label: _halfLabel(food.servingLabel),
                           isSelected: _portion == 0.5,
                           onTap: () => setState(() => _portion = 0.5),
                         ),
@@ -554,34 +836,22 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     );
   }
 
-  /// Phần ảnh minh họa món ăn ở đầu trang.
-  ///
-  /// Chưa có ảnh thật nên dùng khối màu chuyển sắc kèm biểu tượng; khi bổ sung
-  /// ảnh chỉ cần thay phần này bằng `Image.asset`.
+  /// Ảnh bìa ở đầu trang: chính là ảnh minh họa của món (theo nhóm món), không
+  /// dùng một ảnh chung cho mọi món. Thiếu ảnh thì hiện biểu tượng trên nền xanh.
   Widget _buildHero(BuildContext context, FoodItem food) {
     return Stack(
       children: [
-        Container(
-          height: 210,
+        FoodThumb(
+          food: food,
+          size: 210,
           width: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF2E9E6B), Color(0xFF7FC79C)],
-            ),
-          ),
-          child: Image.asset(
-            'assets/images/hero_food.png',
-            fit: BoxFit.cover,
-            cacheWidth: 1080,
-            errorBuilder: (_, __, ___) => const Center(
-              child: Icon(
-                Icons.ramen_dining_rounded,
-                size: 96,
-                color: Colors.white24,
-              ),
-            ),
+          radius: 0,
+          cacheWidth: 1080,
+          background: const Color(0xFF7FC79C),
+          fallback: const Icon(
+            Icons.ramen_dining_rounded,
+            size: 96,
+            color: Colors.white24,
           ),
         ),
         SafeArea(
@@ -628,7 +898,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         width: double.infinity,
         height: 52,
         child: ElevatedButton(
-          onPressed: () => _addToDiary(calories),
+          onPressed: _addToCart,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.primary,
             foregroundColor: Colors.white,
@@ -646,35 +916,13 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     );
   }
 
-  Future<void> _addToDiary(int calories) async {
-    final auth = AuthScope.of(context, listen: false);
-    final user = auth.currentUser;
-    if (user == null) return;
-
-    final app = AppScope.of(context);
-    final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-
-    await app.nutrition.addFood(
-      userId: user.id,
-      food: widget.food,
-      slot: _slot,
-      calorieGoal: user.dailyCalorieGoal,
-      portion: _totalPortion,
-    );
-
-    if (!mounted) return;
-    navigator.pop();
-
-    final portionText =
-        _quantity > 1 ? '$_quantity × ${widget.food.servingLabel}' : '1 phần';
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          'Đã thêm ${widget.food.name} ($portionText) · $calories kcal',
-        ),
-      ),
-    );
+  /// Bỏ món vào giỏ rồi quay lại danh sách, trả về bữa đã chọn.
+  void _addToCart() {
+    AppScope.of(context).nutrition.addToCart(
+          widget.food,
+          portion: _totalPortion,
+        );
+    Navigator.of(context).pop(_slot);
   }
 }
 
@@ -706,6 +954,40 @@ class _CircleIconButton extends StatelessWidget {
           ),
           child: Icon(icon, size: 18, color: AppTheme.textPrimary),
         ),
+      ),
+    );
+  }
+}
+
+/// Ghi chú: đồ uống này sẽ được cộng vào mục "Nước uống" của ngày.
+class _WaterNote extends StatelessWidget {
+  final int ml;
+
+  const _WaterNote({required this.ml});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: AppTheme.lightBlue,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.water_drop_rounded, size: 16, color: AppTheme.blue),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Cộng $ml ml vào nước uống hôm nay',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.blue,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

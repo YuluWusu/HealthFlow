@@ -15,6 +15,7 @@ import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
 import '../theme/food_images.dart';
 import 'add_food_screen.dart';
+import 'water_screen.dart';
 
 /// Màn hình Dinh dưỡng.
 ///
@@ -2807,6 +2808,12 @@ class _StatsTabState extends State<_StatsTab>
             nutrition: nutrition,
             days: _range == 1 ? 7 : 30,
           ),
+          const SizedBox(height: 16),
+          _WaterChartCard(
+            key: ValueKey('water$_range'),
+            nutrition: nutrition,
+            days: _range == 1 ? 7 : 30,
+          ),
         ] else if (summary.calories == 0) ...[
           const _StatsEmptyCard(),
         ] else ...[
@@ -3000,6 +3007,10 @@ class _StatsTabState extends State<_StatsTab>
         if (_range == 0 && summary.calories > 0) ...[
           const SizedBox(height: 16),
           _InsightCard(summary: summary),
+        ],
+        if (_range == 0) ...[
+          const SizedBox(height: 16),
+          _WaterDayStatsCard(nutrition: nutrition),
         ],
       ],
     ),
@@ -3869,19 +3880,17 @@ String _liters(int ml) {
   return text.replaceAll('.', ',');
 }
 
-/// Thẻ uống nước: bấm ly nước để +250 ml.
+/// Thẻ nước uống: hiện tiến độ trong ngày. Bấm vào thẻ (hoặc nút "Thêm") để
+/// mở màn hình nước uống riêng, nơi chọn lượng nước cần thêm.
 class _WaterCard extends StatelessWidget {
   const _WaterCard({required this.nutrition});
 
   final NutritionRepository nutrition;
 
-  static const int _step = 250;
-
-  Future<void> _add(BuildContext context, int delta) async {
-    final user = AuthScope.of(context, listen: false).currentUser;
-    if (user == null) return;
-    HapticFeedback.selectionClick();
-    await nutrition.addWater(userId: user.id, deltaMl: delta);
+  Future<void> _openScreen(BuildContext context) {
+    return Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const WaterScreen()),
+    );
   }
 
   @override
@@ -3892,89 +3901,513 @@ class _WaterCard extends StatelessWidget {
     final progress = (ml / goal).clamp(0.0, 1.0).toDouble();
     final done = ml >= goal;
 
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _openScreen(context),
+      child: _SoftCard(
+        padding: const EdgeInsets.all(14),
+        radius: 20,
+        child: Row(
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: AppTheme.lightBlue,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const Icon(
+                Icons.water_drop_rounded,
+                color: AppTheme.blue,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Nước uống',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${_liters(ml)} / ${_liters(goal)} L${done ? ' · Đạt mục tiêu' : ''}',
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 6,
+                      backgroundColor: AppTheme.lightBlue,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppTheme.blue,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: AppTheme.blue,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add_rounded, color: Colors.white, size: 16),
+                  SizedBox(width: 2),
+                  Text(
+                    'Thêm',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Thống kê nước của một ngày (tab Thống kê, chế độ Ngày).
+class _WaterDayStatsCard extends StatelessWidget {
+  const _WaterDayStatsCard({required this.nutrition});
+
+  final NutritionRepository nutrition;
+
+  @override
+  Widget build(BuildContext context) {
+    final user = AuthScope.of(context, listen: false).currentUser;
+    final goal = NutritionRepository.waterGoalFor(user?.weightKg ?? 55);
+    final ml = nutrition.waterMl;
+    final progress = (ml / goal).clamp(0.0, 1.0).toDouble();
+    final percent = (ml * 100 / goal).round();
+    final remain = goal - ml;
+    final glasses = (remain / 250).ceil();
+
+    final tip = ml == 0
+        ? 'Chưa ghi nhận ly nước nào. Uống một ly để bắt đầu nhé.'
+        : remain <= 0
+            ? 'Đã đạt mục tiêu nước. Giữ nhịp này nhé!'
+            : 'Còn thiếu ${_liters(remain)} L, khoảng $glasses ly nữa.';
+
     return _SoftCard(
-      padding: const EdgeInsets.all(14),
-      radius: 20,
-      child: Row(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: AppTheme.lightBlue,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Icon(
-              Icons.water_drop_rounded,
-              color: AppTheme.blue,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: AppTheme.lightBlue,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(
+                  Icons.water_drop_rounded,
+                  color: AppTheme.blue,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
                   'Nước uống',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: AppTheme.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  '${_liters(ml)} / ${_liters(goal)} L${done ? ' · Đạt mục tiêu' : ''}',
+              ),
+              Text(
+                'Mục tiêu ${_liters(goal)} L',
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                _liters(ml),
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 4, bottom: 4),
+                child: Text(
+                  'L',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$percent%',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.blue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor: AppTheme.lightBlue,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.blue),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            tip,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Biểu đồ cột nước [days] ngày kết thúc ở ngày đang xem (tab Thống kê, chế độ
+/// Tuần/Tháng) kèm đường nét đứt mục tiêu. Bấm vào cột để xem ngày đó.
+class _WaterChartCard extends StatefulWidget {
+  const _WaterChartCard({
+    super.key,
+    required this.nutrition,
+    this.days = 7,
+  });
+
+  final NutritionRepository nutrition;
+  final int days;
+
+  @override
+  State<_WaterChartCard> createState() => _WaterChartCardState();
+}
+
+class _WaterChartCardState extends State<_WaterChartCard> {
+  List<DayWater> _data = const [];
+  String _lastKey = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refresh();
+  }
+
+  @override
+  void didUpdateWidget(covariant _WaterChartCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _refresh();
+  }
+
+  void _refresh() {
+    final n = widget.nutrition;
+    final key =
+        '${widget.days}-${n.selectedDay.millisecondsSinceEpoch}-${n.waterMl}';
+    if (key == _lastKey) return;
+    _lastKey = key;
+    final user = AuthScope.of(context, listen: false).currentUser;
+    if (user == null) return;
+    n.waterLastDays(user.id, n.selectedDay, days: widget.days).then((data) {
+      if (mounted) setState(() => _data = data);
+    });
+  }
+
+  static const _weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+
+  @override
+  Widget build(BuildContext context) {
+    final n = widget.nutrition;
+    final user = AuthScope.of(context, listen: false).currentUser;
+    final goal = NutritionRepository.waterGoalFor(user?.weightKg ?? 55);
+    final compact = widget.days > 7;
+    final withData = _data.where((d) => d.ml > 0).toList();
+    final total = withData.fold<int>(0, (a, d) => a + d.ml);
+    final average = withData.isEmpty ? 0 : (total / withData.length).round();
+    final okDays = withData.where((d) => d.ml >= goal).length;
+
+    var maxValue = goal;
+    for (final d in _data) {
+      if (d.ml > maxValue) maxValue = d.ml;
+    }
+    if (maxValue <= 0) maxValue = 1;
+
+    const chartHeight = 112.0;
+    const labelArea = 22.0;
+    final lineBottom = labelArea + chartHeight * (goal / maxValue);
+
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: AppTheme.lightBlue,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: const Icon(
+                  Icons.water_drop_rounded,
+                  color: AppTheme.blue,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  compact ? 'Nước uống 30 ngày' : 'Nước uống 7 ngày',
                   style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+              if (withData.isEmpty)
+                const Text(
+                  'Chưa có dữ liệu',
+                  style: TextStyle(
                     fontSize: 11.5,
                     color: AppTheme.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 6,
-                    backgroundColor: AppTheme.lightBlue,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppTheme.blue,
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: chartHeight + 36,
+            child: Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var i = 0; i < _data.length; i++)
+                      Expanded(
+                        child: _WaterBar(
+                          data: _data[i],
+                          maxValue: maxValue,
+                          chartHeight: chartHeight,
+                          goal: goal,
+                          compact: compact,
+                          selected: _data[i].day == n.selectedDay,
+                          label: compact
+                              ? ((_data.length - 1 - i) % 5 == 0
+                                  ? '${_data[i].day.day}'
+                                  : '')
+                              : _weekdays[_data[i].day.weekday - 1],
+                          onTap: () => n.selectDay(_data[i].day),
+                        ),
+                      ),
+                  ],
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: lineBottom,
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      size: const Size(double.infinity, 1),
+                      painter: _DashedLinePainter(
+                        color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  bottom: lineBottom + 2,
+                  child: IgnorePointer(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'Mục tiêu ${_liters(goal)} L',
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 10),
-          Column(
-            mainAxisSize: MainAxisSize.min,
+          const SizedBox(height: 10),
+          Row(
             children: [
-              FilledButton.icon(
-                onPressed: () => _add(context, _step),
-                icon: const Icon(Icons.local_drink_rounded, size: 18),
-                label: const Text('+250 ml'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppTheme.blue,
-                  foregroundColor: Colors.white,
-                  visualDensity: VisualDensity.compact,
-                  textStyle: const TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.bold,
+              Expanded(
+                child: _RangeStat(
+                  label: 'Trung bình',
+                  value: '${_liters(average)} L',
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              Expanded(
+                child: _RangeStat(
+                  label: 'Đạt mục tiêu',
+                  value: '$okDays ngày',
+                  color: AppTheme.blue,
+                ),
+              ),
+              Expanded(
+                child: _RangeStat(
+                  label: 'Tổng cộng',
+                  value: '${_liters(total)} L',
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Đường nét đứt là mục tiêu. Cột đậm là ngày đạt mục tiêu. Bấm vào cột để xem ngày đó.',
+            style: TextStyle(
+              fontSize: 10.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WaterBar extends StatelessWidget {
+  const _WaterBar({
+    required this.data,
+    required this.maxValue,
+    required this.chartHeight,
+    required this.goal,
+    required this.selected,
+    required this.label,
+    required this.onTap,
+    this.compact = false,
+  });
+
+  final DayWater data;
+  final int maxValue;
+  final double chartHeight;
+  final int goal;
+  final bool selected;
+  final bool compact;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final reached = data.ml >= goal;
+    final barHeight = data.ml <= 0
+        ? 3.0
+        : (chartHeight * data.ml / maxValue).clamp(6.0, chartHeight);
+    final alpha = reached ? 1.0 : (selected ? 0.85 : 0.45);
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (!compact && data.ml > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 3),
+              child: Text(
+                _liters(data.ml),
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                  color:
+                      selected ? AppTheme.textPrimary : AppTheme.textSecondary,
+                ),
+              ),
+            ),
+          Container(
+            width: compact ? 5 : 18,
+            height: barHeight,
+            decoration: BoxDecoration(
+              color: data.ml <= 0
+                  ? AppTheme.textSecondary.withValues(alpha: 0.2)
+                  : AppTheme.blue.withValues(alpha: alpha),
+              borderRadius: BorderRadius.circular(compact ? 3 : 6),
+            ),
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 16,
+            child: OverflowBox(
+              maxWidth: 40,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 0 : 6,
+                  vertical: 1,
+                ),
+                decoration: BoxDecoration(
+                  color: selected && !compact
+                      ? AppTheme.blue.withValues(alpha: 0.14)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: compact ? 9 : 11,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                    color: selected ? AppTheme.blue : AppTheme.textSecondary,
                   ),
                 ),
               ),
-              if (ml > 0)
-                TextButton(
-                  onPressed: () => _add(context, -_step),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppTheme.textSecondary,
-                    visualDensity: VisualDensity.compact,
-                    textStyle: const TextStyle(fontSize: 11),
-                  ),
-                  child: const Text('Bớt 250 ml'),
-                ),
-            ],
+            ),
           ),
         ],
       ),
