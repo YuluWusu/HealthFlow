@@ -220,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     GestureDetector(
                       onTap: _isSubmitting
                           ? null
-                          : () => Navigator.of(context).push(
+                          : () => Navigator.of(context).pushReplacement(
                                 MaterialPageRoute<void>(
                                   builder: (_) => const RegisterScreen(),
                                 ),
