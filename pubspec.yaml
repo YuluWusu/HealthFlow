@@ -37,6 +37,7 @@ dependencies:
   http: ^1.2.2
   shared_preferences: ^2.3.2
   image_picker: ^1.2.4
+  flutter_local_notifications: ^22.3.1
 
 dev_dependencies:
   flutter_test:
@@ -68,11 +69,11 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/
-    - assets/images/calorie_bg.jpg
-    - assets/images/auth_bg.jpg
-    - assets/images/welcome_bg.jpg
-    - assets/images/avatar.jpg
+    - assets/images/auth/
+    - assets/images/welcome/
+    - assets/images/food/
+    - assets/images/home/
+    - assets/images/core/
     - assets/sounds/
     - assets/data/vn_foods.json
 

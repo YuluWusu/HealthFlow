@@ -101,9 +101,9 @@ class _NutritionBackdrop extends StatelessWidget {
   final Widget child;
 
   static const List<String> _assets = [
-    'assets/images/bg_today.jpg',
-    'assets/images/bg_menu.jpg',
-    'assets/images/bg_stats.jpg',
+    'assets/images/home/bg_today.jpg',
+    'assets/images/home/bg_menu.jpg',
+    'assets/images/home/bg_stats.jpg',
   ];
 
   @override
@@ -805,7 +805,7 @@ class _RingPainter extends CustomPainter {
 
 /// Dải ảnh đầu mỗi thẻ bữa ăn (mỗi bữa một ảnh).
 ///
-/// Ảnh đặt tại assets/images/meal_breakfast.jpg, meal_lunch.jpg,
+/// Ảnh đặt tại assets/images/food/meal_breakfast.jpg, meal_lunch.jpg,
 /// meal_dinner.jpg và meal_snack.jpg. Nếu thiếu ảnh thì hiện dải gradient
 /// theo màu của bữa để giao diện không bị trống.
 class _MealBanner extends StatelessWidget {
@@ -816,13 +816,13 @@ class _MealBanner extends StatelessWidget {
   String get _asset {
     switch (slot) {
       case MealSlot.breakfast:
-        return 'assets/images/meal_breakfast.jpg';
+        return 'assets/images/food/meal_breakfast.jpg';
       case MealSlot.lunch:
-        return 'assets/images/meal_lunch.jpg';
+        return 'assets/images/food/meal_lunch.jpg';
       case MealSlot.dinner:
-        return 'assets/images/meal_dinner.jpg';
+        return 'assets/images/food/meal_dinner.jpg';
       case MealSlot.snack:
-        return 'assets/images/meal_snack.jpg';
+        return 'assets/images/food/meal_snack.jpg';
     }
   }
 
@@ -5432,7 +5432,7 @@ class _HungryBowlPainter extends CustomPainter {
 
 /// Ba banner ảnh bo góc chọn danh mục: Món Việt, Món Tây, Đồ uống.
 ///
-/// Ảnh ưu tiên `assets/images/cat_<tên>.jpg` (thả ảnh thật vào là app tự
+/// Ảnh ưu tiên `assets/images/food/cat_<tên>.jpg` (thả ảnh thật vào là app tự
 /// dùng); nếu chưa có thì dùng ảnh nhóm món có sẵn, rồi mới tới nền màu.
 class _CategoryTiles extends StatelessWidget {
   const _CategoryTiles({required this.selected, required this.onTap});

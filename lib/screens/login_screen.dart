@@ -31,6 +31,14 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Lỗi trả về từ lớp nghiệp vụ (sai mật khẩu, không tìm thấy tài khoản...).
   String? _serverError;
 
+  static const _bgImage = AssetImage('assets/images/auth/auth_bg.jpg');
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(_bgImage, context);
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -56,11 +64,13 @@ class _LoginScreenState extends State<LoginScreen> {
         fit: StackFit.expand,
         children: [
           // Hình nền mờ cho trang đăng nhập / đăng ký
-          Image.asset(
-            'assets/images/auth_bg.jpg', // Thay ảnh thực tế của bạn vào đây
-            fit: BoxFit.cover,
-            opacity: const AlwaysStoppedAnimation(0.15), // Mờ đi để không làm rối giao diện
-            errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+          Opacity(
+            opacity: 0.15,
+            child: Image(
+              image: _bgImage,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+            ),
           ),
           SafeArea(
             child: SingleChildScrollView(

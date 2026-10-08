@@ -12,36 +12,36 @@ String foodImageBase(FoodItem food) {
   if (food is CatalogFood) {
     switch (food.group) {
       case 'Món nước':
-        return 'assets/images/food_mon_nuoc';
+        return 'assets/images/food/food_mon_nuoc';
       case 'Món bánh':
-        return 'assets/images/food_mon_banh';
+        return 'assets/images/food/food_mon_banh';
       case 'Món kho/xào':
-        return 'assets/images/food_kho_xao';
+        return 'assets/images/food/food_kho_xao';
       case 'Món chiên/nướng':
-        return 'assets/images/food_chien_nuong';
+        return 'assets/images/food/food_chien_nuong';
       case 'Món cơm/xôi':
-        return 'assets/images/food_com_xoi';
+        return 'assets/images/food/food_com_xoi';
       case 'Món canh/lẩu':
-        return 'assets/images/food_canh_lau';
+        return 'assets/images/food/food_canh_lau';
       case 'Món tráng miệng/chè':
-        return 'assets/images/food_trang_mieng';
+        return 'assets/images/food/food_trang_mieng';
       case 'Món gỏi/nộm':
-        return 'assets/images/food_goi_nom';
+        return 'assets/images/food/food_goi_nom';
       case 'Món luộc':
-        return 'assets/images/food_luoc';
+        return 'assets/images/food/food_luoc';
     }
     if (food.source == FoodSource.usda) {
-      return 'assets/images/food_tay';
+      return 'assets/images/food/food_tay';
     }
   }
   switch (food.category) {
     case FoodCategory.drink:
-      return 'assets/images/food_drink';
+      return 'assets/images/food/food_drink';
     case FoodCategory.asian:
-      return 'assets/images/food_tay';
+      return 'assets/images/food/food_tay';
     case FoodCategory.vietnamese:
     case FoodCategory.other:
-      return 'assets/images/food_default';
+      return 'assets/images/food/food_default';
   }
 }
 

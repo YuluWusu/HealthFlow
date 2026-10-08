@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/account_store.dart';
 import '../data/health_store.dart';
@@ -35,23 +36,79 @@ class AuthRepository extends ChangeNotifier {
   User? _currentUser;
   bool _isRestoring = true;
 
+  /// Đánh dấu người dùng mới chưa hoàn thành onboarding
+  bool _needsOnboarding = false;
+
   User? get currentUser => _currentUser;
 
   bool get isLoggedIn => _currentUser != null;
 
+  /// `true` nếu người dùng mới đăng ký và chưa hoàn thành thiết lập ban đầu.
+  bool get needsOnboarding => _needsOnboarding;
+
   /// `true` trong lúc ứng dụng đang kiểm tra phiên đăng nhập đã lưu.
   bool get isRestoring => _isRestoring;
 
+  /// Key lưu trữ trong SharedPreferences
+  static const String _keyLoggedInUserId = 'logged_in_user_id';
+  static const String _keyOnboardingComplete = 'onboarding_complete';
+
   /// Khôi phục phiên đăng nhập đã lưu (nếu có).
   ///
-  /// Hiện tại chưa có `shared_preferences` nên phiên không tồn tại qua các
-  /// lần mở lại ứng dụng. Khi bổ sung, chỉ cần đọc mã người dùng đã lưu ở
-  /// đây rồi gọi [_accounts.findById].
+  /// Đọc mã người dùng đã lưu trong SharedPreferences và đăng nhập lại.
   Future<void> restoreSession() async {
-    // Bước mô phỏng độ trễ đọc bộ nhớ thiết bị; giữ hàm bất đồng bộ để sau
-    // này thay bằng truy vấn thật mà không phải sửa nơi gọi.
-    await _delay();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedUserId = prefs.getString(_keyLoggedInUserId);
+
+      if (savedUserId != null && savedUserId.isNotEmpty) {
+        final user = await _accounts.findById(savedUserId);
+        if (user != null) {
+          _currentUser = user;
+          // Kiểm tra xem đã onboarding chưa
+          final onboardingDone = prefs.getBool('${_keyOnboardingComplete}_${user.id}') ?? false;
+          _needsOnboarding = !onboardingDone;
+        }
+      }
+    } catch (_) {
+      // Bỏ qua lỗi đọc SharedPreferences
+    }
+
     _isRestoring = false;
+    notifyListeners();
+  }
+
+  /// Lưu phiên đăng nhập vào SharedPreferences
+  Future<void> _saveSession(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyLoggedInUserId, userId);
+    } catch (_) {
+      // Bỏ qua lỗi lưu
+    }
+  }
+
+  /// Xóa phiên đăng nhập khỏi SharedPreferences
+  Future<void> _clearSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_keyLoggedInUserId);
+    } catch (_) {
+      // Bỏ qua lỗi xóa
+    }
+  }
+
+  /// Đánh dấu đã hoàn thành onboarding
+  Future<void> completeOnboarding() async {
+    _needsOnboarding = false;
+    if (_currentUser != null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('${_keyOnboardingComplete}_${_currentUser!.id}', true);
+      } catch (_) {
+        // Bỏ qua lỗi lưu
+      }
+    }
     notifyListeners();
   }
 
@@ -134,12 +191,27 @@ class AuthRepository extends ChangeNotifier {
     }
 
     _currentUser = user;
+
+    // Kiểm tra onboarding
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final onboardingDone = prefs.getBool('${_keyOnboardingComplete}_${user.id}') ?? false;
+      _needsOnboarding = !onboardingDone;
+    } catch (_) {
+      _needsOnboarding = false;
+    }
+
+    // Lưu phiên đăng nhập
+    await _saveSession(user.id);
+
     notifyListeners();
     return user;
   }
 
   Future<void> logout() async {
+    await _clearSession();
     _currentUser = null;
+    _needsOnboarding = false;
     notifyListeners();
   }
 
@@ -224,7 +296,12 @@ class AuthRepository extends ChangeNotifier {
       await _health.insert(newWeightMetric);
     }
 
-    notifyListeners();
+    // Sử dụng WidgetsBinding.instance.addPostFrameCallback để tránh lỗi
+    // "setState() or markNeedsBuild() called during build" khi
+    // notifyListeners() được gọi từ trong một dialog context.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
     return newWeightMetric;
   }
 

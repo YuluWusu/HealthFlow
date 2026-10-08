@@ -7,6 +7,7 @@ import 'data/auth_scope.dart';
 import 'data/nutrition_repository.dart';
 import 'data/prefs_nutrition_store.dart';
 import 'screens/main_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -90,11 +91,24 @@ class AuthGate extends StatelessWidget {
       );
     }
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      child: auth.isLoggedIn
-          ? const MainScreen(key: ValueKey('main'))
-          : const WelcomeScreen(key: ValueKey('welcome')),
+    if (!auth.isLoggedIn) {
+      return const AnimatedSwitcher(
+        duration: Duration(milliseconds: 250),
+        child: WelcomeScreen(key: ValueKey('welcome')),
+      );
+    }
+
+    // Nếu người dùng mới đăng nhập lần đầu, hiện onboarding
+    if (auth.needsOnboarding) {
+      return const AnimatedSwitcher(
+        duration: Duration(milliseconds: 250),
+        child: OnboardingScreen(key: ValueKey('onboarding')),
+      );
+    }
+
+    return const AnimatedSwitcher(
+      duration: Duration(milliseconds: 250),
+      child: MainScreen(key: ValueKey('main')),
     );
   }
 }

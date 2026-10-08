@@ -20,25 +20,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       'title': 'Thấu Hiểu Cơ Thể',
       'subtitle':
           'Theo dõi chỉ số sức khoẻ mỗi ngày.',
-      'image': 'assets/images/welcome_health.jpg',
+      'image': 'assets/images/welcome/welcome_health.jpg',
     },
     {
       'title': 'Bứt Phá Giới Hạn',
       'subtitle':
           'Thiết lập mục tiêu, theo dõi tiến độ vận động.',
-      'image': 'assets/images/welcome_workout.jpg',
+      'image': 'assets/images/welcome/welcome_workout.jpg',
     },
     {
       'title': 'Quản lý ăn uống',
       'subtitle':
           'Thiết kế thực đơn khoa học chỉ với vài cú chạm.',
-      'image': 'assets/images/welcome_food.jpg',
+      'image': 'assets/images/welcome/welcome_food.jpg',
     },
     {
       'title': 'Chào mừng đến với HealthFlow',
       'subtitle':
-          'Trợ lý chăm sóc sức khỏe toàn diện nằm gọn trong túi bạn. Hãy cùng kiến tạo một phiên bản hoàn hảo hơn của chính mình ngay hôm nay!',
-      'image': 'assets/images/welcome_healthflow.png',
+          'Trợ lý chăm sóc sức khỏe toàn diện nằm gọn trong túi bạn!',
+      'image': 'assets/images/welcome/welcome_healthflow.png',
     },
   ];
 
@@ -76,59 +76,72 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 itemBuilder: (context, index) {
                   final page = _pages[index];
                   final circleSize = MediaQuery.of(context).size.width * 0.75;
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Hình tròn căn giữa
-                      Container(
-                        width: circleSize,
-                        height: circleSize,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.18),
-                              blurRadius: 30,
-                              offset: const Offset(0, 15),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      children: [
+                        // Phần trên: giãn đều, chứa hình tròn căn giữa
+                        Expanded(
+                          flex: 3,
+                          child: Center(
+                            child: Container(
+                              width: circleSize,
+                              height: circleSize,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.18),
+                                    blurRadius: 30,
+                                    offset: const Offset(0, 15),
+                                  ),
+                                ],
+                                image: DecorationImage(
+                                  image: AssetImage(page['image']!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
-                          ],
-                          image: DecorationImage(
-                            image: AssetImage(page['image']!),
-                            fit: BoxFit.cover,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 40),
-                      // Tiêu đề & phụ đề nằm dưới hình tròn
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Column(
-                          children: [
-                            Text(
-                              page['title']!,
-                              style: const TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                                fontStyle: FontStyle.italic,
-                                color: Colors.black,
-                                letterSpacing: -0.5,
+                        // Phần dưới: chứa text, chiều cao cố định cho tất cả trang
+                        SizedBox(
+                          height: 140,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                page['title']!,
+                                style: const TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w900,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.black,
+                                  letterSpacing: -0.5,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              page['subtitle']!,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: AppTheme.textSecondary,
-                                height: 1.4,
+                              const SizedBox(height: 12),
+                              Expanded(
+                                child: Text(
+                                  page['subtitle']!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppTheme.textSecondary,
+                                    height: 1.4,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 },
               ),

@@ -33,6 +33,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _showTermsError = false;
   String? _serverError;
 
+  static const _bgImage = AssetImage('assets/images/auth/auth_bg.jpg');
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(_bgImage, context);
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -59,11 +67,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            'assets/images/auth_bg.jpg',
-            fit: BoxFit.cover,
-            opacity: const AlwaysStoppedAnimation(0.15),
-            errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+          Opacity(
+            opacity: 0.15,
+            child: Image(
+              image: _bgImage,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+            ),
           ),
           SafeArea(
             child: SingleChildScrollView(

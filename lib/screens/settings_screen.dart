@@ -9,6 +9,7 @@ import '../data/auth_repository.dart';
 import '../data/auth_scope.dart';
 import '../models/user.dart';
 import '../theme/app_theme.dart';
+import '../services/notification_service.dart';
 import '../widgets/app_card.dart';
 import '../widgets/error_banner.dart';
 import 'health_goal_screen.dart';
@@ -71,17 +72,7 @@ class SettingsScreen extends StatelessWidget {
           const _SectionLabel('Quyền ứng dụng'),
           AppCard(
             padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Column(
-              children: [
-                _SwitchTile(
-                  icon: Icons.notifications_active_outlined,
-                  title: 'Cho phép thông báo',
-                  subtitle: 'Nhắc nhở lịch tập và uống nước',
-                  iconColor: AppTheme.orange,
-                  initialValue: true,
-                ),
-              ],
-            ),
+            child: _NotificationSwitchTile(),
           ),
           const SizedBox(height: 20),
           const _SectionLabel('Bảo mật và hỗ trợ'),
@@ -146,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
-            void submit() {
+            void submit() async {
               controller.clear();
               if (nameController.text.trim().isEmpty) {
                 setDialogState(
@@ -154,14 +145,21 @@ class SettingsScreen extends StatelessWidget {
                 );
                 return;
               }
-              Navigator.of(dialogContext).pop();
-              _run(
-                context,
-                action: () => auth.updateProfile(
+              try {
+                await auth.updateProfile(
                   fullName: nameController.text,
-                ),
-                successMessage: 'Đã cập nhật tên hiển thị.',
-              );
+                );
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã cập nhật tên hiển thị.')),
+                  );
+                }
+              } on AuthException catch (e) {
+                setDialogState(() => controller.message = e.message);
+              } catch (_) {
+                setDialogState(() => controller.message = 'Có lỗi xảy ra, vui lòng thử lại.');
+              }
             }
 
             return AlertDialog(
@@ -386,25 +384,6 @@ class SettingsScreen extends StatelessWidget {
   // Tiện ích dùng chung trong màn hình
   // ---------------------------------------------------------------------
 
-  /// Chạy một thao tác bất đồng bộ và báo kết quả bằng SnackBar.
-  Future<void> _run(
-    BuildContext context, {
-    required Future<void> Function() action,
-    required String successMessage,
-  }) async {
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      await action();
-      messenger.showSnackBar(SnackBar(content: Text(successMessage)));
-    } on AuthException catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text(error.message)));
-    } catch (_) {
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Có lỗi xảy ra, vui lòng thử lại.')),
-      );
-    }
-  }
-
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -434,7 +413,7 @@ class _ProfileHeader extends StatelessWidget {
                   backgroundColor: AppTheme.lightGreen,
                   backgroundImage: user.avatarPath != null && user.avatarPath!.isNotEmpty
                       ? FileImage(File(user.avatarPath!))
-                      : const AssetImage('assets/images/avatar.jpg') as ImageProvider,
+                      : const AssetImage('assets/images/core/avatar.jpg') as ImageProvider,
                 ),
                 Positioned(
                   right: 0,
@@ -576,38 +555,51 @@ class _ProfileHeader extends StatelessWidget {
   }
 
   Future<void> _pickAvatarFromGallery(BuildContext context) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      if (!context.mounted) return;
-      final auth = AuthScope.of(context, listen: false);
-      auth.updateProfile(avatarPath: pickedFile.path).then((_) {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        if (!context.mounted) return;
+        final auth = AuthScope.of(context, listen: false);
+        await auth.updateProfile(avatarPath: pickedFile.path);
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã cập nhật ảnh đại diện.')),
         );
-      });
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể truy cập thư viện ảnh. Vui lòng kiểm tra quyền trong cài đặt thiết bị.')),
+      );
     }
   }
 
   Future<void> _pickAvatarFromCamera(BuildContext context) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      if (!context.mounted) return;
-      final auth = AuthScope.of(context, listen: false);
-      auth.updateProfile(avatarPath: pickedFile.path).then((_) {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      if (pickedFile != null) {
+        if (!context.mounted) return;
+        final auth = AuthScope.of(context, listen: false);
+        await auth.updateProfile(avatarPath: pickedFile.path);
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã cập nhật ảnh đại diện.')),
         );
-      });
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không thể truy cập camera. Vui lòng kiểm tra quyền trong cài đặt thiết bị.')),
+      );
     }
   }
 
   void _removeAvatar(BuildContext context) {
     final auth = AuthScope.of(context, listen: false);
     auth.updateProfile(avatarPath: '').then((_) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đã xóa ảnh đại diện.')),
       );
@@ -615,53 +607,79 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-class _SwitchTile extends StatefulWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color iconColor;
-  final bool initialValue;
-
-  const _SwitchTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.iconColor,
-    required this.initialValue,
-  });
-
+/// Switch tile cho thông báo với chức năng thực sự (#4)
+class _NotificationSwitchTile extends StatefulWidget {
   @override
-  State<_SwitchTile> createState() => _SwitchTileState();
+  State<_NotificationSwitchTile> createState() => _NotificationSwitchTileState();
 }
 
-class _SwitchTileState extends State<_SwitchTile> {
-  late bool _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.initialValue;
-  }
+class _NotificationSwitchTileState extends State<_NotificationSwitchTile> {
+  bool _value = false;
+  bool _isRequesting = false;
 
   @override
   Widget build(BuildContext context) {
     return SettingsTile(
-      icon: widget.icon,
-      title: widget.title,
-      subtitle: widget.subtitle,
-      iconColor: widget.iconColor,
+      icon: Icons.notifications_active_outlined,
+      title: 'Cho phép thông báo',
+      subtitle: _value ? 'Đã bật thông báo' : 'Nhắc nhở lịch tập và uống nước',
+      iconColor: AppTheme.orange,
       showChevron: false,
-      trailing: Switch(
-        value: _value,
-        activeColor: AppTheme.primary,
-        onChanged: (val) {
-          setState(() => _value = val);
-        },
-      ),
-      onTap: () {
-        setState(() => _value = !_value);
-      },
+      trailing: _isRequesting
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Switch(
+              value: _value,
+              activeColor: AppTheme.primary,
+              onChanged: (val) => _toggleNotification(val),
+            ),
+      onTap: () => _toggleNotification(!_value),
     );
+  }
+
+  Future<void> _toggleNotification(bool enable) async {
+    if (_isRequesting) return;
+
+    if (enable) {
+      setState(() => _isRequesting = true);
+
+      final service = NotificationService();
+      await service.init();
+      final granted = await service.requestPermission();
+
+      if (granted && mounted) {
+        setState(() {
+          _value = true;
+          _isRequesting = false;
+        });
+        
+        await service.showNotification(
+          id: 0,
+          title: 'HealthFlow xin chào!',
+          body: 'Bạn đã sẵn sàng nhận thông báo nhắc nhở sức khỏe.',
+        );
+      } else {
+        if (mounted) {
+          setState(() {
+            _value = false;
+            _isRequesting = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Vui lòng cấp quyền thông báo trong cài đặt hệ thống để tiếp tục.')),
+          );
+        }
+      }
+    } else {
+      setState(() => _value = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã tắt thông báo. Bạn có thể bật lại bất cứ lúc nào.')),
+        );
+      }
+    }
   }
 }
 

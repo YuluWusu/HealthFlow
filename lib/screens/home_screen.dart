@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../data/app_scope.dart';
@@ -106,74 +108,130 @@ class HomeScreen extends StatelessWidget {
     // Lời chào dùng đầy đủ họ tên như bản thiết kế ("Xin chào, Minh Anh").
     final displayName = user?.fullName.trim() ?? 'bạn';
 
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    ImageProvider avatarImage;
+    if (user != null && user.avatarPath != null && user.avatarPath!.isNotEmpty) {
+      avatarImage = FileImage(File(user.avatarPath!));
+    } else {
+      avatarImage = const AssetImage('assets/images/core/avatar.jpg');
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          colors: [
+            AppTheme.primary,
+            AppTheme.primaryDark,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primary.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+        // Dùng tạm hình nền mờ trang trí
+        image: DecorationImage(
+          image: const AssetImage('assets/images/auth/auth_bg.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.2), 
+            BlendMode.dstATop,
+          ),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    date,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Xin chào, $displayName 👋',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Chúc bạn một ngày khỏe mạnh!',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
             children: [
-              Text(
-                date,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.textSecondary,
+              // Ảnh đại diện
+              InkWell(
+                onTap: () => onNavigate?.call(4),
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Colors.white,
+                    backgroundImage: avatarImage,
+                    onBackgroundImageError: (_, __) {},
+                  ),
                 ),
               ),
-              const SizedBox(height: 7),
-              Text(
-                'Xin chào, $displayName 👋',
-                style: const TextStyle(
-                  fontSize: 23,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                'Chúc bạn một ngày khỏe mạnh!',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  color: AppTheme.textSecondary,
+              const SizedBox(height: 12),
+              // Nút thông báo
+              InkWell(
+                onTap: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.notifications_active_rounded, 
+                    color: Colors.white, 
+                    size: 20,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-        // Nút thông báo
-        Container(
-          margin: const EdgeInsets.only(right: 14),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            shape: BoxShape.circle,
-            boxShadow: AppTheme.softShadow(opacity: 0.04),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.textPrimary, size: 22),
-            onPressed: () {
-               Scaffold.of(context).openEndDrawer();
-            },
-          ),
-        ),
-        // Ảnh đại diện: tải từ assets, nếu lỗi thì hiện chữ cái đầu.
-        InkWell(
-          onTap: () => onNavigate?.call(4),
-          borderRadius: BorderRadius.circular(30),
-          child: Container(
-            padding: const EdgeInsets.all(2), // Viền mỏng
-            decoration: const BoxDecoration(
-              color: AppTheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: CircleAvatar(
-              radius: 22,
-              backgroundColor: AppTheme.lightGreen,
-              backgroundImage: const AssetImage('assets/images/avatar.jpg'),
-              onBackgroundImageError: (_, __) {}, // Bỏ qua lỗi nếu chưa có ảnh
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -383,7 +441,7 @@ class _CalorieCard extends StatelessWidget {
               ),
             ],
             image: const DecorationImage(
-              image: AssetImage('assets/images/calorie_bg.jpg'),
+              image: AssetImage('assets/images/home/calorie_bg.jpg'),
               fit: BoxFit.cover,
             ),
           ),
