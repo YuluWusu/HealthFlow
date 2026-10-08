@@ -3173,7 +3173,7 @@ class _WeekChartCardState extends State<_WeekChartCard> {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: chartHeight + 36,
+            height: chartHeight + 44,
             child: Stack(
               children: [
                 Row(
@@ -4218,7 +4218,7 @@ class _WaterChartCardState extends State<_WaterChartCard> {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: chartHeight + 36,
+            height: chartHeight + 44,
             child: Stack(
               children: [
                 Row(
