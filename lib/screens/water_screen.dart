@@ -9,7 +9,6 @@ import '../data/app_scope.dart';
 import '../data/auth_scope.dart';
 import '../data/nutrition_repository.dart';
 import '../models/nutrition.dart';
-import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 
 /// 1250 -> "1,25", 2000 -> "2,0" (đơn vị lít).
@@ -208,30 +207,21 @@ class _WaterScreenState extends State<WaterScreen> {
                   Expanded(
                     child: _QuickButton(
                       label: '+250 ml',
-                      onTap: () {
-                        AudioService().playTap();
-                        _add(nutrition, 250);
-                      },
+                      onTap: () => _add(nutrition, 250),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _QuickButton(
                       label: '+500 ml',
-                      onTap: () {
-                        AudioService().playTap();
-                        _add(nutrition, 500);
-                      },
+                      onTap: () => _add(nutrition, 500),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _QuickButton(
                       label: '+1 lít',
-                      onTap: () {
-                        AudioService().playTap();
-                        _add(nutrition, 1000);
-                      },
+                      onTap: () => _add(nutrition, 1000),
                     ),
                   ),
                 ],
@@ -251,10 +241,7 @@ class _WaterScreenState extends State<WaterScreen> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
-                    onPressed: () {
-                      AudioService().playSlide();
-                      _remove(nutrition);
-                    },
+                    onPressed: () => _remove(nutrition),
                     icon: const Icon(Icons.edit_note_rounded, size: 20),
                     label: const Text('Uống nhầm? Chỉnh lại lượng nước'),
                     style: TextButton.styleFrom(

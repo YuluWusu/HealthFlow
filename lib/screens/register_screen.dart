@@ -33,7 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _showTermsError = false;
   String? _serverError;
 
-  static const _bgImage = AssetImage('assets/images/welcome/bg_login-register.jpg');
+  static const _bgImage = AssetImage('assets/images/auth/auth_bg.jpg');
 
   @override
   void didChangeDependencies() {

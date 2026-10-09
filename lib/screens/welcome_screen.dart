@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
@@ -50,14 +49,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   void _openLogin(BuildContext context) {
-    AudioService().playTap();
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
     );
   }
 
   void _openRegister(BuildContext context) {
-    AudioService().playTap();
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const RegisterScreen()),
     );
@@ -74,10 +71,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                onPageChanged: (index) {
-                  AudioService().playSlide();
-                  setState(() => _currentPage = index);
-                },
+                onPageChanged: (index) => setState(() => _currentPage = index),
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
                   final page = _pages[index];

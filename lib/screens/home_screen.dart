@@ -10,7 +10,6 @@ import '../data/workout_repository.dart';
 import '../models/health_metric.dart';
 import '../models/nutrition.dart';
 import '../models/user.dart';
-import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 
 /// Trang chủ (Dashboard) theo bản thiết kế: lời chào, thẻ năng lượng, các chỉ
@@ -50,29 +49,20 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 22),
                 _CalorieCard(
                   summary: app.nutrition.summary,
-                  onTap: () {
-                    AudioService().playTap();
-                    onNavigate?.call(3);
-                  },
+                  onTap: () => onNavigate?.call(3),
                 ),
                 const SizedBox(height: 18),
                 _ActivityRow(
                   minutesToday: app.workout.minutesToday,
                   goalPercent: app.workout.goalPercent,
                   caloriesBurned: app.workout.caloriesBurnedToday,
-                  onTap: () {
-                    AudioService().playTap();
-                    onNavigate?.call(2);
-                  },
+                  onTap: () => onNavigate?.call(2),
                 ),
                 const SizedBox(height: 24),
                 _SectionHeading(
                   title: 'Chỉ số sức khỏe',
                   actionText: 'Xem tất cả',
-                  onAction: () {
-                    AudioService().playTap();
-                    onNavigate?.call(1);
-                  },
+                  onAction: () => onNavigate?.call(1),
                 ),
                 const SizedBox(height: 12),
                 _HealthOverview(
@@ -84,10 +74,7 @@ class HomeScreen extends StatelessWidget {
                 _SectionHeading(
                   title: 'Thói quen hôm nay',
                   actionText: 'Dinh dưỡng',
-                  onAction: () {
-                    AudioService().playTap();
-                    onNavigate?.call(3);
-                  },
+                  onAction: () => onNavigate?.call(3),
                 ),
                 const SizedBox(height: 12),
                 _MealSummaryCard(nutrition: app.nutrition),
@@ -125,9 +112,7 @@ class HomeScreen extends StatelessWidget {
     if (user != null && user.avatarPath != null && user.avatarPath!.isNotEmpty) {
       avatarImage = FileImage(File(user.avatarPath!));
     } else {
-      avatarImage = AssetImage(user?.gender == 'female' 
-          ? 'assets/images/auth/female.jpg' 
-          : 'assets/images/auth/male.jpg');
+      avatarImage = const AssetImage('assets/images/core/avatar.jpg');
     }
 
     return Container(
@@ -267,10 +252,7 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.favorite_rounded,
                 color: AppTheme.pink,
                 background: AppTheme.lightPink,
-                onTap: () {
-                  AudioService().playTap();
-                  onNavigate?.call(1);
-                },
+                onTap: () => onNavigate?.call(1),
               ),
             ),
             const SizedBox(width: 10),
@@ -280,10 +262,7 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.fitness_center_rounded,
                 color: AppTheme.primary,
                 background: AppTheme.lightGreen,
-                onTap: () {
-                  AudioService().playTap();
-                  onNavigate?.call(2);
-                },
+                onTap: () => onNavigate?.call(2),
               ),
             ),
             const SizedBox(width: 10),
@@ -293,10 +272,7 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.restaurant_rounded,
                 color: AppTheme.orange,
                 background: AppTheme.lightOrange,
-                onTap: () {
-                  AudioService().playTap();
-                  onNavigate?.call(3);
-                },
+                onTap: () => onNavigate?.call(3),
               ),
             ),
           ],

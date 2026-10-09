@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 import '../data/nutrition_store.dart';
+import '../models/ingredient.dart';
 import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
+import 'ingredient_source.dart';
 import 'usda_food_service.dart';
 import 'vietnam_food_source.dart';
 
@@ -33,13 +35,19 @@ class NutritionRepository extends ChangeNotifier {
     NutritionStore? store,
     VietnamFoodSource? vietnam,
     UsdaFoodService? usda,
+    IngredientSource? ingredientSource,
   })  : _store = store ?? InMemoryNutritionStore(),
+        _ingredientSource = ingredientSource ?? IngredientSource(),
         _vietnam = vietnam ?? VietnamFoodSource(),
         _usda = usda ?? UsdaFoodService();
 
   final NutritionStore _store;
   final VietnamFoodSource _vietnam;
   final UsdaFoodService _usda;
+  final IngredientSource _ingredientSource;
+
+  // Nguyên liệu để ăn theo định lượng (gram), tách riêng khỏi danh mục món.
+  List<Ingredient> _ingredients = const [];
 
   List<FoodItem> _catalog = const [];
   List<MealEntry> _todayEntries = const [];
@@ -67,6 +75,7 @@ class NutritionRepository extends ChangeNotifier {
   int get cupMl => _cupMl;
 
   List<FoodItem> get catalog => _catalog;
+  List<Ingredient> get ingredients => _ingredients;
   List<MealEntry> get todayEntries => _todayEntries;
   NutritionSummary get summary => _summary;
   bool get usdaUsesDemoKey => _usda.usesDemoKey;
@@ -170,6 +179,12 @@ class NutritionRepository extends ChangeNotifier {
         : seed.where((f) => f.category != FoodCategory.vietnamese);
 
     _catalog = List.unmodifiable([...vietnamese, ...fallback]);
+
+    try {
+      _ingredients = await _ingredientSource.load();
+    } catch (e) {
+      debugPrint('Không đọc được ingredients.json: $e');
+    }
     notifyListeners();
   }
 
@@ -244,7 +259,7 @@ class NutritionRepository extends ChangeNotifier {
       protein: entry.protein / p,
       carbs: entry.carbs / p,
       fat: entry.fat / p,
-      servingLabel: '1 phần',
+      servingLabel: entry.isByGrams ? '100g' : '1 phần',
     );
   }
 
@@ -259,6 +274,23 @@ class NutritionRepository extends ChangeNotifier {
       final matchKeyword = query.isEmpty || _fold(food.name).contains(query);
       return matchCategory && matchKeyword;
     }).toList();
+  }
+
+  /// Tìm nguyên liệu để ăn theo định lượng (bỏ dấu, lọc theo nhóm).
+  List<Ingredient> searchIngredients({String keyword = '', String? group}) {
+    final query = _fold(keyword.trim());
+    return _ingredients.where((i) {
+      final matchGroup = group == null || i.group == group;
+      final matchKeyword = query.isEmpty || _fold(i.name).contains(query);
+      return matchGroup && matchKeyword;
+    }).toList();
+  }
+
+  /// Bỏ [grams] gram [ingredient] vào giỏ (1 phần = 100 g). Cùng nguyên liệu
+  /// thì cộng dồn gram.
+  void addIngredientToCart(Ingredient ingredient, int grams) {
+    if (grams <= 0) return;
+    addToCart(ingredient.toFoodItem(), portion: grams / 100);
   }
 
   /// Tra cứu món quốc tế trên USDA. Ném [UsdaException] khi lỗi mạng/key.
