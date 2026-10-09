@@ -9,11 +9,6 @@ abstract class HealthStore {
   Future<List<HealthMetric>> byUser(String userId);
 
   Future<void> insert(HealthMetric metric);
-  Future<void> update(HealthMetric metric);
-
-  /// Xóa một bản ghi theo [id]. Không báo lỗi nếu [id] không tồn tại,
-  /// coi như đã ở đúng trạng thái mong muốn (idempotent).
-  Future<void> delete(String id);
 
   /// Tạo số liệu khởi tạo nếu người dùng chưa có chỉ số nào.
   ///
@@ -38,18 +33,6 @@ class InMemoryHealthStore implements HealthStore {
   }
 
   @override
-  Future<void> update(HealthMetric metric) async {
-    final index = _metrics.indexWhere((m) => m.id == metric.id);
-    if (index == -1) return;
-    _metrics[index] = metric;
-  }
-
-  @override
-  Future<void> delete(String id) async {
-    _metrics.removeWhere((m) => m.id == id);
-  }
-
-  @override
   Future<void> seedIfEmpty(String userId) async {
     final existing = await byUser(userId);
     if (existing.isNotEmpty) return;
@@ -71,7 +54,7 @@ class InMemoryHealthStore implements HealthStore {
       double? secondary,
     }) {
       return HealthMetric(
-        id: 'seed-$userId-${type.storeName}-$daysAgo',
+        id: 'seed-${type.storeName}-$daysAgo',
         userId: userId,
         type: type,
         value: value,

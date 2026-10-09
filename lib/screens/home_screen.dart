@@ -10,8 +10,8 @@ import '../data/workout_repository.dart';
 import '../models/health_metric.dart';
 import '../models/nutrition.dart';
 import '../models/user.dart';
-import '../theme/app_theme.dart';
 import '../services/audio_service.dart';
+import '../theme/app_theme.dart';
 
 /// Trang chủ (Dashboard) theo bản thiết kế: lời chào, thẻ năng lượng, các chỉ
 /// số sức khỏe, hoạt động trong ngày và lối vào nhanh các mục khác.
@@ -50,20 +50,29 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 22),
                 _CalorieCard(
                   summary: app.nutrition.summary,
-                  onTap: () => onNavigate?.call(3),
+                  onTap: () {
+                    AudioService().playTap();
+                    onNavigate?.call(3);
+                  },
                 ),
                 const SizedBox(height: 18),
                 _ActivityRow(
                   minutesToday: app.workout.minutesToday,
                   goalPercent: app.workout.goalPercent,
                   caloriesBurned: app.workout.caloriesBurnedToday,
-                  onTap: () => onNavigate?.call(2),
+                  onTap: () {
+                    AudioService().playTap();
+                    onNavigate?.call(2);
+                  },
                 ),
                 const SizedBox(height: 24),
                 _SectionHeading(
                   title: 'Chỉ số sức khỏe',
                   actionText: 'Xem tất cả',
-                  onAction: () => onNavigate?.call(1),
+                  onAction: () {
+                    AudioService().playTap();
+                    onNavigate?.call(1);
+                  },
                 ),
                 const SizedBox(height: 12),
                 _HealthOverview(
@@ -75,7 +84,10 @@ class HomeScreen extends StatelessWidget {
                 _SectionHeading(
                   title: 'Thói quen hôm nay',
                   actionText: 'Dinh dưỡng',
-                  onAction: () => onNavigate?.call(3),
+                  onAction: () {
+                    AudioService().playTap();
+                    onNavigate?.call(3);
+                  },
                 ),
                 const SizedBox(height: 12),
                 _MealSummaryCard(nutrition: app.nutrition),
@@ -113,7 +125,9 @@ class HomeScreen extends StatelessWidget {
     if (user != null && user.avatarPath != null && user.avatarPath!.isNotEmpty) {
       avatarImage = FileImage(File(user.avatarPath!));
     } else {
-      avatarImage = AssetImage(user != null ? 'assets/images/auth/${user.gender}.jpg' : 'assets/images/auth/male.jpg');
+      avatarImage = AssetImage(user?.gender == 'female' 
+          ? 'assets/images/auth/female.jpg' 
+          : 'assets/images/auth/male.jpg');
     }
 
     return Container(
@@ -212,9 +226,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 12),
               // Nút thông báo
               InkWell(
-                onTap: ()  {
-          AudioService().playTap();
-
+                onTap: () {
                   Scaffold.of(context).openEndDrawer();
                 },
                 borderRadius: BorderRadius.circular(20),
@@ -255,7 +267,10 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.favorite_rounded,
                 color: AppTheme.pink,
                 background: AppTheme.lightPink,
-                onTap: () => onNavigate?.call(1),
+                onTap: () {
+                  AudioService().playTap();
+                  onNavigate?.call(1);
+                },
               ),
             ),
             const SizedBox(width: 10),
@@ -265,7 +280,10 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.fitness_center_rounded,
                 color: AppTheme.primary,
                 background: AppTheme.lightGreen,
-                onTap: () => onNavigate?.call(2),
+                onTap: () {
+                  AudioService().playTap();
+                  onNavigate?.call(2);
+                },
               ),
             ),
             const SizedBox(width: 10),
@@ -275,7 +293,10 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.restaurant_rounded,
                 color: AppTheme.orange,
                 background: AppTheme.lightOrange,
-                onTap: () => onNavigate?.call(3),
+                onTap: () {
+                  AudioService().playTap();
+                  onNavigate?.call(3);
+                },
               ),
             ),
           ],
@@ -1118,9 +1139,7 @@ class _NotificationTile extends StatelessWidget {
           ],
         ),
       ),
-      onTap: ()  {
-          AudioService().playTap();
-},
+      onTap: () {},
       isThreeLine: true,
     );
   }

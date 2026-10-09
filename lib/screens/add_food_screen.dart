@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show FilteringTextInputFormatter;
 
 import '../data/app_scope.dart';
 import '../data/auth_scope.dart';
 import '../data/nutrition_repository.dart';
-import '../models/ingredient.dart';
-import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
 import '../theme/food_images.dart';
-import '../services/audio_service.dart';
 
 /// Màn hình 7 trong bản thiết kế: thêm món ăn vào nhật ký.
 ///
@@ -32,10 +28,6 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
 
   FoodCategory? _selectedCategory;
   MealSlot _selectedSlot = MealSlot.breakfast;
-
-  /// `false`: ăn theo món (danh mục). `true`: ăn theo định lượng (gram).
-  bool _byGrams = false;
-  String? _selectedGroup;
 
   @override
   void initState() {
@@ -73,30 +65,22 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             category: _selectedCategory,
           );
 
-          final ingredients = app.nutrition.searchIngredients(
-            keyword: _searchController.text,
-            group: _selectedGroup,
-          );
-
           final cartCount = app.nutrition.cartCount;
 
           return Column(
             children: [
-              _buildModeToggle(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
                 child: TextField(
                   controller: _searchController,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    hintText: _byGrams ? 'Tìm nguyên liệu...' : 'Tìm món ăn...',
+                    hintText: 'Tìm món ăn...',
                     prefixIcon: const Icon(Icons.search_rounded, size: 21),
                     suffixIcon: _searchController.text.isEmpty
                         ? null
                         : IconButton(
-                            onPressed: ()  {
-              AudioService().playTap();
-
+                            onPressed: () {
                               _searchController.clear();
                               setState(() {});
                             },
@@ -106,26 +90,12 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                   ),
                 ),
               ),
-              _byGrams ? _buildGroupChips() : _buildCategoryChips(),
+              _buildCategoryChips(),
               const SizedBox(height: 6),
               _buildSlotSelector(),
               const SizedBox(height: 8),
               Expanded(
-                child: _byGrams
-                    ? (ingredients.isEmpty
-                        ? const _NoResult()
-                        : ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(20, 6, 20, 24),
-                            itemCount: ingredients.length,
-                            itemBuilder: (context, index) {
-                              final ing = ingredients[index];
-                              return _IngredientTile(
-                                ingredient: ing,
-                                onTap: () => _openGramSheet(ing),
-                              );
-                            },
-                          ))
-                    : foods.isEmpty
+                child: foods.isEmpty
                     ? const _NoResult()
                     : ListView.builder(
                         padding: const EdgeInsets.fromLTRB(20, 6, 20, 24),
@@ -151,95 +121,6 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  /// Công tắc 2 cách ăn: theo món (có sẵn) / theo định lượng (gram).
-  Widget _buildModeToggle() {
-    Widget seg(String label, bool value) {
-      final selected = _byGrams == value;
-      return Expanded(
-        child: GestureDetector(
-          onTap: () => setState(() => _byGrams = value),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            padding: const EdgeInsets.symmetric(vertical: 9),
-            decoration: BoxDecoration(
-              color: selected ? AppTheme.primary : Colors.transparent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : AppTheme.textSecondary,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
-        ),
-        child: Row(
-          children: [
-            seg('Theo món ăn', false),
-            seg('Theo định lượng (g)', true),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Chip nhóm nguyên liệu (Tinh bột, Đạm, Rau củ...).
-  Widget _buildGroupChips() {
-    final groups = <String>[];
-    for (final i in AppScope.of(context).nutrition.ingredients) {
-      if (!groups.contains(i.group)) groups.add(i.group);
-    }
-    return SizedBox(
-      height: 38,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: [
-          _CategoryChip(
-            label: 'Tất cả',
-            isSelected: _selectedGroup == null,
-            onTap: () => setState(() => _selectedGroup = null),
-          ),
-          for (final g in groups)
-            _CategoryChip(
-              label: g,
-              isSelected: _selectedGroup == g,
-              onTap: () => setState(() => _selectedGroup = g),
-            ),
-        ],
-      ),
-    );
-  }
-
-  /// Nhập số gram của một nguyên liệu rồi bỏ vào giỏ.
-  Future<void> _openGramSheet(Ingredient ingredient) async {
-    final nutrition = AppScope.of(context, listen: false).nutrition;
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _GramSheet(
-        ingredient: ingredient,
-        onAdd: (grams) => nutrition.addIngredientToCart(ingredient, grams),
       ),
     );
   }
@@ -607,19 +488,6 @@ class _CartSheetState extends State<_CartSheet> {
     return '$n phần';
   }
 
-  /// Nguyên liệu hiện số gram; món thường hiện số phần.
-  static String _amountText(PortionedFood item) => isIngredientFoodId(item.food.id)
-      ? '${gramsOfPortion(item.portion)}g'
-      : _portionText(item.portion);
-
-  /// Nguyên liệu tăng/giảm 50 g mỗi lần bấm.
-  static double _stepDown(PortionedFood item) => isIngredientFoodId(item.food.id)
-      ? item.portion - 0.5
-      : _down(item.portion);
-  static double _stepUp(PortionedFood item) => isIngredientFoodId(item.food.id)
-      ? item.portion + 0.5
-      : _up(item.portion);
-
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
@@ -697,7 +565,7 @@ class _CartSheetState extends State<_CartSheet> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: Text(
-                            '${item.calories} kcal · ${_amountText(item)}',
+                            '${item.calories} kcal · ${_portionText(item.portion)}',
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -706,7 +574,7 @@ class _CartSheetState extends State<_CartSheet> {
                                 onPressed: () =>
                                     widget.nutrition.setCartPortion(
                                   item.food.id,
-                                  _stepDown(item),
+                                  _down(item.portion),
                                 ),
                                 icon: Icon(
                                   item.portion <= 0.5
@@ -721,7 +589,7 @@ class _CartSheetState extends State<_CartSheet> {
                                 onPressed: () =>
                                     widget.nutrition.setCartPortion(
                                   item.food.id,
-                                  _stepUp(item),
+                                  _up(item.portion),
                                 ),
                                 icon: const Icon(
                                   Icons.add_circle_outline_rounded,
@@ -1416,254 +1284,6 @@ class _NoResult extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-
-/// Một dòng nguyên liệu trong chế độ "Theo định lượng".
-class _IngredientTile extends StatelessWidget {
-  final Ingredient ingredient;
-  final VoidCallback onTap;
-
-  const _IngredientTile({required this.ingredient, required this.onTap});
-
-  static String _n(double v) =>
-      v % 1 == 0 ? v.toInt().toString() : v.toStringAsFixed(1).replaceAll('.', ',');
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 6, 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        ingredient.name,
-                        style: const TextStyle(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${ingredient.calories.round()} kcal / 100g · '
-                        'Đạm ${_n(ingredient.protein)} · '
-                        'Carb ${_n(ingredient.carbs)} · '
-                        'Béo ${_n(ingredient.fat)}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: onTap,
-                  icon: const Icon(
-                    Icons.add_circle_rounded,
-                    color: AppTheme.primary,
-                    size: 27,
-                  ),
-                  tooltip: 'Nhập số gram ${ingredient.name}',
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Bảng nhập số gram: gõ trực tiếp hoặc chọn nhanh, kcal và macro tính ngay.
-class _GramSheet extends StatefulWidget {
-  final Ingredient ingredient;
-  final int initialGrams;
-  final void Function(int grams) onAdd;
-
-  const _GramSheet({
-    required this.ingredient,
-    required this.onAdd,
-    this.initialGrams = 100,
-  });
-
-  @override
-  State<_GramSheet> createState() => _GramSheetState();
-}
-
-class _GramSheetState extends State<_GramSheet> {
-  late final TextEditingController _controller =
-      TextEditingController(text: '${widget.initialGrams}');
-
-  static const _quick = [50, 100, 150, 200, 300];
-
-  int get _grams => int.tryParse(_controller.text.trim()) ?? 0;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _set(int grams) {
-    _controller.text = '$grams';
-    _controller.selection = TextSelection.collapsed(offset: _controller.text.length);
-    setState(() {});
-  }
-
-  static String _n(double v) => v.toStringAsFixed(1).replaceAll('.', ',');
-
-  @override
-  Widget build(BuildContext context) {
-    final ing = widget.ingredient;
-    final g = _grams;
-    final bottom = MediaQuery.of(context).viewInsets.bottom;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: bottom),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                ing.name,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${ing.calories.round()} kcal / 100g',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _controller,
-                autofocus: true,
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  labelText: 'Khối lượng',
-                  suffixText: 'g',
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final q in _quick)
-                    ActionChip(
-                      label: Text('${q}g'),
-                      onPressed: () => _set(q),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppTheme.lightGreen,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${ing.caloriesFor(g)} kcal',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: AppTheme.primaryDark,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Đạm ${_n(ing.proteinFor(g))}g · '
-                      'Carb ${_n(ing.carbsFor(g))}g · '
-                      'Béo ${_n(ing.fatFor(g))}g',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: g <= 0
-                      ? null
-                      : () {
-                          widget.onAdd(g);
-                          Navigator.of(context).pop();
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Text(
-                    g <= 0 ? 'Nhập số gram' : 'Thêm vào giỏ · ${g}g',
-                    style: const TextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

@@ -324,19 +324,19 @@ class SettingsScreen extends StatelessWidget {
               _HelpRow(
                 icon: Icons.mail_outline_rounded,
                 title: 'Email',
-                value: 'hotro@healthflow.vn',
+                value: 'yuluwusu@gmail.com',
               ),
               SizedBox(height: 14),
               _HelpRow(
                 icon: Icons.phone_outlined,
                 title: 'Điện thoại',
-                value: '1900 1234',
+                value: '+84 357 534 303',
               ),
               SizedBox(height: 14),
               _HelpRow(
                 icon: Icons.schedule_rounded,
                 title: 'Thời gian hỗ trợ',
-                value: '8:00 - 20:00 hằng ngày',
+                value: '8:00 - 22:00 hằng ngày',
               ),
             ],
           ),
@@ -420,7 +420,7 @@ class _ProfileHeader extends StatelessWidget {
                   backgroundColor: AppTheme.lightGreen,
                   backgroundImage: user.avatarPath != null && user.avatarPath!.isNotEmpty
                       ? FileImage(File(user.avatarPath!))
-                      : AssetImage('assets/images/auth/${user.gender}.jpg') as ImageProvider,
+                      : AssetImage(user.gender == 'female' ? 'assets/images/auth/female.jpg' : 'assets/images/auth/male.jpg') as ImageProvider,
                 ),
                 Positioned(
                   right: 0,
@@ -611,6 +611,39 @@ class _ProfileHeader extends StatelessWidget {
         const SnackBar(content: Text('Đã xóa ảnh đại diện.')),
       );
     });
+  }
+}
+
+/// Switch tile cho âm thanh
+class _SoundSwitchTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: AudioService(),
+      builder: (context, _) {
+        final isEnabled = AudioService().soundEnabled;
+        return SettingsTile(
+          icon: Icons.volume_up_outlined,
+          title: 'Âm thanh ứng dụng',
+          subtitle: isEnabled ? 'Đã bật hiệu ứng âm thanh' : 'Đã tắt hiệu ứng âm thanh',
+          iconColor: AppTheme.blue,
+          showChevron: false,
+          trailing: Switch(
+            value: isEnabled,
+            activeColor: AppTheme.primary,
+            onChanged: (val) {
+              AudioService().setSoundEnabled(val);
+              if (val) AudioService().playDing();
+            },
+          ),
+          onTap: () {
+            final newVal = !isEnabled;
+            AudioService().setSoundEnabled(newVal);
+            if (newVal) AudioService().playDing();
+          },
+        );
+      },
+    );
   }
 }
 
@@ -863,35 +896,4 @@ class _DialogController {
   String? message;
 
   void clear() => message = null;
-}
-
-class _SoundSwitchTile extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: AudioService(),
-      builder: (context, _) {
-        final isEnabled = AudioService().soundEnabled;
-        return SettingsTile(
-          icon: isEnabled ? Icons.volume_up_outlined : Icons.volume_off_outlined,
-          title: 'Âm thanh ứng dụng',
-          subtitle: isEnabled ? 'Đã bật âm thanh' : 'Tắt âm thanh hệ thống',
-          iconColor: AppTheme.blue,
-          showChevron: false,
-          trailing: Switch(
-            value: isEnabled,
-            activeColor: AppTheme.primary,
-            onChanged: (val) {
-              AudioService().setSoundEnabled(val);
-              if (val) AudioService().playDing();
-            },
-          ),
-          onTap: () {
-            AudioService().setSoundEnabled(!isEnabled);
-            if (!isEnabled) AudioService().playDing();
-          },
-        );
-      },
-    );
-  }
 }

@@ -4,7 +4,6 @@ import '../data/auth_scope.dart';
 import '../models/user.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_card.dart';
-import '../services/audio_service.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   const ProfileDetailScreen({super.key});
@@ -17,7 +16,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
   bool _isEditing = false;
   late TextEditingController _nameController;
   late String _originalName;
-  late String _currentGender;
+  late String _selectedGender;
   late String _originalGender;
 
   @override
@@ -34,7 +33,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       _originalName = user?.fullName ?? '';
       _nameController.text = _originalName;
       _originalGender = user?.gender ?? 'male';
-      _currentGender = _originalGender;
+      _selectedGender = _originalGender;
     }
   }
 
@@ -56,11 +55,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     }
     
     final auth = AuthScope.of(context, listen: false);
-    auth.updateProfile(fullName: name, gender: _currentGender);
+    auth.updateProfile(fullName: name, gender: _selectedGender);
     setState(() {
       _isEditing = false;
       _originalName = name;
-      _originalGender = _currentGender;
+      _originalGender = _selectedGender;
     });
     _showMessage('Đã cập nhật thông tin cá nhân.');
   }
@@ -79,9 +78,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       onPopInvoked: (didPop) async {
         if (didPop) return;
         
-        final hasChanges = _isEditing &&
-            (_nameController.text.trim() != _originalName ||
-             _currentGender != _originalGender);
+        final hasChanges = _isEditing && (_nameController.text.trim() != _originalName || _selectedGender != _originalGender);
         
         if (hasChanges) {
           final confirm = await showDialog<bool>(
@@ -105,7 +102,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
             setState(() {
               _isEditing = false;
               _nameController.text = _originalName;
-              _currentGender = _originalGender;
+              _selectedGender = _originalGender;
             });
             if (context.mounted) Navigator.of(context).pop();
           }
@@ -126,10 +123,19 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           Center(
-            child: CircleAvatar(
-              radius: 50,
-              backgroundColor: AppTheme.surface,
-              backgroundImage: AssetImage('assets/images/auth/$_currentGender.jpg'),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppTheme.primary, width: 3),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage(
+                  _selectedGender == 'female'
+                      ? 'assets/images/auth/female.jpg'
+                      : 'assets/images/auth/male.jpg',
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -146,8 +152,17 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                TextField(
+                  controller: TextEditingController(text: user.email),
+                  enabled: false,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _currentGender,
+                  value: _selectedGender,
                   decoration: const InputDecoration(
                     labelText: 'Giới tính',
                     prefixIcon: Icon(Icons.wc_rounded, size: 20),
@@ -156,20 +171,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                     DropdownMenuItem(value: 'male', child: Text('Nam')),
                     DropdownMenuItem(value: 'female', child: Text('Nữ')),
                   ],
-                  onChanged: _isEditing
-                      ? (val) {
-                          if (val != null) setState(() => _currentGender = val);
-                        }
-                      : null,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: TextEditingController(text: user.email),
-                  enabled: false,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
-                  ),
+                  onChanged: _isEditing ? (value) {
+                    if (value != null) {
+                      setState(() => _selectedGender = value);
+                    }
+                  } : null,
                 ),
               ],
             ),
@@ -180,12 +186,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: ()  {
-              AudioService().playTap();
-
+                    onPressed: () {
                       setState(() {
                         _isEditing = false;
-                        _nameController.text = user.fullName;
+                        _nameController.text = _originalName;
+                        _selectedGender = _originalGender;
                       });
                     },
                     style: OutlinedButton.styleFrom(

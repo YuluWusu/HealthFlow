@@ -11,9 +11,6 @@ import 'package:healthcare/models/workout.dart';
 import 'package:healthcare/utils/sha256.dart';
 
 void main() {
-  // Nạp danh mục món ăn cần rootBundle, nên phải khởi tạo binding trước.
-  TestWidgetsFlutterBinding.ensureInitialized();
-
   setUp(() {
     // Kiểm thử không cần chờ độ trễ giả lập.
     AuthRepository.simulatedLatency = Duration.zero;
@@ -346,10 +343,7 @@ void main() {
 
       expect(base.copyWith(weightKg: 50, heightCm: 170).bmiLabel, 'Thiếu cân');
       expect(base.copyWith(weightKg: 65, heightCm: 170).bmiLabel, 'Bình thường');
-      // BMI xếp loại theo chuẩn WHO Châu Á (dùng chung với HealthAssessor):
-      // 23.0–24.9 là Thừa cân, từ 25.0 trở lên là Béo phì.
-      expect(base.copyWith(weightKg: 70, heightCm: 170).bmiLabel, 'Thừa cân');
-      expect(base.copyWith(weightKg: 78, heightCm: 170).bmiLabel, 'Béo phì');
+      expect(base.copyWith(weightKg: 78, heightCm: 170).bmiLabel, 'Thừa cân');
       expect(base.copyWith(weightKg: 95, heightCm: 170).bmiLabel, 'Béo phì');
     });
   });

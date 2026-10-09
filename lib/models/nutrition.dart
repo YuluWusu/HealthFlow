@@ -38,15 +38,6 @@ enum MealSlot {
   }
 }
 
-/// Tiền tố id của "món" sinh ra từ nguyên liệu ăn theo định lượng (gram).
-const String kIngredientIdPrefix = 'ing-';
-
-/// `true` nếu [foodId] là nguyên liệu ăn theo gram (1 phần = 100 g).
-bool isIngredientFoodId(String foodId) => foodId.startsWith(kIngredientIdPrefix);
-
-/// Số gram tương ứng với [portion] phần của nguyên liệu (1 phần = 100 g).
-int gramsOfPortion(double portion) => (portion * 100).round();
-
 /// Món ăn trong danh mục (dữ liệu dùng chung, không thuộc riêng ai).
 class FoodItem {
   final String id;
@@ -230,11 +221,7 @@ class MealEntry {
     );
   }
 
-  /// Nguyên liệu ăn theo định lượng thì hiện số gram thay vì "phần".
-  bool get isByGrams => isIngredientFoodId(foodId);
-
   String get portionLabel {
-    if (isByGrams) return '${gramsOfPortion(portion)}g';
     if (portion == 1) return '1 phần';
     if (portion == 0.5) return '1/2 phần';
     return '${portion.toStringAsFixed(1)} phần';
