@@ -509,6 +509,8 @@ class _HistoryTab extends StatelessWidget {
         return Icons.bedtime_outlined;
       case HealthMetricType.steps:
         return Icons.directions_walk_rounded;
+      case HealthMetricType.bmi:
+        return Icons.calculate_outlined;
     }
   }
 
@@ -526,6 +528,8 @@ class _HistoryTab extends StatelessWidget {
         return AppTheme.blue;
       case HealthMetricType.steps:
         return AppTheme.primary;
+      case HealthMetricType.bmi:
+        return AppTheme.blue;
     }
   }
 

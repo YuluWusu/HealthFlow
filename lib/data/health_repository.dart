@@ -23,11 +23,28 @@ class HealthRepository extends ChangeNotifier {
   ///
   /// Nếu người dùng chưa có chỉ số nào (tài khoản mẫu hoặc tài khoản vừa
   /// tạo), bộ số liệu khởi tạo được thêm vào để giao diện có dữ liệu hiển thị.
-  Future<void> load(String userId) async {
+  Future<void> load(String userId, {double? heightCm}) async {
     _isLoading = true;
     notifyListeners();
 
     await _store.seedIfEmpty(userId);
+    
+    if (heightCm != null && heightCm > 0) {
+      final stored = await _store.byUser(userId);
+      for (final m in stored.where((x) => x.type == HealthMetricType.weight)) {
+        final bmiId = HealthMetric.bmiIdFor(m.id);
+        if (!stored.any((x) => x.id == bmiId)) {
+          await _store.insert(HealthMetric(
+            id: bmiId,
+            userId: m.userId,
+            type: HealthMetricType.bmi,
+            value: m.value / ((heightCm / 100) * (heightCm / 100)),
+            recordedAt: m.recordedAt,
+          ));
+        }
+      }
+    }
+    
     _metrics = await _store.byUser(userId);
 
     _isLoading = false;
@@ -41,9 +58,52 @@ class HealthRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addMetric(HealthMetric metric) async {
+  Future<void> addMetric(HealthMetric metric, {double? heightCm}) async {
     await _store.insert(metric);
-    await load(metric.userId);
+    if (metric.type == HealthMetricType.weight && heightCm != null && heightCm > 0) {
+      final bmiValue = metric.value / ((heightCm / 100) * (heightCm / 100));
+      await _store.insert(HealthMetric(
+        id: HealthMetric.bmiIdFor(metric.id),
+        userId: metric.userId,
+        type: HealthMetricType.bmi,
+        value: bmiValue,
+        recordedAt: metric.recordedAt,
+      ));
+    }
+    await load(metric.userId, heightCm: heightCm);
+  }
+
+  Future<void> updateMetric(HealthMetric metric, {double? heightCm}) async {
+    await _store.update(metric);
+    if (metric.type == HealthMetricType.weight) {
+      final bmiId = HealthMetric.bmiIdFor(metric.id);
+      if (heightCm != null && heightCm > 0) {
+        final bmiValue = metric.value / ((heightCm / 100) * (heightCm / 100));
+        final stored = await _store.byUser(metric.userId);
+        final hasBmi = stored.any((x) => x.id == bmiId);
+        final bmiMetric = HealthMetric(
+          id: bmiId,
+          userId: metric.userId,
+          type: HealthMetricType.bmi,
+          value: bmiValue,
+          recordedAt: metric.recordedAt,
+        );
+        if (hasBmi) {
+          await _store.update(bmiMetric);
+        } else {
+          await _store.insert(bmiMetric);
+        }
+      } else {
+        await _store.delete(bmiId);
+      }
+    }
+    await load(metric.userId, heightCm: heightCm);
+  }
+
+  Future<void> deleteMetric(String id, String userId) async {
+    await _store.delete(id);
+    await _store.delete(HealthMetric.bmiIdFor(id));
+    await load(userId);
   }
 
   /// Chỉ số mới nhất của một loại, chưa có thì trả về `null`.
@@ -84,6 +144,17 @@ class HealthRepository extends ChangeNotifier {
 
   /// Lịch sử ghi nhận gần đây, mới nhất xếp trước.
   List<HealthMetric> recentHistory({int limit = 3}) {
-    return _metrics.take(limit).toList();
+    return _metrics.where((m) => !m.type.isDerived).take(limit).toList();
+  }
+
+  /// Lấy chuỗi dữ liệu theo thời gian của một chỉ số nhất định trong khoảng [days] ngày.
+  List<HealthMetric> seriesOf(HealthMetricType type, {required int days, DateTime? now}) {
+    final endDate = now ?? DateTime.now();
+    final startDate = endDate.subtract(Duration(days: days));
+    final filtered = _metrics.where((m) =>
+        m.type == type &&
+        m.recordedAt.isAfter(startDate) &&
+        (m.recordedAt.isBefore(endDate) || m.recordedAt.isAtSameMomentAs(endDate))).toList();
+    return filtered.reversed.toList();
   }
 }

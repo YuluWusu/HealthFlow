@@ -9,7 +9,8 @@ enum HealthMetricType {
   heartRate('heart_rate', 'Nhịp tim', 'bpm'),
   bloodGlucose('blood_glucose', 'Đường huyết', 'mg/dL'),
   sleep('sleep', 'Giấc ngủ', 'giờ'),
-  steps('steps', 'Vận động', 'bước');
+  steps('steps', 'Vận động', 'bước'),
+  bmi('bmi', 'Chỉ số BMI', '');
 
   const HealthMetricType(this.storeName, this.label, this.unit);
 
@@ -23,6 +24,11 @@ enum HealthMetricType {
       orElse: () => HealthMetricType.weight,
     );
   }
+
+  bool get isDerived => this == HealthMetricType.bmi;
+
+  static List<HealthMetricType> get userEntered =>
+      HealthMetricType.values.where((t) => !t.isDerived).toList();
 }
 
 /// Một lần ghi nhận chỉ số sức khỏe của người dùng.
@@ -47,6 +53,8 @@ class HealthMetric {
     required this.recordedAt,
     this.note = '',
   });
+
+  static String bmiIdFor(String weightId) => 'bmi_$weightId';
 
   /// Chuỗi hiển thị đã kèm đơn vị, ví dụ `120/80 mmHg` hoặc `56.5 kg`.
   String get displayValue {

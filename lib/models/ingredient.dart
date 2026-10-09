@@ -1,5 +1,7 @@
 import 'nutrition.dart';
 
+const String kIngredientIdPrefix = 'ing_';
+
 /// Nguyên liệu/thực phẩm đơn lẻ, dinh dưỡng tính trên 100 g.
 ///
 /// Dùng cho cách ăn "theo định lượng": người dùng tự nấu, cân được bao nhiêu
