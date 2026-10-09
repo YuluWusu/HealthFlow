@@ -7,6 +7,7 @@ import '../widgets/app_buttons.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/error_banner.dart';
 import 'login_screen.dart';
+import '../services/audio_service.dart';
 
 /// Màn hình 2 trong bản thiết kế: đăng ký tài khoản.
 ///
@@ -345,7 +346,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             content: const Text('Tài khoản của bạn đã được tạo thành công. Vui lòng đăng nhập để tiếp tục.'),
             actions: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: ()  {
+              AudioService().playTap();
+
                   Navigator.of(context).pop();
                 },
                 child: const Text('Đăng nhập ngay'),

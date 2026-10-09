@@ -9,6 +9,7 @@ import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
 import '../theme/food_images.dart';
+import '../services/audio_service.dart';
 
 /// Màn hình 7 trong bản thiết kế: thêm món ăn vào nhật ký.
 ///
@@ -93,7 +94,9 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                     suffixIcon: _searchController.text.isEmpty
                         ? null
                         : IconButton(
-                            onPressed: () {
+                            onPressed: ()  {
+              AudioService().playTap();
+
                               _searchController.clear();
                               setState(() {});
                             },

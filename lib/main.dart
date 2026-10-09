@@ -9,11 +9,13 @@ import 'data/prefs_nutrition_store.dart';
 import 'screens/main_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/welcome_screen.dart';
+import 'services/audio_service.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  await AudioService().init();
   runApp(HealthFlowApp(prefs: prefs));
 }
 

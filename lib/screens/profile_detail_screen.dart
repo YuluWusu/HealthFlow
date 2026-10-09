@@ -4,6 +4,7 @@ import '../data/auth_scope.dart';
 import '../models/user.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_card.dart';
+import '../services/audio_service.dart';
 
 class ProfileDetailScreen extends StatefulWidget {
   const ProfileDetailScreen({super.key});
@@ -16,6 +17,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
   bool _isEditing = false;
   late TextEditingController _nameController;
   late String _originalName;
+  late String _currentGender;
+  late String _originalGender;
 
   @override
   void initState() {
@@ -30,6 +33,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       final user = AuthScope.of(context).currentUser;
       _originalName = user?.fullName ?? '';
       _nameController.text = _originalName;
+      _originalGender = user?.gender ?? 'male';
+      _currentGender = _originalGender;
     }
   }
 
@@ -51,10 +56,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     }
     
     final auth = AuthScope.of(context, listen: false);
-    auth.updateProfile(fullName: name);
+    auth.updateProfile(fullName: name, gender: _currentGender);
     setState(() {
       _isEditing = false;
       _originalName = name;
+      _originalGender = _currentGender;
     });
     _showMessage('Đã cập nhật thông tin cá nhân.');
   }
@@ -73,7 +79,9 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       onPopInvoked: (didPop) async {
         if (didPop) return;
         
-        final hasChanges = _isEditing && _nameController.text.trim() != _originalName;
+        final hasChanges = _isEditing &&
+            (_nameController.text.trim() != _originalName ||
+             _currentGender != _originalGender);
         
         if (hasChanges) {
           final confirm = await showDialog<bool>(
@@ -97,6 +105,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
             setState(() {
               _isEditing = false;
               _nameController.text = _originalName;
+              _currentGender = _originalGender;
             });
             if (context.mounted) Navigator.of(context).pop();
           }
@@ -116,6 +125,14 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Center(
+            child: CircleAvatar(
+              radius: 50,
+              backgroundColor: AppTheme.surface,
+              backgroundImage: AssetImage('assets/images/auth/$_currentGender.jpg'),
+            ),
+          ),
+          const SizedBox(height: 24),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,6 +144,23 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                     labelText: 'Họ và tên hiển thị',
                     prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
                   ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _currentGender,
+                  decoration: const InputDecoration(
+                    labelText: 'Giới tính',
+                    prefixIcon: Icon(Icons.wc_rounded, size: 20),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'male', child: Text('Nam')),
+                    DropdownMenuItem(value: 'female', child: Text('Nữ')),
+                  ],
+                  onChanged: _isEditing
+                      ? (val) {
+                          if (val != null) setState(() => _currentGender = val);
+                        }
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 TextField(
@@ -146,7 +180,9 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
+                    onPressed: ()  {
+              AudioService().playTap();
+
                       setState(() {
                         _isEditing = false;
                         _nameController.text = user.fullName;

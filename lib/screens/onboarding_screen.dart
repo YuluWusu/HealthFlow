@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/auth_scope.dart';
+import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 
 /// Màn hình thiết lập thông tin ban đầu cho người dùng mới.
@@ -26,6 +27,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _weightController = TextEditingController(text: '55');
   final _calorieController = TextEditingController(text: '2000');
   String _selectedGoal = 'Giữ dáng';
+  String _selectedGender = 'male';
 
   final List<String> _goals = [
     'Giảm cân',
@@ -35,7 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     'Sống khỏe',
   ];
 
-  static const int _totalSteps = 4;
+  static const int _totalSteps = 6;
 
   @override
   void dispose() {
@@ -47,6 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextStep() {
+    AudioService().playSlide();
     if (_currentStep < _totalSteps - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
@@ -58,6 +61,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _prevStep() {
+    AudioService().playSlide();
     if (_currentStep > 0) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 350),
@@ -81,9 +85,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         weightKg: weight,
         dailyCalorieGoal: calorie,
         healthGoal: _selectedGoal,
+        gender: _selectedGender,
       );
       // Đánh dấu đã hoàn thành onboarding
       if (mounted) {
+        AudioService().playSuccess();
         auth.completeOnboarding();
       }
     } catch (e) {
@@ -156,10 +162,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (index) => setState(() => _currentStep = index),
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _buildWelcomePage(),
+                  _buildGenderPage(),
                   _buildHeightWeightPage(),
                   _buildGoalPage(),
                   _buildCaloriePage(),
+                  _buildFinalWelcomePage(),
+                  _buildTutorialPage(),
                 ],
               ),
             ),
@@ -189,9 +197,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         )
                       : Text(
-                          _currentStep < _totalSteps - 1
-                              ? 'Tiếp tục'
-                              : 'Hoàn tất thiết lập',
+                          _currentStep == 4 ? 'Bắt đầu sử dụng' : (_currentStep == 5 ? 'Tôi đã hiểu' : 'Tiếp tục'),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -206,28 +212,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildWelcomePage() {
+  Widget _buildGenderPage() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: AppTheme.lightGreen,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: const Icon(
-              Icons.waving_hand_rounded,
-              size: 50,
-              color: AppTheme.primary,
-            ),
-          ),
-          const SizedBox(height: 32),
           const Text(
-            'Chào mừng bạn đến\nvới HealthFlow! 🎉',
+            'Chào mừng bạn đến với HealthFlow! 🎉',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 26,
@@ -238,8 +230,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Hãy dành vài phút để thiết lập hồ sơ sức khỏe của bạn.\n'
-            'Thông tin này giúp HealthFlow đưa ra gợi ý phù hợp nhất cho bạn.',
+            'Hãy chọn giới tính của bạn để chúng tôi có thể đưa ra gợi ý sức khỏe chính xác nhất.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -247,24 +238,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 1.6,
             ),
           ),
-          const SizedBox(height: 32),
-          // Các tính năng
-          _FeatureItem(
-            icon: Icons.monitor_weight_outlined,
-            title: 'Theo dõi cân nặng & chiều cao',
-            color: AppTheme.blue,
-          ),
-          const SizedBox(height: 12),
-          _FeatureItem(
-            icon: Icons.flag_outlined,
-            title: 'Đặt mục tiêu sức khỏe cá nhân',
-            color: AppTheme.primary,
-          ),
-          const SizedBox(height: 12),
-          _FeatureItem(
-            icon: Icons.restaurant_rounded,
-            title: 'Quản lý dinh dưỡng hàng ngày',
-            color: AppTheme.orange,
+          const SizedBox(height: 48),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _GenderOption(
+                label: 'Nam',
+                image: 'assets/images/auth/male.jpg',
+                isSelected: _selectedGender == 'male',
+                onTap: () {
+                  AudioService().playTap();
+                  setState(() => _selectedGender = 'male');
+                },
+              ),
+              const SizedBox(width: 32),
+              _GenderOption(
+                label: 'Nữ',
+                image: 'assets/images/auth/female.jpg',
+                isSelected: _selectedGender == 'female',
+                onTap: () {
+                  AudioService().playTap();
+                  setState(() => _selectedGender = 'female');
+                },
+              ),
+            ],
           ),
         ],
       ),
@@ -782,3 +779,176 @@ class _CalorieSuggestion extends StatelessWidget {
     );
   }
 }
+
+class _GenderOption extends StatelessWidget {
+  final String label;
+  final String image;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _GenderOption({
+    required this.label,
+    required this.image,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          AnimatedScale(
+            scale: isSelected ? 1.1 : 1.0,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutBack,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? AppTheme.primary : Colors.transparent,
+                  width: 3,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: AppTheme.primary.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                        )
+                      ]
+                    : null,
+              ),
+              child: ClipOval(
+                child: Image.asset(image, fit: BoxFit.cover),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              color: isSelected ? AppTheme.primary : AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+extension _FinalPages on _OnboardingScreenState {
+  Widget _buildFinalWelcomePage() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 250,
+            height: 250,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primary.withValues(alpha: 0.15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                )
+              ],
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/auth/step_welcome_final.jpg',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: AppTheme.lightGreen),
+              ),
+            ),
+          ),
+          const SizedBox(height: 48),
+          const Text(
+            'Tuyệt vời! 🚀',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Hồ sơ của bạn đã sẵn sàng.\nHealthFlow đã cá nhân hóa trải nghiệm dành riêng cho bạn.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              color: AppTheme.textSecondary,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTutorialPage() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 250,
+            height: 250,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.blue.withValues(alpha: 0.15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                )
+              ],
+            ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/images/auth/step_tutorial.jpg',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: AppTheme.lightBlue),
+              ),
+            ),
+          ),
+          const SizedBox(height: 48),
+          const Text(
+            'Bắt đầu hành trình',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+              height: 1.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Theo dõi chỉ số mỗi ngày, hoàn thành mục tiêu và chia sẻ thành tích của bạn!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              color: AppTheme.textSecondary,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

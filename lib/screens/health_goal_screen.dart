@@ -4,6 +4,7 @@ import '../data/auth_scope.dart';
 import '../models/user.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_card.dart';
+import '../services/audio_service.dart';
 
 class HealthGoalScreen extends StatefulWidget {
   const HealthGoalScreen({super.key});
@@ -218,7 +219,9 @@ class _HealthGoalScreenState extends State<HealthGoalScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () {
+                    onPressed: ()  {
+              AudioService().playTap();
+
                       setState(() {
                         _isEditing = false;
                         _heightController.text = user.heightCm.toStringAsFixed(0);

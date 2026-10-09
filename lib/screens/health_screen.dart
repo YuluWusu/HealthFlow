@@ -19,6 +19,7 @@ import '../widgets/health_hero_card.dart';
 import '../widgets/health_insight_card.dart';
 import '../widgets/health_visuals.dart';
 import '../widgets/screen_backdrop.dart';
+import '../services/audio_service.dart';
 
 /// Màn hình theo dõi Sức khỏe với 4 tab:
 /// 1. Tổng quan (Chỉ số & Cảnh báo)
@@ -1330,6 +1331,8 @@ class _HistoryTab extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
+                   AudioService().playTap();
+
               Navigator.of(dialogContext).pop();
               await health.deleteMetric(metric.id, user!.id);
               if (metric.type == HealthMetricType.weight) {
@@ -1409,6 +1412,8 @@ class _HistoryTab extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                   AudioService().playTap();
+
                     final value = HealthValidator.parseNumber(valueController.text);
                     final secondary = needsSecondary
                         ? HealthValidator.parseNumber(secondaryController.text)
@@ -1849,6 +1854,8 @@ class _AddMetricButton extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
+                   AudioService().playTap();
+
                     final value = HealthValidator.parseNumber(valueController.text);
                     final secondary = needsSecondary
                         ? HealthValidator.parseNumber(secondaryController.text)

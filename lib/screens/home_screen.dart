@@ -11,6 +11,7 @@ import '../models/health_metric.dart';
 import '../models/nutrition.dart';
 import '../models/user.dart';
 import '../theme/app_theme.dart';
+import '../services/audio_service.dart';
 
 /// Trang chủ (Dashboard) theo bản thiết kế: lời chào, thẻ năng lượng, các chỉ
 /// số sức khỏe, hoạt động trong ngày và lối vào nhanh các mục khác.
@@ -112,7 +113,7 @@ class HomeScreen extends StatelessWidget {
     if (user != null && user.avatarPath != null && user.avatarPath!.isNotEmpty) {
       avatarImage = FileImage(File(user.avatarPath!));
     } else {
-      avatarImage = const AssetImage('assets/images/core/avatar.jpg');
+      avatarImage = AssetImage(user != null ? 'assets/images/auth/${user.gender}.jpg' : 'assets/images/auth/male.jpg');
     }
 
     return Container(
@@ -211,7 +212,9 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 12),
               // Nút thông báo
               InkWell(
-                onTap: () {
+                onTap: ()  {
+          AudioService().playTap();
+
                   Scaffold.of(context).openEndDrawer();
                 },
                 borderRadius: BorderRadius.circular(20),
@@ -1115,7 +1118,9 @@ class _NotificationTile extends StatelessWidget {
           ],
         ),
       ),
-      onTap: () {},
+      onTap: ()  {
+          AudioService().playTap();
+},
       isThreeLine: true,
     );
   }

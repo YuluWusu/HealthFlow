@@ -9,6 +9,7 @@ import '../data/auth_repository.dart';
 import '../data/auth_scope.dart';
 import '../models/user.dart';
 import '../theme/app_theme.dart';
+import '../services/audio_service.dart';
 import '../services/notification_service.dart';
 import '../widgets/app_card.dart';
 import '../widgets/error_banner.dart';
@@ -72,7 +73,13 @@ class SettingsScreen extends StatelessWidget {
           const _SectionLabel('Quyền ứng dụng'),
           AppCard(
             padding: const EdgeInsets.symmetric(vertical: 4),
-            child: _NotificationSwitchTile(),
+            child: Column(
+              children: [
+                _NotificationSwitchTile(),
+                const Divider(height: 1, indent: 64),
+                _SoundSwitchTile(),
+              ],
+            ),
           ),
           const SizedBox(height: 20),
           const _SectionLabel('Bảo mật và hỗ trợ'),
@@ -413,7 +420,7 @@ class _ProfileHeader extends StatelessWidget {
                   backgroundColor: AppTheme.lightGreen,
                   backgroundImage: user.avatarPath != null && user.avatarPath!.isNotEmpty
                       ? FileImage(File(user.avatarPath!))
-                      : const AssetImage('assets/images/core/avatar.jpg') as ImageProvider,
+                      : AssetImage('assets/images/auth/${user.gender}.jpg') as ImageProvider,
                 ),
                 Positioned(
                   right: 0,
@@ -856,4 +863,35 @@ class _DialogController {
   String? message;
 
   void clear() => message = null;
+}
+
+class _SoundSwitchTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: AudioService(),
+      builder: (context, _) {
+        final isEnabled = AudioService().soundEnabled;
+        return SettingsTile(
+          icon: isEnabled ? Icons.volume_up_outlined : Icons.volume_off_outlined,
+          title: 'Âm thanh ứng dụng',
+          subtitle: isEnabled ? 'Đã bật âm thanh' : 'Tắt âm thanh hệ thống',
+          iconColor: AppTheme.blue,
+          showChevron: false,
+          trailing: Switch(
+            value: isEnabled,
+            activeColor: AppTheme.primary,
+            onChanged: (val) {
+              AudioService().setSoundEnabled(val);
+              if (val) AudioService().playDing();
+            },
+          ),
+          onTap: () {
+            AudioService().setSoundEnabled(!isEnabled);
+            if (!isEnabled) AudioService().playDing();
+          },
+        );
+      },
+    );
+  }
 }
