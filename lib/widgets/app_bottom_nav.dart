@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 
 /// Thanh điều hướng dưới cùng với 5 mục theo bản thiết kế.
@@ -56,10 +55,7 @@ class AppBottomNav extends StatelessWidget {
 
               return Expanded(
                 child: InkWell(
-                  onTap: () {
-                    AudioService().playTap();
-                    onItemTapped(index);
-                  },
+                  onTap: () => onItemTapped(index),
                   borderRadius: BorderRadius.circular(16),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -5119,7 +5119,7 @@ class _CartSheetState extends State<_CartSheet> {
                           title: Text(item.food.name,
                               maxLines: 1, overflow: TextOverflow.ellipsis),
                           subtitle: Text(
-                              '${item.calories} kcal · ${_portionText(item.portion)}'),
+                              '${item.calories} kcal · ${isIngredientFoodId(item.food.id) ? '${gramsOfPortion(item.portion)}g' : _portionText(item.portion)}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -5519,11 +5519,11 @@ class _CategoryTile extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Image.asset(
-                'assets/images/$asset.jpg',
+                'assets/images/food/$asset.jpg',
                 fit: BoxFit.cover,
                 cacheWidth: 500,
                 errorBuilder: (_, __, ___) => Image.asset(
-                  'assets/images/$fallbackAsset.jpg',
+                  'assets/images/food/$fallbackAsset.jpg',
                   fit: BoxFit.cover,
                   cacheWidth: 500,
                   errorBuilder: (_, __, ___) => ColoredBox(color: color),
