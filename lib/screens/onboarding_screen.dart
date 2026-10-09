@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/auth_scope.dart';
+import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 
 /// Màn hình thiết lập thông tin ban đầu cho người dùng mới.
@@ -26,6 +27,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _weightController = TextEditingController(text: '55');
   final _calorieController = TextEditingController(text: '2000');
   String _selectedGoal = 'Giữ dáng';
+  String _selectedGender = 'male';
 
   final List<String> _goals = [
     'Giảm cân',
@@ -35,7 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     'Sống khỏe',
   ];
 
-  static const int _totalSteps = 4;
+  static const int _totalSteps = 6;
 
   @override
   void dispose() {
@@ -47,6 +49,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextStep() {
+    if (_currentStep == 3) {
+      AudioService().playSuccess();
+    } else {
+      AudioService().playSlide();
+    }
+
     if (_currentStep < _totalSteps - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
@@ -58,6 +66,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _prevStep() {
+    AudioService().playSlide();
     if (_currentStep > 0) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 350),
@@ -81,9 +90,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         weightKg: weight,
         dailyCalorieGoal: calorie,
         healthGoal: _selectedGoal,
+        gender: _selectedGender,
       );
       // Đánh dấu đã hoàn thành onboarding
       if (mounted) {
+        AudioService().playSuccess();
         auth.completeOnboarding();
       }
     } catch (e) {
@@ -104,51 +115,51 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Progress indicator
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      if (_currentStep > 0)
-                        IconButton(
-                          onPressed: _prevStep,
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                        )
-                      else
-                        const SizedBox(width: 32),
-                      Expanded(
-                        child: Text(
-                          'Bước ${_currentStep + 1} / $_totalSteps',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.textSecondary,
+            if (_currentStep < 4)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        if (_currentStep > 0)
+                          IconButton(
+                            onPressed: _prevStep,
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          )
+                        else
+                          const SizedBox(width: 32),
+                        Expanded(
+                          child: Text(
+                            'Bước ${_currentStep + 1} / 4',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 32),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: (_currentStep + 1) / _totalSteps,
-                      minHeight: 6,
-                      backgroundColor: AppTheme.lightGreen,
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                        const SizedBox(width: 32),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    // Progress bar
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: LinearProgressIndicator(
+                        value: (_currentStep + 1) / 4,
+                        minHeight: 6,
+                        backgroundColor: AppTheme.lightGreen,
+                        valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             // Pages
             Expanded(
               child: PageView(
@@ -160,6 +171,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   _buildHeightWeightPage(),
                   _buildGoalPage(),
                   _buildCaloriePage(),
+                  _buildFinalWelcomePage(),
+                  _buildTutorialPage(),
                 ],
               ),
             ),
@@ -189,9 +202,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         )
                       : Text(
-                          _currentStep < _totalSteps - 1
+                          _currentStep < 4
                               ? 'Tiếp tục'
-                              : 'Hoàn tất thiết lập',
+                              : _currentStep == 4
+                                  ? 'Bắt đầu sử dụng'
+                                  : 'Tôi đã hiểu',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -208,24 +223,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildWelcomePage() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: AppTheme.lightGreen,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: const Icon(
-              Icons.waving_hand_rounded,
-              size: 50,
-              color: AppTheme.primary,
-            ),
-          ),
-          const SizedBox(height: 32),
           const Text(
             'Chào mừng bạn đến\nvới HealthFlow! 🎉',
             textAlign: TextAlign.center,
@@ -238,8 +239,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Hãy dành vài phút để thiết lập hồ sơ sức khỏe của bạn.\n'
-            'Thông tin này giúp HealthFlow đưa ra gợi ý phù hợp nhất cho bạn.',
+            'Bạn là ai?\nHãy chọn giới tính để HealthFlow\ncá nhân hóa gợi ý cho bạn nhé.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -247,26 +247,99 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 1.6,
             ),
           ),
-          const SizedBox(height: 32),
-          // Các tính năng
-          _FeatureItem(
-            icon: Icons.monitor_weight_outlined,
-            title: 'Theo dõi cân nặng & chiều cao',
-            color: AppTheme.blue,
-          ),
-          const SizedBox(height: 12),
-          _FeatureItem(
-            icon: Icons.flag_outlined,
-            title: 'Đặt mục tiêu sức khỏe cá nhân',
-            color: AppTheme.primary,
-          ),
-          const SizedBox(height: 12),
-          _FeatureItem(
-            icon: Icons.restaurant_rounded,
-            title: 'Quản lý dinh dưỡng hàng ngày',
-            color: AppTheme.orange,
+          const SizedBox(height: 40),
+          Row(
+            children: [
+              Expanded(
+                child: _buildGenderCard(
+                  gender: 'male',
+                  label: 'Nam',
+                  imagePath: 'assets/images/auth/male.jpg',
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildGenderCard(
+                  gender: 'female',
+                  label: 'Nữ',
+                  imagePath: 'assets/images/auth/female.jpg',
+                ),
+              ),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGenderCard({
+    required String gender,
+    required String label,
+    required String imagePath,
+  }) {
+    final isSelected = _selectedGender == gender;
+    return GestureDetector(
+      onTap: () {
+        AudioService().playTap();
+        setState(() => _selectedGender = gender);
+      },
+      child: AnimatedScale(
+        scale: isSelected ? 1.05 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutBack,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: isSelected ? AppTheme.primary : Colors.transparent,
+              width: 3,
+            ),
+            boxShadow: [
+              if (isSelected)
+                BoxShadow(
+                  color: AppTheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 110,
+                height: 110,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent,
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isSelected ? AppTheme.primary : AppTheme.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (isSelected)
+                const Icon(Icons.check_circle_rounded, color: AppTheme.primary, size: 28)
+              else
+                const SizedBox(height: 28),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -279,17 +352,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           const SizedBox(height: 40),
           Center(
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppTheme.lightBlue,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Icon(
-                Icons.straighten_rounded,
-                size: 40,
-                color: AppTheme.blue,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/images/auth/step_body.jpg', // Thay ảnh này
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightBlue,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Icon(Icons.straighten_rounded, size: 50, color: AppTheme.blue),
+                ),
               ),
             ),
           ),
@@ -398,17 +476,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           const SizedBox(height: 40),
           Center(
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppTheme.lightGreen,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Icon(
-                Icons.flag_rounded,
-                size: 40,
-                color: AppTheme.primary,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/images/auth/step_goal.jpg', // Thay ảnh này
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGreen,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Icon(Icons.flag_rounded, size: 50, color: AppTheme.primary),
+                ),
               ),
             ),
           ),
@@ -461,7 +544,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     : AppTheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 child: InkWell(
-                  onTap: () => setState(() => _selectedGoal = goal),
+                  onTap: () {
+                    AudioService().playTap();
+                    setState(() => _selectedGoal = goal);
+                  },
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -518,17 +604,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           const SizedBox(height: 40),
           Center(
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppTheme.lightOrange,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Icon(
-                Icons.local_fire_department_rounded,
-                size: 40,
-                color: AppTheme.orange,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(
+                'assets/images/auth/step_calorie.jpg', // Thay ảnh này
+                width: 120,
+                height: 120,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightOrange,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Icon(Icons.local_fire_department_rounded, size: 50, color: AppTheme.orange),
+                ),
               ),
             ),
           ),
@@ -579,7 +670,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             value: '1500',
             icon: Icons.trending_down_rounded,
             color: AppTheme.blue,
-            onTap: () => setState(() => _calorieController.text = '1500'),
+            onTap: () {
+              AudioService().playTap();
+              setState(() => _calorieController.text = '1500');
+            },
           ),
           const SizedBox(height: 8),
           _CalorieSuggestion(
@@ -587,7 +681,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             value: '2000',
             icon: Icons.balance_rounded,
             color: AppTheme.primary,
-            onTap: () => setState(() => _calorieController.text = '2000'),
+            onTap: () {
+              AudioService().playTap();
+              setState(() => _calorieController.text = '2000');
+            },
           ),
           const SizedBox(height: 8),
           _CalorieSuggestion(
@@ -595,7 +692,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             value: '2500',
             icon: Icons.trending_up_rounded,
             color: AppTheme.orange,
-            onTap: () => setState(() => _calorieController.text = '2500'),
+            onTap: () {
+              AudioService().playTap();
+              setState(() => _calorieController.text = '2500');
+            },
           ),
           const SizedBox(height: 24),
           Container(
@@ -619,6 +719,106 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinalWelcomePage() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: Image.asset(
+              'assets/images/auth/step_welcome_final.jpg', // Ảnh chào mừng hoàn tất
+              width: 180,
+              height: 180,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  color: AppTheme.lightGreen,
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                child: const Icon(Icons.celebration_rounded, size: 80, color: AppTheme.primary),
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
+          const Text(
+            'Hồ sơ đã hoàn tất!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Cảm ơn bạn đã cung cấp thông tin.\nHealthFlow đã sẵn sàng đồng hành cùng bạn trên con đường chinh phục sức khỏe.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14.5,
+              color: AppTheme.textSecondary,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTutorialPage() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Hướng dẫn cơ bản',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 32),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Image.asset(
+              'assets/images/auth/step_tutorial.jpg', // Ảnh hướng dẫn
+              width: double.infinity,
+              height: 240,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: double.infinity,
+                height: 240,
+                decoration: BoxDecoration(
+                  color: AppTheme.lightBlue,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Icon(Icons.explore_rounded, size: 80, color: AppTheme.blue),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          const Text(
+            '• Trang Chủ: Xem tổng quan calo và hoạt động.\n'
+            '• Sức Khỏe: Theo dõi cân nặng & các chỉ số.\n'
+            '• Dinh Dưỡng: Quản lý bữa ăn trong ngày.\n'
+            '• Tập Luyện: Các bài tập rèn luyện thể chất.',
+            style: TextStyle(
+              fontSize: 14.5,
+              color: AppTheme.textSecondary,
+              height: 1.8,
             ),
           ),
         ],
@@ -689,44 +889,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 }
 
-class _FeatureItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final Color color;
-
-  const _FeatureItem({
-    required this.icon,
-    required this.title,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: color,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _CalorieSuggestion extends StatelessWidget {
   final String label;

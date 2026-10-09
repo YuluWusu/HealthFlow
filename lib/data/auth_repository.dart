@@ -260,6 +260,7 @@ class AuthRepository extends ChangeNotifier {
     double? heightCm,
     double? weightKg,
     int? dailyCalorieGoal,
+    String? gender,
     String? avatarPath,
   }) async {
     final user = _currentUser;
@@ -278,6 +279,7 @@ class AuthRepository extends ChangeNotifier {
       heightCm: heightCm,
       weightKg: weightKg,
       dailyCalorieGoal: dailyCalorieGoal,
+      gender: gender,
       avatarPath: avatarPath,
     );
     await _accounts.update(updated);

@@ -16,6 +16,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
   bool _isEditing = false;
   late TextEditingController _nameController;
   late String _originalName;
+  late String _selectedGender;
+  late String _originalGender;
 
   @override
   void initState() {
@@ -30,6 +32,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       final user = AuthScope.of(context).currentUser;
       _originalName = user?.fullName ?? '';
       _nameController.text = _originalName;
+      _originalGender = user?.gender ?? 'male';
+      _selectedGender = _originalGender;
     }
   }
 
@@ -51,10 +55,11 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
     }
     
     final auth = AuthScope.of(context, listen: false);
-    auth.updateProfile(fullName: name);
+    auth.updateProfile(fullName: name, gender: _selectedGender);
     setState(() {
       _isEditing = false;
       _originalName = name;
+      _originalGender = _selectedGender;
     });
     _showMessage('Đã cập nhật thông tin cá nhân.');
   }
@@ -73,7 +78,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       onPopInvoked: (didPop) async {
         if (didPop) return;
         
-        final hasChanges = _isEditing && _nameController.text.trim() != _originalName;
+        final hasChanges = _isEditing && (_nameController.text.trim() != _originalName || _selectedGender != _originalGender);
         
         if (hasChanges) {
           final confirm = await showDialog<bool>(
@@ -97,6 +102,7 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
             setState(() {
               _isEditing = false;
               _nameController.text = _originalName;
+              _selectedGender = _originalGender;
             });
             if (context.mounted) Navigator.of(context).pop();
           }
@@ -116,6 +122,23 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          Center(
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppTheme.primary, width: 3),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage(
+                  _selectedGender == 'female'
+                      ? 'assets/images/auth/female.jpg'
+                      : 'assets/images/auth/male.jpg',
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,6 +160,23 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                     prefixIcon: Icon(Icons.mail_outline_rounded, size: 20),
                   ),
                 ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  decoration: const InputDecoration(
+                    labelText: 'Giới tính',
+                    prefixIcon: Icon(Icons.wc_rounded, size: 20),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'male', child: Text('Nam')),
+                    DropdownMenuItem(value: 'female', child: Text('Nữ')),
+                  ],
+                  onChanged: _isEditing ? (value) {
+                    if (value != null) {
+                      setState(() => _selectedGender = value);
+                    }
+                  } : null,
+                ),
               ],
             ),
           ),
@@ -149,7 +189,8 @@ class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
                     onPressed: () {
                       setState(() {
                         _isEditing = false;
-                        _nameController.text = user.fullName;
+                        _nameController.text = _originalName;
+                        _selectedGender = _originalGender;
                       });
                     },
                     style: OutlinedButton.styleFrom(
