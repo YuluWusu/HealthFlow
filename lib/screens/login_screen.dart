@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Lỗi trả về từ lớp nghiệp vụ (sai mật khẩu, không tìm thấy tài khoản...).
   String? _serverError;
 
-  static const _bgImage = AssetImage('assets/images/auth/auth_bg.jpg');
+  static const _bgImage = AssetImage('assets/images/welcome/bg_login-register.jpg');
 
   @override
   void didChangeDependencies() {

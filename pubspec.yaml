@@ -50,12 +50,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.13.1
-
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/images/core/logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -75,9 +69,9 @@ flutter:
     - assets/images/food/
     - assets/images/home/
     - assets/images/core/
+    - assets/images/exercise/
     - assets/sounds/
     - assets/data/vn_foods.json
-    - assets/data/ingredients.json
 
   fonts:
     - family: BeVietnamPro

@@ -9,27 +9,13 @@ enum HealthMetricType {
   heartRate('heart_rate', 'Nhịp tim', 'bpm'),
   bloodGlucose('blood_glucose', 'Đường huyết', 'mg/dL'),
   sleep('sleep', 'Giấc ngủ', 'giờ'),
-  steps('steps', 'Vận động', 'bước'),
-
-  /// BMI theo từng lần cân. Do ứng dụng TỰ GHI từ cân nặng và chiều cao tại
-  /// thời điểm cân, người dùng không nhập tay (xem [isDerived]).
-  bmi('bmi', 'BMI', 'kg/m²');
+  steps('steps', 'Vận động', 'bước');
 
   const HealthMetricType(this.storeName, this.label, this.unit);
 
   final String storeName;
   final String label;
   final String unit;
-
-  /// Loại chỉ số được tính ra từ chỉ số khác, không cho nhập, sửa hay xóa
-  /// riêng lẻ (xóa hoặc sửa lần cân thì BMI đi kèm tự cập nhật theo).
-  bool get isDerived => this == HealthMetricType.bmi;
-
-  /// Các loại người dùng được nhập tay (dùng cho form thêm chỉ số).
-  static List<HealthMetricType> get userEntered => [
-    for (final type in values)
-      if (!type.isDerived) type,
-  ];
 
   static HealthMetricType fromStoreName(String value) {
     return HealthMetricType.values.firstWhere(
@@ -61,10 +47,6 @@ class HealthMetric {
     required this.recordedAt,
     this.note = '',
   });
-
-  /// Mã bản ghi BMI đi kèm một lần cân. Suy ra từ mã lần cân nên sửa hoặc xóa
-  /// lần cân là tìm được đúng bản ghi BMI tương ứng.
-  static String bmiIdFor(String weightId) => 'bmi-$weightId';
 
   /// Chuỗi hiển thị đã kèm đơn vị, ví dụ `120/80 mmHg` hoặc `56.5 kg`.
   String get displayValue {
