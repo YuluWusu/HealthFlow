@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, unused_import
+
 import 'package:flutter/material.dart';
 
 import '../data/auth_scope.dart';
