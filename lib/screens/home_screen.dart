@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_underscores
 
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -14,10 +15,11 @@ import '../models/nutrition.dart';
 import '../models/user.dart';
 import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
+import 'add_food_screen.dart';
 
 /// Trang chủ (Dashboard) theo bản thiết kế: lời chào, thẻ năng lượng, các chỉ
 /// số sức khỏe, hoạt động trong ngày và lối vào nhanh các mục khác.
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   /// Gọi khi người dùng bấm vào lối vào nhanh, để chuyển tab ở màn hình chính.
   final ValueChanged<int>? onNavigate;
 
@@ -27,11 +29,82 @@ class HomeScreen extends StatelessWidget {
   });
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late final AnimationController _entranceController;
+  late final AnimationController _pulseController;
+
+  /// Cache ảnh đại diện để tránh giật khi vẽ lại.
+  ImageProvider? _cachedAvatarImage;
+  String? _lastAvatarPath;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..forward();
+
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _entranceController.dispose();
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  /// Chuẩn bị và cache sẵn ảnh đại diện cho người dùng.
+  ImageProvider _getAvatarImage(User? user) {
+    final avatarPath = user?.avatarPath;
+
+    // Trả về cached nếu path không đổi
+    if (avatarPath == _lastAvatarPath && _cachedAvatarImage != null) {
+      return _cachedAvatarImage!;
+    }
+    _lastAvatarPath = avatarPath;
+
+    ImageProvider image;
+    if (user != null && avatarPath != null && avatarPath.isNotEmpty) {
+      image = ResizeImage(FileImage(File(avatarPath)), width: 150);
+    } else {
+      image = ResizeImage(
+        AssetImage(user?.gender == 'female'
+            ? 'assets/images/auth/female.jpg'
+            : 'assets/images/auth/male.jpg'),
+        width: 150,
+      );
+    }
+    _cachedAvatarImage = image;
+
+    // Tiền tải ảnh vào bộ đệm để tránh nhấp nháy.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) precacheImage(image, context);
+    });
+    return image;
+  }
+
+  /// Lời chào theo thời gian trong ngày.
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Chào buổi sáng';
+    if (hour < 18) return 'Chào buổi chiều';
+    return 'Chào buổi tối';
+  }
+
+  @override
   Widget build(BuildContext context) {
     final auth = AuthScope.of(context);
     final user = auth.currentUser;
 
-    // `AppScope` được lấy không theo dõi thay đổi; dữ liệu được vẽ lại nhờ
+    // `AppData` được lấy không theo dõi thay đổi; dữ liệu được vẽ lại nhờ
     // các `ListenableBuilder` bên dưới nên phạm vi vẽ lại hẹp.
     final app = AppScope.of(context);
 
@@ -45,59 +118,54 @@ class HomeScreen extends StatelessWidget {
             app.workout,
           ]),
           builder: (context, _) {
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-              children: [
-                _buildHeader(context, user),
-                const SizedBox(height: 22),
-                _CalorieCard(
-                  summary: app.nutrition.summary,
-                  onTap: () {
-                    AudioService().playTap();
-                    onNavigate?.call(3);
-                  },
-                ),
-                const SizedBox(height: 18),
-                _ActivityRow(
-                  minutesToday: app.workout.minutesToday,
-                  goalPercent: app.workout.goalPercent,
-                  caloriesBurned: app.workout.caloriesBurnedToday,
-                  onTap: () {
-                    AudioService().playTap();
-                    onNavigate?.call(2);
-                  },
-                ),
-                const SizedBox(height: 24),
-                _SectionHeading(
-                  title: 'Chỉ số sức khỏe',
-                  actionText: 'Xem tất cả',
-                  onAction: () {
-                    AudioService().playTap();
-                    onNavigate?.call(1);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _HealthOverview(
-                  health: app.health,
-                  bmi: user?.bmi ?? 0,
-                  bmiLabel: user?.bmiLabel ?? 'Chưa có dữ liệu',
-                ),
-                const SizedBox(height: 24),
-                _SectionHeading(
-                  title: 'Thói quen hôm nay',
-                  actionText: 'Dinh dưỡng',
-                  onAction: () {
-                    AudioService().playTap();
-                    onNavigate?.call(3);
-                  },
-                ),
-                const SizedBox(height: 12),
-                _MealSummaryCard(nutrition: app.nutrition),
-                const SizedBox(height: 24),
-                _buildQuickAccess(),
-                const SizedBox(height: 20),
-                const _DailyTip(),
-              ],
+            return AnimatedBuilder(
+              animation: _entranceController,
+              builder: (context, _) {
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                  children: [
+                    _buildAnimatedChild(0, _buildHeader(context, user)),
+                    const SizedBox(height: 20),
+                    _buildAnimatedChild(1, _buildStatsRow(app, user)),
+                    const SizedBox(height: 20),
+                    _buildAnimatedChild(
+                      2,
+                      _CalorieCard(
+                        summary: app.nutrition.summary,
+                        onTap: () {
+                          AudioService().playTap();
+                          widget.onNavigate?.call(3);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildAnimatedChild(
+                      3,
+                      _ActivityRow(
+                        minutesToday: app.workout.minutesToday,
+                        goalPercent: app.workout.goalPercent,
+                        caloriesBurned: app.workout.caloriesBurnedToday,
+                        onTap: () {
+                          AudioService().playTap();
+                          widget.onNavigate?.call(2);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    _buildAnimatedChild(4, _buildHealthSection(app, user)),
+                    const SizedBox(height: 22),
+                    _buildAnimatedChild(5, _buildMealSection(app)),
+                    const SizedBox(height: 22),
+                    _buildAnimatedChild(6, _buildMacroSection(app)),
+                    const SizedBox(height: 22),
+                    _buildAnimatedChild(7, _buildWaterSection(app, user)),
+                    const SizedBox(height: 22),
+                    _buildAnimatedChild(8, _buildQuickAccess()),
+                    const SizedBox(height: 18),
+                    _buildAnimatedChild(9, const _DailyTip()),
+                  ],
+                );
+              },
             );
           },
         ),
@@ -105,152 +173,513 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Hiệu ứng xuất hiện lệch giờ cho từng phần tử.
+  Widget _buildAnimatedChild(int index, Widget child) {
+    final delay = (index * 0.08).clamp(0.0, 0.6);
+    final end = (delay + 0.4).clamp(0.0, 1.0);
+    final animation = CurvedAnimation(
+      parent: _entranceController,
+      curve: Interval(delay, end, curve: Curves.easeOutCubic),
+    );
+
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.08),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Header
+  // ---------------------------------------------------------------------------
+
   Widget _buildHeader(BuildContext context, User? user) {
     final now = DateTime.now();
     const weekdays = [
-      'Thứ Hai',
-      'Thứ Ba',
-      'Thứ Tư',
-      'Thứ Năm',
-      'Thứ Sáu',
-      'Thứ Bảy',
-      'Chủ Nhật',
+      'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm',
+      'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật',
     ];
 
     final weekday = weekdays[now.weekday - 1];
     final date = '$weekday, ${now.day}/${now.month}/${now.year}';
-
-    // Lời chào dùng đầy đủ họ tên như bản thiết kế ("Xin chào, Minh Anh").
     final displayName = user?.fullName.trim() ?? 'bạn';
+    final avatarImage = _getAvatarImage(user);
+    final greeting = _getGreeting();
 
-    ImageProvider avatarImage;
-    if (user != null && user.avatarPath != null && user.avatarPath!.isNotEmpty) {
-      avatarImage = FileImage(File(user.avatarPath!));
-    } else {
-      avatarImage = AssetImage(user?.gender == 'female' 
-          ? 'assets/images/auth/female.jpg' 
-          : 'assets/images/auth/male.jpg');
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          colors: [
-            AppTheme.primary,
-            AppTheme.primaryDark,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-        // Dùng tạm hình nền mờ trang trí
-        image: DecorationImage(
-          image: const AssetImage('assets/images/auth/auth_bg.jpg'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.2), 
-            BlendMode.dstATop,
-          ),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    date,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Xin chào, $displayName 👋',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Chúc bạn một ngày khỏe mạnh!',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Ngày tháng nằm tách riêng, rõ ràng
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Row(
             children: [
-              // Ảnh đại diện
-              InkWell(
-                onTap: () => onNavigate?.call(4),
-                borderRadius: BorderRadius.circular(30),
-                child: Container(
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: CircleAvatar(
-                    radius: 24,
-                    backgroundColor: Colors.white,
-                    backgroundImage: avatarImage,
-                    onBackgroundImageError: (_, __) {},
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Nút thông báo
-              InkWell(
-                onTap: () {
-                  Scaffold.of(context).openEndDrawer();
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.notifications_active_rounded, 
-                    color: Colors.white, 
-                    size: 20,
-                  ),
+              const Icon(Icons.calendar_today_rounded, color: AppTheme.textSecondary, size: 14),
+              const SizedBox(width: 6),
+              Text(
+                date,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textSecondary,
+                  letterSpacing: 0.2,
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        // Header thông tin người dùng với hình nền mờ
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            image: DecorationImage(
+              image: const ResizeImage(AssetImage('assets/images/auth/auth_bg.jpg'), height: 400),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withValues(alpha: 0.35),
+                BlendMode.darken,
+              ),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primary.withValues(alpha: 0.35),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$greeting,',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          '$displayName 👋',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        if (user != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.25),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.flag_rounded,
+                                    color: Colors.white, size: 13),
+                                const SizedBox(width: 5),
+                                Text(
+                                  user.healthGoal,
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    children: [
+                      // Ảnh đại diện có viền gradient
+                      GestureDetector(
+                        onTap: () {
+                          AudioService().playTap();
+                          widget.onNavigate?.call(4);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withValues(alpha: 0.6),
+                                Colors.white.withValues(alpha: 0.2),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.white.withValues(alpha: 0.2),
+                            backgroundImage: avatarImage,
+                            onBackgroundImageError: (_, __) {},
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Nút thông báo
+                      _GlassButton(
+                        icon: Icons.notifications_active_rounded,
+                        onTap: () => Scaffold.of(context).openEndDrawer(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // Stats Row – 3 chỉ số mini nổi bật ngay dưới header
+  // ---------------------------------------------------------------------------
+
+  Widget _buildStatsRow(AppData app, User? user) {
+    final summary = app.nutrition.summary;
+    final waterMl = app.nutrition.waterMl;
+    final waterGoal = NutritionRepository.waterGoalFor(user?.weightKg ?? 55);
+    final waterPercent = waterGoal > 0
+        ? ((waterMl / waterGoal) * 100).round().clamp(0, 999)
+        : 0;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _MiniStatCard(
+            icon: Icons.local_fire_department_rounded,
+            label: 'Calo nạp',
+            value: '${summary.calories}',
+            unit: 'kcal',
+            color: AppTheme.orange,
+            background: AppTheme.lightOrange,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _MiniStatCard(
+            icon: Icons.fitness_center_rounded,
+            label: 'Đã đốt',
+            value: '${app.workout.caloriesBurnedToday}',
+            unit: 'kcal',
+            color: AppTheme.pink,
+            background: AppTheme.lightPink,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _MiniStatCard(
+            icon: Icons.water_drop_rounded,
+            label: 'Nước',
+            value: '$waterPercent',
+            unit: '%',
+            color: AppTheme.blue,
+            background: AppTheme.lightBlue,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Health Section
+  // ---------------------------------------------------------------------------
+
+  Widget _buildHealthSection(AppData app, User? user) {
+    return Column(
+      children: [
+        _SectionHeading(
+          title: 'Chỉ số sức khỏe',
+          actionText: 'Xem tất cả',
+          onAction: () {
+            AudioService().playTap();
+            widget.onNavigate?.call(1);
+          },
+        ),
+        const SizedBox(height: 12),
+        _HealthOverview(
+          health: app.health,
+          bmi: user?.bmi ?? 0,
+          bmiLabel: user?.bmiLabel ?? 'Chưa có dữ liệu',
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Meal Summary Section
+  // ---------------------------------------------------------------------------
+
+  Widget _buildMealSection(AppData app) {
+    return Column(
+      children: [
+        _SectionHeading(
+          title: 'Thói quen hôm nay',
+          actionText: 'Dinh dưỡng',
+          onAction: () {
+            AudioService().playTap();
+            widget.onNavigate?.call(3);
+          },
+        ),
+        const SizedBox(height: 12),
+        _MealSummaryCard(nutrition: app.nutrition),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Macro nutrients breakdown
+  // ---------------------------------------------------------------------------
+
+  Widget _buildMacroSection(AppData app) {
+    final summary = app.nutrition.summary;
+    return Column(
+      children: [
+        const _SectionHeading(
+          title: 'Phân bổ chất dinh dưỡng',
+          subtitle: 'Tỉ lệ Protein – Carbs – Fat',
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(22),
+            boxShadow: AppTheme.softShadow(opacity: 0.04),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 90,
+                height: 90,
+                child: CustomPaint(
+                  painter: _MacroRingPainter(
+                    proteinPercent: summary.proteinPercent,
+                    carbsPercent: summary.carbsPercent,
+                    fatPercent: summary.fatPercent,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${summary.calories}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  children: [
+                    _MacroRow(
+                      label: 'Protein',
+                      grams: summary.protein,
+                      percent: summary.proteinPercent,
+                      color: AppTheme.blue,
+                    ),
+                    const SizedBox(height: 12),
+                    _MacroRow(
+                      label: 'Carbs',
+                      grams: summary.carbs,
+                      percent: summary.carbsPercent,
+                      color: AppTheme.orange,
+                    ),
+                    const SizedBox(height: 12),
+                    _MacroRow(
+                      label: 'Fat',
+                      grams: summary.fat,
+                      percent: summary.fatPercent,
+                      color: AppTheme.pink,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Water Section
+  // ---------------------------------------------------------------------------
+
+  Widget _buildWaterSection(AppData app, User? user) {
+    final waterMl = app.nutrition.waterMl;
+    final weightKg = user?.weightKg ?? 55;
+    final waterGoal = NutritionRepository.waterGoalFor(weightKg);
+    final waterProgress =
+        waterGoal > 0 ? (waterMl / waterGoal).clamp(0.0, 1.0) : 0.0;
+    final waterPercent = (waterProgress * 100).round();
+    final cups = (waterMl / (app.nutrition.cupMl)).ceil();
+
+    return Column(
+      children: [
+        _SectionHeading(
+          title: 'Nước uống hôm nay',
+          actionText: 'Chi tiết',
+          onAction: () {
+            AudioService().playTap();
+            widget.onNavigate?.call(3);
+          },
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.blue.withValues(alpha: 0.08),
+                AppTheme.lightBlue,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(
+              color: AppTheme.blue.withValues(alpha: 0.12),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  final scale = 1.0 + (_pulseController.value * 0.05);
+                  return Transform.scale(
+                    scale: scale,
+                    child: child,
+                  );
+                },
+                child: SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox.expand(
+                        child: CircularProgressIndicator(
+                          value: waterProgress,
+                          strokeWidth: 7,
+                          strokeCap: StrokeCap.round,
+                          backgroundColor: AppTheme.blue.withValues(alpha: 0.15),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              AppTheme.blue),
+                        ),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.water_drop_rounded,
+                              color: AppTheme.blue, size: 18),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$waterPercent%',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '$waterMl',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textPrimary,
+                              fontFamily: AppTheme.fontFamily,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' / $waterGoal ml',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppTheme.textSecondary,
+                              fontFamily: AppTheme.fontFamily,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: waterProgress,
+                        minHeight: 6,
+                        backgroundColor: AppTheme.blue.withValues(alpha: 0.12),
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(AppTheme.blue),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Đã uống $cups cốc · Mục tiêu $waterGoal ml',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Quick Access
+  // ---------------------------------------------------------------------------
 
   Widget _buildQuickAccess() {
     return Column(
@@ -266,12 +695,13 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _QuickAccessCard(
                 title: 'Sức khỏe',
+                subtitle: 'Chỉ số',
                 icon: Icons.favorite_rounded,
                 color: AppTheme.pink,
                 background: AppTheme.lightPink,
                 onTap: () {
                   AudioService().playTap();
-                  onNavigate?.call(1);
+                  widget.onNavigate?.call(1);
                 },
               ),
             ),
@@ -279,12 +709,13 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _QuickAccessCard(
                 title: 'Tập luyện',
+                subtitle: 'Bài tập',
                 icon: Icons.fitness_center_rounded,
                 color: AppTheme.primary,
                 background: AppTheme.lightGreen,
                 onTap: () {
                   AudioService().playTap();
-                  onNavigate?.call(2);
+                  widget.onNavigate?.call(2);
                 },
               ),
             ),
@@ -292,12 +723,32 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               child: _QuickAccessCard(
                 title: 'Dinh dưỡng',
+                subtitle: 'Thực đơn',
                 icon: Icons.restaurant_rounded,
                 color: AppTheme.orange,
                 background: AppTheme.lightOrange,
                 onTap: () {
                   AudioService().playTap();
-                  onNavigate?.call(3);
+                  widget.onNavigate?.call(3);
+                },
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _QuickAccessCard(
+                title: 'Định lượng',
+                subtitle: 'Thức ăn',
+                icon: Icons.scale_rounded,
+                color: AppTheme.blue,
+                background: AppTheme.lightBlue,
+                onTap: () {
+                  AudioService().playTap();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AddFoodScreen(initialByGrams: true),
+                    ),
+                  );
                 },
               ),
             ),
@@ -307,18 +758,36 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Notification Drawer
+  // ---------------------------------------------------------------------------
+
   Widget _buildNotificationDrawer(BuildContext context) {
     return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(left: Radius.circular(24)),
+      ),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: AppTheme.primary.withValues(alpha: 0.06),
+              ),
               child: Row(
                 children: [
-                  const Icon(Icons.notifications_active_rounded, color: AppTheme.primary),
-                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.lightGreen,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.notifications_active_rounded,
+                        color: AppTheme.primary, size: 20),
+                  ),
+                  const SizedBox(width: 12),
                   const Text(
                     'Thông báo',
                     style: TextStyle(
@@ -342,21 +811,24 @@ class HomeScreen extends StatelessWidget {
                 children: const [
                   _NotificationTile(
                     title: 'Đã đến giờ uống nước!',
-                    subtitle: 'Hãy uống 1 cốc nước (250ml) để duy trì sự tỉnh táo.',
+                    subtitle:
+                        'Hãy uống 1 cốc nước (250ml) để duy trì sự tỉnh táo.',
                     time: '10 phút trước',
                     icon: Icons.local_drink_rounded,
                     color: AppTheme.blue,
                   ),
                   _NotificationTile(
                     title: 'Mục tiêu hoàn thành',
-                    subtitle: 'Bạn đã đạt 100% mục tiêu calo hôm nay. Tuyệt vời!',
+                    subtitle:
+                        'Bạn đã đạt 100% mục tiêu calo hôm nay. Tuyệt vời!',
                     time: '2 giờ trước',
                     icon: Icons.emoji_events_rounded,
                     color: AppTheme.orange,
                   ),
                   _NotificationTile(
                     title: 'Nhắc nhở tập luyện',
-                    subtitle: 'Đừng quên bài tập Cardio 15 phút chiều nay nhé.',
+                    subtitle:
+                        'Đừng quên bài tập Cardio 15 phút chiều nay nhé.',
                     time: 'Hôm qua',
                     icon: Icons.fitness_center_rounded,
                     color: AppTheme.pink,
@@ -366,6 +838,118 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// SHARED PRIVATE WIDGETS
+// =============================================================================
+
+/// Nút kính mờ trong header.
+class _GlassButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _GlassButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.all(9),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.18),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.15),
+              width: 1,
+            ),
+          ),
+          child: Icon(icon, color: Colors.white, size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+/// Thẻ thống kê nhỏ 3 cột.
+class _MiniStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final String unit;
+  final Color color;
+  final Color background;
+
+  const _MiniStatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.unit,
+    required this.color,
+    required this.background,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: AppTheme.softShadow(opacity: 0.04),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(height: 8),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                    fontFamily: AppTheme.fontFamily,
+                  ),
+                ),
+                TextSpan(
+                  text: ' $unit',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: color.withValues(alpha: 0.7),
+                    fontFamily: AppTheme.fontFamily,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 3),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -418,12 +1002,16 @@ class _SectionHeading extends StatelessWidget {
         if (actionText != null)
           GestureDetector(
             onTap: onAction,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 8, bottom: 2),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppTheme.lightGreen,
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Text(
                 actionText!,
                 style: const TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.primary,
                 ),
@@ -461,147 +1049,200 @@ class _CalorieCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primary.withValues(alpha: 0.30),
-                blurRadius: 20,
+                color: AppTheme.primary.withValues(alpha: 0.25),
+                blurRadius: 24,
                 offset: const Offset(0, 10),
               ),
             ],
-            image: const DecorationImage(
-              image: AssetImage('assets/images/home/calorie_bg.jpg'),
-              fit: BoxFit.cover,
-            ),
           ),
-          child: Container(
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primaryDark.withValues(alpha: 0.85),
-                  AppTheme.primary.withValues(alpha: 0.95),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.17),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.local_fire_department_rounded,
-                      color: Colors.white,
-                      size: 21,
-                    ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // Background image
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/welcome/welcome_food.jpg',
+                    fit: BoxFit.cover,
+                    
                   ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text(
-                      'Tổng calo hôm nay',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                ),
+                // Gradient overlay cho phép hình nền hiện rõ hơn
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppTheme.primaryDark.withValues(alpha: 0.70),
+                          AppTheme.primary.withValues(alpha: 0.40),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                     ),
                   ),
-                  Text(
-                    '$percent%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _formatThousands(consumed),
-                          style: const TextStyle(
-                            fontSize: 34,
-                            height: 1.1,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '/ ${_formatThousands(target)} kcal',
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            color: Colors.white70,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 78,
-                    height: 78,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox.expand(
-                          child: CircularProgressIndicator(
-                            value: progress,
-                            strokeWidth: 8,
-                            strokeCap: StrokeCap.round,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.2),
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Colors.white,
+                ),
+                // Content
+                Padding(
+                  padding: const EdgeInsets.all(22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.17),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Colors.white,
+                              size: 21,
                             ),
                           ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Text(
+                              'Tổng calo hôm nay',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.18),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '$percent%',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _formatThousands(consumed),
+                                  style: const TextStyle(
+                                    fontSize: 36,
+                                    height: 1.1,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  '/ ${_formatThousands(target)} kcal',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 82,
+                            height: 82,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox.expand(
+                                  child: CircularProgressIndicator(
+                                    value: progress,
+                                    strokeWidth: 8,
+                                    strokeCap: StrokeCap.round,
+                                    backgroundColor:
+                                        Colors.white.withValues(alpha: 0.2),
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.restaurant_rounded,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '$percent%',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 7,
+                          backgroundColor:
+                              Colors.white.withValues(alpha: 0.2),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.white),
                         ),
-                        const Icon(
-                          Icons.restaurant_rounded,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Icon(
+                            remaining >= 0
+                                ? Icons.arrow_downward_rounded
+                                : Icons.arrow_upward_rounded,
+                            color: Colors.white70,
+                            size: 13,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            remaining >= 0
+                                ? 'Còn lại ${_formatThousands(remaining)} kcal'
+                                : 'Đã vượt ${_formatThousands(-remaining)} kcal',
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 7,
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  valueColor:
-                      const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                remaining >= 0
-                    ? 'Còn lại ${_formatThousands(remaining)} kcal'
-                    : 'Đã vượt ${_formatThousands(-remaining)} kcal',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 11.5,
-                ),
-              ),
-            ],
-          ),
+              ],
+            ),
           ),
         ),
       ),
@@ -646,6 +1287,9 @@ class _ActivityRow extends StatelessWidget {
             title: 'Vận động hôm nay',
             value: '$minutesToday phút',
             note: 'Mục tiêu ${WorkoutRepository.dailyMinuteGoal} phút',
+            progress: (minutesToday / WorkoutRepository.dailyMinuteGoal)
+                .clamp(0.0, 1.0),
+            progressColor: AppTheme.primary,
             onTap: onTap,
           ),
         ),
@@ -658,6 +1302,8 @@ class _ActivityRow extends StatelessWidget {
             title: 'Năng lượng đốt',
             value: '$caloriesBurned kcal',
             note: 'Hoàn thành $goalPercent%',
+            progress: (goalPercent / 100.0).clamp(0.0, 1.0),
+            progressColor: AppTheme.orange,
             onTap: onTap,
           ),
         ),
@@ -673,6 +1319,8 @@ class _SmallInfoCard extends StatelessWidget {
   final String title;
   final String value;
   final String note;
+  final double progress;
+  final Color progressColor;
   final VoidCallback? onTap;
 
   const _SmallInfoCard({
@@ -682,6 +1330,8 @@ class _SmallInfoCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.note,
+    required this.progress,
+    required this.progressColor,
     this.onTap,
   });
 
@@ -698,14 +1348,27 @@ class _SmallInfoCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: iconBackground,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: iconColor, size: 20),
+              Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: iconBackground,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(icon, color: iconColor, size: 20),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${(progress * 100).round()}%',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: iconColor,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Text(
@@ -724,7 +1387,17 @@ class _SmallInfoCard extends StatelessWidget {
                   color: AppTheme.textPrimary,
                 ),
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 5,
+                  backgroundColor: iconBackground,
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                ),
+              ),
+              const SizedBox(height: 6),
               Text(
                 note,
                 style: TextStyle(
@@ -764,12 +1437,11 @@ class _HealthOverview extends StatelessWidget {
           child: _HealthMetricCard(
             icon: Icons.monitor_weight_outlined,
             title: 'Cân nặng',
-            value: weight == null
-                ? '--'
-                : weight.value.toStringAsFixed(1),
+            value: weight == null ? '--' : weight.value.toStringAsFixed(1),
             unit: 'kg',
             note: trend.display,
-            noteColor: trend.isDecrease ? AppTheme.primary : AppTheme.textSecondary,
+            noteColor:
+                trend.isDecrease ? AppTheme.primary : AppTheme.textSecondary,
             iconColor: AppTheme.blue,
             iconBackground: AppTheme.lightBlue,
           ),
@@ -820,6 +1492,7 @@ class _HealthMetricCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: AppTheme.softShadow(opacity: 0.04),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -885,6 +1558,7 @@ class _MealSummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(20),
+        boxShadow: AppTheme.softShadow(opacity: 0.04),
       ),
       child: Column(
         children: [
@@ -963,12 +1637,19 @@ class _MealRow extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            '$calories kcal',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: hasFood ? AppTheme.textPrimary : AppTheme.textSecondary,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: hasFood ? AppTheme.lightGreen : AppTheme.background,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '$calories kcal',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: hasFood ? AppTheme.primary : AppTheme.textSecondary,
+              ),
             ),
           ),
         ],
@@ -979,6 +1660,7 @@ class _MealRow extends StatelessWidget {
 
 class _QuickAccessCard extends StatelessWidget {
   final String title;
+  final String subtitle;
   final IconData icon;
   final Color color;
   final Color background;
@@ -986,6 +1668,7 @@ class _QuickAccessCard extends StatelessWidget {
 
   const _QuickAccessCard({
     required this.title,
+    required this.subtitle,
     required this.icon,
     required this.color,
     required this.background,
@@ -996,31 +1679,40 @@ class _QuickAccessCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppTheme.surface,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 17, horizontal: 5),
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 6),
           child: Column(
             children: [
               Container(
-                width: 42,
-                height: 42,
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
                   color: background,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(icon, color: color, size: 23),
+                child: Icon(icon, color: color, size: 24),
               ),
-              const SizedBox(height: 9),
+              const SizedBox(height: 10),
               Text(
                 title,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
                   color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: AppTheme.textSecondary,
                 ),
               ),
             ],
@@ -1050,28 +1742,46 @@ class _DailyTip extends StatelessWidget {
     final tip = _tips[DateTime.now().day % _tips.length];
 
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppTheme.lightGreen,
-        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary.withValues(alpha: 0.08),
+            AppTheme.lightGreen,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppTheme.primary.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.lightbulb_outline_rounded,
-            color: AppTheme.primary,
-            size: 23,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.lightbulb_rounded,
+              color: AppTheme.primary,
+              size: 20,
+            ),
           ),
-          const SizedBox(width: 11),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Một lời nhắc nhỏ',
+                  'Mẹo sức khỏe hôm nay',
                   style: TextStyle(
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),
@@ -1081,7 +1791,7 @@ class _DailyTip extends StatelessWidget {
                   tip,
                   style: const TextStyle(
                     color: AppTheme.textSecondary,
-                    fontSize: 11.5,
+                    fontSize: 12,
                     height: 1.5,
                   ),
                 ),
@@ -1111,39 +1821,194 @@ class _NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(10),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Container(
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.15),
-          shape: BoxShape.circle,
+          color: color.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(16),
         ),
-        child: Icon(icon, color: color, size: 20),
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4.0),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              subtitle,
-              style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, height: 1.3),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: color, size: 20),
             ),
-            const SizedBox(height: 4),
-            Text(
-              time,
-              style: TextStyle(fontSize: 11, color: AppTheme.primary.withValues(alpha: 0.8)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      color: AppTheme.textSecondary,
+                      height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    time,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: color.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      onTap: () {},
-      isThreeLine: true,
     );
   }
 }
 
+// =============================================================================
+// MACRO RING PAINTER
+// =============================================================================
+
+/// Vẽ vòng tròn tỉ lệ chất dinh dưỡng (Protein / Carbs / Fat).
+class _MacroRingPainter extends CustomPainter {
+  final double proteinPercent;
+  final double carbsPercent;
+  final double fatPercent;
+
+  _MacroRingPainter({
+    required this.proteinPercent,
+    required this.carbsPercent,
+    required this.fatPercent,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 8;
+    const strokeWidth = 10.0;
+    const startAngle = -math.pi / 2;
+
+    final bgPaint = Paint()
+      ..color = Colors.grey.withValues(alpha: 0.08)
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(center, radius, bgPaint);
+
+    final total = proteinPercent + carbsPercent + fatPercent;
+    if (total <= 0) return;
+
+    final segments = [
+      (proteinPercent, AppTheme.blue),
+      (carbsPercent, AppTheme.orange),
+      (fatPercent, AppTheme.pink),
+    ];
+
+    double currentAngle = startAngle;
+    for (final (percent, color) in segments) {
+      if (percent <= 0) continue;
+      final sweep = percent * 2 * math.pi;
+      final paint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        currentAngle,
+        sweep,
+        false,
+        paint,
+      );
+      currentAngle += sweep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _MacroRingPainter oldDelegate) {
+    return proteinPercent != oldDelegate.proteinPercent ||
+        carbsPercent != oldDelegate.carbsPercent ||
+        fatPercent != oldDelegate.fatPercent;
+  }
+}
+
+/// Dòng hiển thị macro: label – progress bar – gram.
+class _MacroRow extends StatelessWidget {
+  final String label;
+  final double grams;
+  final double percent;
+  final Color color;
+
+  const _MacroRow({
+    required this.label,
+    required this.grams,
+    required this.percent,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 50,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: percent.clamp(0, 1),
+              minHeight: 5,
+              backgroundColor: color.withValues(alpha: 0.12),
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 46,
+          child: Text(
+            '${grams.toStringAsFixed(0)}g',
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

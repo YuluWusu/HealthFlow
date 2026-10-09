@@ -72,6 +72,7 @@ flutter:
     - assets/images/exercise/
     - assets/sounds/
     - assets/data/vn_foods.json
+    - assets/data/ingredients.json
 
   fonts:
     - family: BeVietnamPro

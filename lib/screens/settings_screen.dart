@@ -419,8 +419,8 @@ class _ProfileHeader extends StatelessWidget {
                   radius: 32,
                   backgroundColor: AppTheme.lightGreen,
                   backgroundImage: user.avatarPath != null && user.avatarPath!.isNotEmpty
-                      ? FileImage(File(user.avatarPath!))
-                      : AssetImage(user.gender == 'female' ? 'assets/images/auth/female.jpg' : 'assets/images/auth/male.jpg') as ImageProvider,
+                      ? ResizeImage(FileImage(File(user.avatarPath!)), width: 150) as ImageProvider
+                      : ResizeImage(AssetImage(user.gender == 'female' ? 'assets/images/auth/female.jpg' : 'assets/images/auth/male.jpg'), width: 150),
                 ),
                 Positioned(
                   right: 0,

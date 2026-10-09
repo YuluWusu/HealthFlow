@@ -1,5 +1,3 @@
-// ignore_for_file: unnecessary_underscores
-
 import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
@@ -564,18 +562,11 @@ class _EnergyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final remaining = summary.remainingCalories;
     final over = remaining < 0;
-    final dark = Color.lerp(AppTheme.primary, Colors.black, 0.22)!;
     final ringColor = _ringColorFor(summary.rawPercent);
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppTheme.primary, dark],
-        ),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -585,8 +576,37 @@ class _EnergyCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(
+          children: [
+            // Ảnh nền
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/home/calorie_bg.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
+            // Lớp phủ gradient trong suốt
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primaryDark.withValues(alpha: 0.70),
+                      AppTheme.primary.withValues(alpha: 0.40),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+            ),
+            // Nội dung thẻ
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
           Row(
             children: [
               Expanded(
@@ -723,7 +743,11 @@ class _EnergyCard extends StatelessWidget {
               ],
             ),
           ),
-        ],
+              ],
+            ),
+          ),
+          ],
+        ),
       ),
     );
   }
@@ -5121,7 +5145,7 @@ class _CartSheetState extends State<_CartSheet> {
                           title: Text(item.food.name,
                               maxLines: 1, overflow: TextOverflow.ellipsis),
                           subtitle: Text(
-                              '${item.calories} kcal · ${_portionText(item.portion)}'),
+                              '${item.calories} kcal · ${isIngredientFoodId(item.food.id) ? '${gramsOfPortion(item.portion)}g' : _portionText(item.portion)}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -5521,11 +5545,11 @@ class _CategoryTile extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Image.asset(
-                'assets/images/$asset.jpg',
+                'assets/images/food/$asset.jpg',
                 fit: BoxFit.cover,
                 cacheWidth: 500,
                 errorBuilder: (_, __, ___) => Image.asset(
-                  'assets/images/$fallbackAsset.jpg',
+                  'assets/images/food/$fallbackAsset.jpg',
                   fit: BoxFit.cover,
                   cacheWidth: 500,
                   errorBuilder: (_, __, ___) => ColoredBox(color: color),
