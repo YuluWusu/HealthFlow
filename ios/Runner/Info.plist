@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>HealthFlow dùng camera để quét mã vạch sản phẩm và chụp ảnh bữa ăn.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>HealthFlow cần truy cập thư viện ảnh để bạn chọn ảnh bữa ăn hoặc ảnh đại diện.</string>
 </dict>
 </plist>

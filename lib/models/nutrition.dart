@@ -62,6 +62,13 @@ class FoodItem {
   /// Mô tả khối lượng một phần, ví dụ `1 tô (300g)`.
   final String servingLabel;
 
+  /// Chất xơ (g), đường (g) và natri (mg) cho một phần ăn chuẩn.
+  /// Không có số liệu thì là 0. Với món Việt/nguyên liệu, đường và natri là
+  /// số ước tính từ thành phần (xem `NutrientEstimator`).
+  final double fiber;
+  final double sugar;
+  final double sodium;
+
   const FoodItem({
     required this.id,
     required this.name,
@@ -71,6 +78,9 @@ class FoodItem {
     required this.carbs,
     required this.fat,
     required this.servingLabel,
+    this.fiber = 0,
+    this.sugar = 0,
+    this.sodium = 0,
   });
 
   Map<String, Object?> toMap() {
@@ -83,6 +93,9 @@ class FoodItem {
       'carbs': carbs,
       'fat': fat,
       'serving_label': servingLabel,
+      'fiber': fiber,
+      'sugar': sugar,
+      'sodium': sodium,
     };
   }
 
@@ -96,6 +109,9 @@ class FoodItem {
       carbs: (map['carbs'] as num).toDouble(),
       fat: (map['fat'] as num).toDouble(),
       servingLabel: map['serving_label'] as String? ?? '1 phần',
+      fiber: (map['fiber'] as num?)?.toDouble() ?? 0,
+      sugar: (map['sugar'] as num?)?.toDouble() ?? 0,
+      sodium: (map['sodium'] as num?)?.toDouble() ?? 0,
     );
   }
 }
@@ -151,6 +167,17 @@ class MealEntry {
   /// Lưu kèm để khi xóa/sửa món thì trừ lại đúng số đã cộng.
   final int waterMl;
 
+  /// Chất xơ (g), đường (g), natri (mg) của cả dòng (đã nhân khẩu phần).
+  final double fiber;
+  final double sugar;
+  final double sodium;
+
+  /// Ghi chú tự do của người dùng cho dòng này (ví dụ "ăn ở nhà bạn").
+  final String? note;
+
+  /// Đường dẫn ảnh chụp bữa ăn trên thiết bị (null nếu chưa có).
+  final String? photoPath;
+
   const MealEntry({
     required this.id,
     required this.userId,
@@ -164,6 +191,11 @@ class MealEntry {
     required this.fat,
     required this.eatenAt,
     this.waterMl = 0,
+    this.fiber = 0,
+    this.sugar = 0,
+    this.sodium = 0,
+    this.note,
+    this.photoPath,
   });
 
   /// Tạo bản ghi nhật ký từ một món trong danh mục.
@@ -197,6 +229,9 @@ class MealEntry {
       fat: food.fat * portion * scale,
       eatenAt: eatenAt,
       waterMl: (drinkMlOf(food) * portion).round(),
+      fiber: food.fiber * portion * scale,
+      sugar: food.sugar * portion * scale,
+      sodium: food.sodium * portion * scale,
     );
   }
 
@@ -213,6 +248,9 @@ class MealEntry {
     double? fat,
     DateTime? eatenAt,
     int? waterMl,
+    double? fiber,
+    double? sugar,
+    double? sodium,
   }) {
     return MealEntry(
       id: id ?? this.id,
@@ -227,8 +265,40 @@ class MealEntry {
       fat: fat ?? this.fat,
       eatenAt: eatenAt ?? this.eatenAt,
       waterMl: waterMl ?? this.waterMl,
+      fiber: fiber ?? this.fiber,
+      sugar: sugar ?? this.sugar,
+      sodium: sodium ?? this.sodium,
+      note: note,
+      photoPath: photoPath,
     );
   }
+
+  /// Bản sao với ghi chú và ảnh được **đặt lại đúng** theo tham số (truyền
+  /// null/bỏ trống để xóa). Mọi trường khác giữ nguyên.
+  MealEntry withNote({String? note, String? photoPath}) {
+    final trimmed = note?.trim();
+    return MealEntry(
+      id: id,
+      userId: userId,
+      foodId: foodId,
+      foodName: foodName,
+      slot: slot,
+      portion: portion,
+      calories: calories,
+      protein: protein,
+      carbs: carbs,
+      fat: fat,
+      eatenAt: eatenAt,
+      waterMl: waterMl,
+      fiber: fiber,
+      sugar: sugar,
+      sodium: sodium,
+      note: (trimmed == null || trimmed.isEmpty) ? null : trimmed,
+      photoPath: photoPath,
+    );
+  }
+
+  bool get hasNote => note != null && note!.isNotEmpty;
 
   /// Nguyên liệu ăn theo định lượng thì hiện số gram thay vì "phần".
   bool get isByGrams => isIngredientFoodId(foodId);
@@ -254,6 +324,11 @@ class MealEntry {
       'fat': fat,
       'eaten_at': eatenAt.millisecondsSinceEpoch,
       'water_ml': waterMl,
+      'fiber': fiber,
+      'sugar': sugar,
+      'sodium': sodium,
+      'note': note,
+      'photo_path': photoPath,
     };
   }
 
@@ -273,6 +348,11 @@ class MealEntry {
         (map['eaten_at'] as num).toInt(),
       ),
       waterMl: (map['water_ml'] as num?)?.toInt() ?? 0,
+      fiber: (map['fiber'] as num?)?.toDouble() ?? 0,
+      sugar: (map['sugar'] as num?)?.toDouble() ?? 0,
+      sodium: (map['sodium'] as num?)?.toDouble() ?? 0,
+      note: map['note'] as String?,
+      photoPath: map['photo_path'] as String?,
     );
   }
 }
@@ -285,12 +365,20 @@ class NutritionSummary {
   final double fat;
   final int calorieGoal;
 
+  /// Chất xơ (g), đường (g), natri (mg) cả ngày.
+  final double fiber;
+  final double sugar;
+  final double sodium;
+
   const NutritionSummary({
     required this.calories,
     required this.protein,
     required this.carbs,
     required this.fat,
     required this.calorieGoal,
+    this.fiber = 0,
+    this.sugar = 0,
+    this.sodium = 0,
   });
 
   static const NutritionSummary empty = NutritionSummary(
@@ -334,6 +422,9 @@ class NutritionSummary {
       carbs: carbs,
       fat: fat,
       calorieGoal: calorieGoal ?? this.calorieGoal,
+      fiber: fiber,
+      sugar: sugar,
+      sodium: sodium,
     );
   }
 }
