@@ -1,0 +1,1512 @@
+TRƯỜNG ĐẠI HỌC CÔNG THƯƠNG TP. HCM
+KHOA CÔNG NGHỆ THÔNG TIN
+BÁO CÁO ĐỒ ÁN
+MÔN HỌC: PHÁT TRIỂN ỨNG DỤNG DI ĐỘNG
+ĐỀ TÀI
+XÂY DỰNG ỨNG DỤNG QUẢN LÝ VÀ THEO DÕI SỨC KHỎE CÁ NHÂN (HEALTHFLOW)
+Giảng viên hướng dẫn: Đỗ Gia Bảo
+Nhóm thực hiện: Nhóm 4
+Thành viên:
+1. Hoàng Xuân Phi Long – MSSV: 2001240256 (Nhóm trưởng)
+2. Huỳnh Công Tạo – MSSV: 2001240431
+3. Nguyễn Đăng Khoa – MSSV: 2001240205
+4. Võ Trí Thức – MSSV: 2001240486
+Tp. HCM, 2026.
+BẢNG PHÂN CÔNG CÔNG VIỆC
+Bảng dưới đây trình bày phân công công việc giữa các thành viên trong nhóm theo từng module chức năng của ứng dụng HealthFlow.
+STT
+Họ và tên
+MSSV
+Công việc được phân công
+1
+Hoàng Xuân Phi Long
+(nhóm trưởng)
+2001240256
+Tổng hợp và kết nối các module do thành viên gửi thành sản phẩm hoàn chỉnh.
+Quản lý module Tài khoản (đăng ký, đăng nhập, phân quyền phiên làm việc) và Dashboard (trang chủ, màn hình chính, điều hướng chung, màn hình cài đặt).
+2
+Huỳnh Công Tạo
+2001240431
+Quản lý module Bài tập thể dục: danh mục bài tập, màn hình tập luyện, ghi nhận buổi tập và thống kê tiến độ tập luyện.
+3
+Nguyễn Đăng Khoa
+2001240205
+Quản lý module Chỉ số sức khỏe: nhập và theo dõi cân nặng, huyết áp, nhịp tim, đường huyết, giấc ngủ, vận động, tính BMI và biểu đồ xu hướng.
+4
+Võ Trí Thức
+2001240486
+Quản lý module Bữa ăn / Món ăn: danh mục món ăn, tìm kiếm, ghi nhận bữa ăn, tính năng lượng và các chất dinh dưỡng, theo dõi lượng nước uống.
+Bảng 1: Phân công công việc của các thành viên trong nhóm
+Ghi chú: nhóm trưởng chịu trách nhiệm tích hợp các module do thành viên bàn giao, thống nhất giao diện dùng chung (theme, thanh điều hướng, mô hình dữ liệu) và kiểm thử liên kết giữa các module trước khi hoàn thiện sản phẩm.
+MỤC LỤC
+MỤC LỤCi
+DANH MỤC HÌNH ẢNHiv
+DANH MỤC BẢNG BIỂUv
+LỜI MỞ ĐẦU1
+CHƯƠNG 1: GIỚI THIỆU ĐỀ TÀI2
+1.1. Lý do chọn đề tài2
+1.2. Mục tiêu đề tài3
+1.2.1. Mục tiêu tổng quát3
+1.2.2. Mục tiêu cụ thể3
+1.3. Phạm vi đề tài4
+1.3.1. Phạm vi chức năng4
+1.3.2. Phạm vi công nghệ4
+1.3.3. Giới hạn của đề tài5
+1.4. Phương pháp thực hiện6
+CHƯƠNG 2: PHÂN TÍCH YÊU CẦU8
+2.1. Mô tả bài toán8
+2.2. Yêu cầu chức năng9
+2.2.1. Nhóm chức năng quản lý tài khoản9
+2.2.2. Nhóm chức năng theo dõi sức khỏe10
+2.2.3. Nhóm chức năng dinh dưỡng và bữa ăn11
+2.2.4. Nhóm chức năng tập luyện13
+2.2.5. Nhóm chức năng Dashboard13
+2.2.6. Nhóm chức năng đồng bộ và tích hợp14
+2.3. Yêu cầu phi chức năng14
+2.3.1. Hiệu năng14
+2.3.2. Khả năng sử dụng14
+2.3.3. Bảo mật15
+2.3.4. Tính tin cậy15
+2.3.5. Khả năng mở rộng15
+2.3.6. Khả năng bảo trì15
+2.3.7. Khả năng tương thích16
+2.3.8. Khả năng hoạt động khi mất kết nối16
+2.4. Use case diagram tổng quát16
+2.4.1. Mô tả các Actor17
+2.4.2. Mô tả quan hệ Use Case18
+2.4.3. Ý nghĩa của Use Case Diagram18
+CHƯƠNG 3: THIẾT KẾ HỆ THỐNG19
+3.1. Thiết kế cơ sở dữ liệu (ERD)19
+3.1.1. Module Dinh dưỡng (Bữa ăn/Món ăn)19
+3.1.2. Module Chỉ số sức khỏe24
+3.1.3. Module Tập luyện và module Tài khoản25
+3.2. Class Diagram35
+3.2.1. Module Dinh dưỡng (Bữa ăn/Món ăn)35
+3.2.2. Module Chỉ số sức khỏe38
+3.2.3. Module Tập luyện39
+3.3. Sequence Diagram42
+3.3.1. Sequence – Đăng nhập và Đăng ký tài khoản42
+3.3.2. Sequence – Ghi nhận chỉ số sức khỏe44
+3.3.3. Sequence – Hoàn thành buổi tập45
+3.3.4. Sequence – Quản lý bữa ăn47
+3.4. Deployment Diagram51
+CHƯƠNG 4: THIẾT KẾ GIAO DIỆN NGƯỜI DÙNG (UI/UX)53
+4.1. Sơ đồ điều hướng (Navigation Flow)53
+4.2. Kết quả giao diện đã triển khai55
+4.2.1. Giao diện chào mừng, đăng ký và đăng nhập55
+4.2.2. Giao diện thiết lập ban đầu và trang chủ58
+4.2.3. Giao diện theo dõi chỉ số sức khoẻ61
+4.2.4. Giao diện các bài tập thể chất64
+4.2.5. Giao diện quản lý bữa ăn, món ăn66
+CHƯƠNG 5: CẤU TRÚC VÀ TRIỂN KHAI CHƯƠNG TRÌNH69
+5.1. Kiến trúc tổng thể69
+5.2. Cấu trúc thư mục project70
+5.3. Kết quả deploy và kiểm thử UI/UX73
+CHƯƠNG 6: KẾT LUẬN76
+6.1. Kết quả đạt được76
+6.2. Hạn chế77
+6.3. Hướng phát triển78
+TÀI LIỆU THAM KHẢO80
+PHỤ LỤC A: THÔNG TIN DỰ ÁN VÀ MÔI TRƯỜNG PHÁT TRIỂN82
+PHỤ LỤC B: KẾT QUẢ CHẠY KIỂM THỬ TỰ ĐỘNG83
+DANH MỤC HÌNH ẢNH
+Hình 1: Sơ đồ Use case tổng quát của đồ án17
+Hình 2: Sơ đồ thực thể – quan hệ (ERD) của module Dinh dưỡng20
+Hình 3: Class Diagram – tầng Model của module Dinh dưỡng27
+Hình 4: Class Diagram – tầng Repository và nguồn dữ liệu của module Dinh dưỡng28
+Hình 5: Sequence Diagram – Đăng nhập và đăng ký tài khoản32
+Hình 6: Sequence Diagram – Ghi nhận chỉ số sức khỏe34
+Hình 7: Sequence Diagram – Hoàn thành buổi tập36
+Hình 8: Sequence Diagram – Tìm kiếm món ăn37
+Hình 9: Sequence Diagram – Ghi nhận món vào bữa ăn39
+Hình 10: Sequence Diagram – Xóa món khỏi bữa ăn39
+Hình 11: Deployment Diagram – Triển khai ứng dụng HealthFlow41
+Hình 12: Sơ đồ điều hướng (Navigation Flow) của ứng dụng43
+Hình 13: Giao diện chào mừng và giới thiệu ứng dụng46
+Hình 14: Giao diện đăng ký và đăng nhập47
+Hình 15: Giao diện thiết lập ban đầu (onboarding) và mục tiêu sức khỏe49
+Hình 16: Giao diện trang chủ (Dashboard)50
+Hình 17: Giao diện cài đặt và hồ sơ cá nhân51
+Hình 18: Giao diện theo dõi chỉ số sức khỏe52
+Hình 19: Giao diện nhập chỉ số và biểu đồ xu hướng53
+Hình 20: Giao diện theo dõi lượng nước uống54
+Hình 21: Giao diện module Bài tập thể dục55
+Hình 22: Giao diện chi tiết bài tập và ghi nhận hoàn thành55
+Hình 23: Giao diện module Bữa ăn, Món ăn – tab Hôm nay57
+Hình 24: Giao diện tìm kiếm và thêm món ăn57
+Hình 25: Giao diện thống kê dinh dưỡng theo Ngày, Tuần, Tháng57
+Hình 26: Kiến trúc phân tầng của ứng dụng HealthFlow58
+Hình 27: Cấu trúc thư mục mã nguồn dự án60
+DANH MỤC BẢNG BIỂU
+Bảng 1: Phân công công việc của các thành viên trong nhóm
+Bảng 2: Mô tả thuộc tính thực thể FOOD_ITEM22
+Bảng 3: Mô tả thuộc tính thực thể MEAL_ENTRY23
+Bảng 4: Mô tả thuộc tính các thực thể MEAL_COMBO, COMBO_ITEM và WATER_LOG23
+Bảng 5: Trách nhiệm của các lớp trong module Dinh dưỡng28
+Bảng 6: Mô tả thuộc tính thực thể HEALTH_METRIC25
+Bảng 7: Trách nhiệm của các lớp trong module Chỉ số sức khỏe30
+Bảng 8: Trách nhiệm của các lớp trong module Tập luyện31
+Bảng 9: Danh sách các màn hình của ứng dụng42
+Bảng 10: Danh sách các gói thư viện sử dụng trong dự án59
+Bảng 11: Cấu trúc thư mục mã nguồn dự án57
+Bảng 12: Kết quả kiểm thử tự động của dự án60
+LỜI MỞ ĐẦU
+Trong bối cảnh kỷ nguyên số hóa phát triển mạnh mẽ, chiếc điện thoại thông minh đã trở thành một trợ lý đắc lực trong mọi khía cạnh của đời sống, đặc biệt là trong việc quản lý và chăm sóc sức khỏe cá nhân. Nhận thức về tầm quan trọng của việc rèn luyện thể chất và kiểm soát dinh dưỡng ngày càng được nâng cao, kéo theo nhu cầu rất lớn về các nền tảng công nghệ hỗ trợ người dùng theo dõi sức khỏe một cách khoa học, tiện lợi và liền mạch.
+Tuy nhiên, qua khảo sát thực tế, các ứng dụng theo dõi sức khỏe hiện có trên thị trường thường mắc phải một số hạn chế nhất định: yêu cầu kết nối Internet liên tục để hoạt động, hoặc giao diện quá khô khan, thiếu các yếu tố tương tác tạo động lực (gamification) khiến người dùng dễ dàng bỏ cuộc. Từ những trăn trở đó, nhóm quyết định chọn đề tài “Xây dựng ứng dụng quản lý và theo dõi sức khỏe cá nhân” cho đồ án môn học Phát triển Ứng dụng Di động.
+Mục tiêu cốt lõi của dự án là xây dựng một hệ sinh thái khép kín trên thiết bị di động, thân thiện và phù hợp với nhiều đối tượng người dùng. Ứng dụng cung cấp các tính năng từ theo dõi chỉ số cơ thể (BMI, huyết áp, nhịp tim), quản lý lượng calories tiêu thụ hằng ngày, cho đến việc cung cấp lộ trình rèn luyện thể chất một cách trực quan. Bằng việc vận dụng framework Flutter kết hợp lưu trữ cục bộ trên thiết bị, ứng dụng hướng đến trải nghiệm mượt mà ngay cả khi ngoại tuyến, đồng thời tận dụng các RESTful API để mở rộng khả năng tra cứu và xử lý dữ liệu.
+Nhóm thực hiện xin gửi lời cảm ơn chân thành đến thầy Đỗ Gia Bảo vì những bài giảng tận tâm và định hướng kỹ thuật quý báu trong suốt quá trình học tập. Mặc dù đã nỗ lực hết sức, đồ án chắc chắn vẫn còn những thiếu sót nhất định. Nhóm rất mong nhận được những nhận xét, góp ý từ thầy để có thể tiếp tục khắc phục và hoàn thiện sản phẩm tốt hơn trong tương lai.
+CHƯƠNG 1: GIỚI THIỆU ĐỀ TÀI
+1.1. Lý do chọn đề tài
+Các ứng dụng di động trong lĩnh vực mHealth được nghiên cứu và sử dụng cho nhiều hoạt động liên quan đến quản lý sức khỏe; trong đó, người dùng có thể sử dụng ứng dụng để hỗ trợ quản lý sức khỏe thông qua chế độ ăn uống và tập luyện.
+Nghiên cứu của Park et al. cho thấy Mobile Personal Health Record (mPHR) có thể đóng vai trò là nền tảng tích hợp Patient-Generated Health Data (PGHD) với thông tin y tế của người dùng. Nghiên cứu được thực hiện trên ứng dụng My Chart in My Hand và ghi nhận các loại dữ liệu như cân nặng, huyết áp và đường huyết; từ dữ liệu người dùng nhập vào, hệ thống có thể tính toán BMI và một số chỉ số nguy cơ sức khỏe khác [1].
+Từ cơ sở trên, nhóm lựa chọn xây dựng HealthFlow – ứng dụng quản lý sức khỏe cá nhân, hướng đến việc tập trung các hoạt động theo dõi sức khỏe, dinh dưỡng và tập luyện trong một hệ thống thống nhất.
+HealthFlow được định hướng là nơi người dùng có thể ghi nhận dữ liệu cá nhân, theo dõi các chỉ số sức khỏe, quản lý bữa ăn, ghi nhận hoạt động tập luyện và quan sát thông tin tổng quan trên Dashboard. Đây là thiết kế chức năng do nhóm đề xuất dựa trên yêu cầu của đề tài và không phải là kết luận trực tiếp từ một nghiên cứu cụ thể.
+Bên cạnh chức năng nghiệp vụ, khả năng sử dụng (usability) là một yếu tố quan trọng đối với việc chấp nhận và sử dụng các ứng dụng mHealth. Galavi et al. thực hiện một nghiên cứu tổng quan hệ thống (systematic literature review) về usability của ứng dụng mHealth và xác định các heuristic liên quan đến những vấn đề như khả năng hiển thị trạng thái hệ thống, tính linh hoạt và hiệu quả sử dụng, điều hướng và mức độ gắn kết của người dùng [2].
+Đối với thiết kế dashboard, nghiên cứu của Arslan et al. tổng hợp các phương pháp, yếu tố thuận lợi và rào cản liên quan đến Human-Centred Design trong quá trình phát triển digital health dashboard. Nhóm sử dụng nghiên cứu này như tài liệu tham khảo về phương pháp thiết kế, không xem các kết quả của nghiên cứu là yêu cầu bắt buộc đối với giao diện HealthFlow [3].
+Đề tài đồng thời phù hợp với yêu cầu của học phần Phát triển Ứng dụng Di động vì cho phép nhóm áp dụng các kiến thức về thiết kế giao diện, xử lý dữ liệu nhập, quản lý trạng thái, lưu trữ cục bộ, xác thực người dùng và tích hợp dịch vụ bên ngoài.
+Vì những lý do trên, nhóm lựa chọn đề tài “Xây dựng ứng dụng quản lý sức khỏe cá nhân HealthFlow” nhằm xây dựng một sản phẩm có tính ứng dụng thực tế, đồng thời vận dụng các kiến thức đã học vào quá trình phân tích, thiết kế và phát triển ứng dụng di động.
+1.2. Mục tiêu đề tài
+1.2.1. Mục tiêu tổng quát
+Xây dựng ứng dụng di động HealthFlow hỗ trợ người dùng quản lý và theo dõi sức khỏe cá nhân trên một nền tảng thống nhất, bao gồm các nhóm chức năng chính: quản lý tài khoản, theo dõi chỉ số sức khỏe, quản lý dinh dưỡng và quản lý quá trình tập luyện.
+1.2.2. Mục tiêu cụ thể
+Xây dựng chức năng đăng ký, đăng nhập và quản lý thông tin hồ sơ người dùng.
+Cho phép người dùng ghi nhận các chỉ số sức khỏe như cân nặng, huyết áp, nhịp tim, đường huyết, giấc ngủ và số bước chân.
+Tính toán và hiển thị một số chỉ số tổng hợp như BMI và xu hướng thay đổi của các chỉ số theo thời gian.
+Xây dựng chức năng tìm kiếm và quản lý dữ liệu món ăn, đồng thời ghi nhận các món ăn theo từng bữa trong ngày.
+Tính toán tổng năng lượng và các chất dinh dưỡng chính gồm Protein, Carbohydrate và chất béo dựa trên khẩu phần ăn.
+Cung cấp danh mục bài tập theo nhóm, cường độ và thời lượng; hỗ trợ ghi nhận các buổi tập đã hoàn thành.
+Xây dựng Dashboard tổng quan nhằm tập hợp các thông tin quan trọng từ các module Sức khỏe, Dinh dưỡng và Tập luyện.
+Thiết kế kiến trúc có khả năng mở rộng để tích hợp cơ sở dữ liệu cục bộ Sqflite, Firebase Authentication, Cloud Firestore, Firebase Cloud Messaging và các API bên ngoài.
+1.3. Phạm vi đề tài
+1.3.1. Phạm vi chức năng
+Đề tài tập trung xây dựng bốn nhóm chức năng nghiệp vụ chính:
+Quản lý tài khoản: Người dùng có thể đăng ký, đăng nhập và quản lý thông tin hồ sơ cá nhân. Hồ sơ bao gồm các thông tin phục vụ việc cá nhân hóa trải nghiệm như họ tên, chiều cao, cân nặng, mục tiêu calories và mục tiêu sức khỏe.
+Theo dõi sức khỏe: Người dùng có thể ghi nhận các chỉ số sức khỏe theo từng thời điểm, xem dữ liệu đã lưu và theo dõi xu hướng thay đổi. Hệ thống tự động tính toán chỉ số BMI dựa trên dữ liệu chiều cao và cân nặng mà người dùng cung cấp.
+Dinh dưỡng và bữa ăn: Người dùng có thể tìm kiếm món ăn, lựa chọn món ăn và ghi nhận vào các bữa sáng, trưa, tối hoặc bữa phụ. Hệ thống tính toán lượng calories và các chất dinh dưỡng chính dựa trên khẩu phần được ghi nhận, đồng thời tổng hợp dữ liệu theo ngày, theo tuần và theo tháng.
+Tập luyện: Người dùng có thể xem danh mục các bài tập theo nhóm, cường độ và thời lượng, sau đó ghi nhận những bài tập đã hoàn thành và lượng calories tiêu hao tương ứng.
+Ngoài các chức năng nghiệp vụ trên, hệ thống có Dashboard đóng vai trò là màn hình tổng quan, cung cấp các thông tin tóm tắt và điều hướng đến những module chính.
+1.3.2. Phạm vi công nghệ
+Ứng dụng được phát triển bằng Flutter/Dart. Phiên bản hiện tại của dự án được xây dựng và kiểm thử với bộ công cụ Flutter tương ứng Dart SDK 3.13.2 (xem Phụ lục A).
+Kiến trúc ứng dụng được định hướng theo nguyên tắc phân tách trách nhiệm giữa tầng giao diện và tầng dữ liệu; tài liệu kiến trúc của Flutter khuyến nghị sử dụng các lớp như UI, View Model, Repository và Service, trong đó Repository đóng vai trò tách logic truy cập dữ liệu khỏi phần còn lại của ứng dụng [4].
+Sqflite được định hướng sử dụng làm plugin SQLite cho Flutter. Tài liệu của gói này mô tả khả năng mở cơ sở dữ liệu, thực hiện các thao tác insert, query, update, delete, transaction và batch trên nền tảng Flutter [5]. Trong phiên bản hiện tại, dữ liệu dinh dưỡng đã được lưu bền vững bằng shared_preferences [6]thông qua một lớp trừu tượng lưu trữ, do đó việc chuyển sang Sqflite ở giai đoạn sau chỉ cần bổ sung một lớp cài đặt mới mà không phải sửa tầng giao diện.
+Firebase Authentication được định hướng sử dụng cho chức năng xác thực tài khoản bằng email và mật khẩu. Tài liệu Firebase dành cho Flutter cung cấp trực tiếp các phương thức createUserWithEmailAndPassword() và signInWithEmailAndPassword() cho đăng ký và đăng nhập [7]. Cơ chế theo dõi trạng thái xác thực thông qua authStateChanges() và truy xuất người dùng hiện tại thông qua currentUser cho phép ứng dụng phản ứng theo trạng thái đăng nhập của người dùng.
+Cloud Firestore được định hướng sử dụng để lưu trữ dữ liệu trên đám mây. Tài liệu Firebase mô tả các thao tác tạo, thêm và cập nhật document trong Cloud Firestore, đồng thời cung cấp cơ chế làm việc với dữ liệu trong ứng dụng client [8].
+Firebase Cloud Messaging (FCM) được định hướng sử dụng cho chức năng thông báo đẩy. Tài liệu Firebase cung cấp hướng dẫn tích hợp FCM trực tiếp cho ứng dụng Flutter [9]. Trong phiên bản hiện tại, ứng dụng đã tích hợp thông báo cục bộ thông qua gói flutter_local_notifications để thử nghiệm luồng cấp quyền và hiển thị thông báo.
+REST API được tích hợp thực tế cho dữ liệu dinh dưỡng quốc tế: ứng dụng gọi dịch vụ USDA FoodData Central để tra cứu thông tin dinh dưỡng của món ăn nước ngoài theo thời gian thực [10].
+1.3.3. Giới hạn của đề tài
+Đề tài tập trung vào việc ghi nhận, quản lý và theo dõi dữ liệu sức khỏe cá nhân, không nhằm thay thế hoạt động khám, chẩn đoán hoặc điều trị của chuyên gia y tế.
+Các chức năng đồng bộ Firebase, kết nối API bên ngoài cho dữ liệu bài tập và một số cơ chế nền được xác định là định hướng mở rộng của hệ thống và được triển khai tùy theo tiến độ của đồ án.
+Đề tài không tập trung xây dựng hệ thống dành cho cơ sở khám chữa bệnh, quản lý bệnh án chuyên nghiệp hoặc kết nối trực tiếp với thiết bị y tế chuyên dụng.
+Dữ liệu tài khoản, chỉ số sức khỏe và nhật ký tập luyện hiện được lưu trong bộ nhớ của tiến trình nên sẽ được khởi tạo lại khi ứng dụng được mở lại; chỉ dữ liệu dinh dưỡng và lượng nước uống được lưu bền vững trên thiết bị.
+1.4. Phương pháp thực hiện
+Đề tài được thực hiện theo quy trình phân tích, thiết kế, phát triển và kiểm thử ứng dụng di động theo từng giai đoạn. Sáu bước dưới đây mô tả trình tự công việc mà nhóm đã triển khai.
+Bước 1: Khảo sát và phân tích yêu cầu
+Nhóm xác định nhu cầu của người dùng và phân tích các nghiệp vụ chính của hệ thống, từ đó xây dựng danh sách chức năng và đặc tả yêu cầu hệ thống.
+Các chức năng được chia thành bốn nhóm chính gồm Tài khoản, Sức khỏe, Dinh dưỡng và Tập luyện.
+Bước 2: Nghiên cứu tài liệu và tham khảo các hệ thống liên quan
+Nhóm tìm kiếm các tài liệu học thuật, hướng dẫn kỹ thuật và nghiên cứu liên quan đến Mobile Personal Health Record, Patient-Generated Health Data, usability của ứng dụng mHealth và thiết kế digital health dashboard.
+Các tài liệu được sử dụng để hỗ trợ việc xác định bối cảnh nghiệp vụ, xây dựng yêu cầu và tham khảo nguyên tắc thiết kế hệ thống.
+Đối với hình ảnh hoặc giao diện của các hệ thống bên ngoài, nhóm ghi rõ nguồn và phân biệt giữa tài liệu tham khảo với thiết kế do nhóm tự xây dựng.
+Bước 3: Phân tích và thiết kế hệ thống
+Từ đặc tả yêu cầu, nhóm xây dựng các mô hình phân tích và thiết kế như Use Case Diagram, Activity Diagram, Sequence Diagram, Class Diagram và mô hình cơ sở dữ liệu.
+Các thực thể chính của hệ thống bao gồm User, HealthMetric, FoodItem, CatalogFood, MealEntry, MealCombo, WaterLog, Workout và WorkoutLog.
+Quan hệ giữa các thực thể được thiết kế nhằm đảm bảo dữ liệu của từng người dùng được quản lý độc lập và có thể mở rộng khi bổ sung chức năng.
+Bước 4: Thiết kế giao diện và kiến trúc ứng dụng
+Nhóm xây dựng giao diện theo hướng đơn giản, nhất quán và tập trung vào thông tin cần thiết cho từng tác vụ. Việc đánh giá và tham khảo usability được thực hiện dựa trên các nghiên cứu về heuristic của mHealth và các nguyên tắc usability phổ biến.
+Đối với khả năng tiếp cận, Flutter lưu ý rằng kích thước chữ trên ứng dụng có thể chịu ảnh hưởng từ thiết lập cỡ chữ của hệ điều hành, vì vậy bố cục cần đủ không gian để nội dung vẫn được hiển thị khi người dùng tăng kích thước chữ [4].
+Về kiến trúc phần mềm, hệ thống được tổ chức theo luồng: UI → State Management (ChangeNotifier/Store) → Repository → Local/Remote Data Source.
+Cách tổ chức này được nhóm xây dựng dựa trên nguyên tắc separation of concerns và Repository pattern được Flutter mô tả trong tài liệu kiến trúc ứng dụng.
+Bước 5: Phát triển và tích hợp
+Nhóm triển khai ứng dụng bằng Flutter/Dart và xây dựng từng module theo phân công.
+Trong giai đoạn đầu, dữ liệu mẫu được sử dụng để hoàn thiện giao diện và kiểm tra luồng chức năng.
+Ở các giai đoạn tích hợp, nhóm hiện thực lớp lưu trữ cục bộ cho dữ liệu dinh dưỡng (shared_preferences, có thể thay bằng Sqflite), tích hợp dịch vụ tra cứu dinh dưỡng USDA qua REST API và bổ sung âm thanh phản hồi, thông báo cục bộ cho trải nghiệm người dùng.
+Bước 6: Kiểm thử và đánh giá
+Nhóm tiến hành kiểm thử từng chức năng và kiểm thử sự liên kết giữa các module.
+Các nội dung kiểm thử bao gồm kiểm tra dữ liệu nhập, tính toán chỉ số, lưu trữ dữ liệu, hiển thị thông tin, điều hướng và xử lý lỗi.
+Ngoài kiểm thử thủ công, nhóm xây dựng bộ kiểm thử tự động bằng gói flutter_test cho tầng dữ liệu, các hàm tính toán chỉ số, kiểm tra dữ liệu nhập và một số widget chính (xem Chương 6).
+Kết quả kiểm thử được sử dụng để phát hiện lỗi, điều chỉnh thiết kế và hoàn thiện ứng dụng trước khi trình bày và đánh giá.
+CHƯƠNG 2: PHÂN TÍCH YÊU CẦU
+2.1. Mô tả bài toán
+Trong quá trình quản lý sức khỏe cá nhân, người dùng thường phải theo dõi nhiều loại thông tin khác nhau như cân nặng, huyết áp, nhịp tim, đường huyết, chế độ ăn uống và hoạt động tập luyện. Các dữ liệu này có mối liên hệ với nhau nhưng thường được ghi nhận riêng lẻ, dẫn đến việc người dùng khó theo dõi toàn bộ quá trình thay đổi sức khỏe của bản thân.
+Xuất phát từ vấn đề trên, nhóm xây dựng HealthFlow – ứng dụng quản lý sức khỏe cá nhân trên nền tảng di động. Hệ thống hướng đến việc tập trung các hoạt động theo dõi sức khỏe, dinh dưỡng và tập luyện trong cùng một ứng dụng, từ đó giúp người dùng dễ dàng ghi nhận, quản lý và theo dõi dữ liệu cá nhân.
+Khi sử dụng HealthFlow, người dùng có thể tạo tài khoản, đăng nhập và thiết lập hồ sơ cá nhân. Hồ sơ có thể chứa các thông tin như họ tên, giới tính, chiều cao, cân nặng hiện tại, mục tiêu năng lượng hằng ngày và mục tiêu sức khỏe. Các thông tin này được sử dụng làm cơ sở để cá nhân hóa dữ liệu và các nội dung hiển thị trong ứng dụng.
+Đối với việc theo dõi sức khỏe, người dùng có thể ghi nhận các chỉ số theo từng thời điểm như cân nặng, huyết áp, nhịp tim, đường huyết, giấc ngủ và số bước chân. Hệ thống lưu lại lịch sử chỉ số, cho phép người dùng xem dữ liệu và theo dõi sự thay đổi theo thời gian. Dựa trên chiều cao và cân nặng, hệ thống tính toán chỉ số BMI để người dùng theo dõi.
+Đối với dinh dưỡng, người dùng có thể tìm kiếm món ăn, lựa chọn món ăn và ghi nhận vào các bữa sáng, trưa, tối hoặc bữa phụ. Mỗi món ăn được gắn với các thông tin dinh dưỡng như calories, Protein, Carbohydrate và Fat. Khi người dùng nhập khẩu phần, hệ thống tính toán lượng dinh dưỡng tương ứng và cập nhật tổng dinh dưỡng trong ngày.
+Đối với tập luyện, người dùng có thể xem danh mục các bài tập được phân loại theo nhóm bài tập, cường độ và thời lượng. Sau khi hoàn thành một bài tập, người dùng có thể ghi nhận buổi tập, số phút thực hiện và lượng calories tiêu hao.
+Dashboard đóng vai trò là màn hình tổng quan của hệ thống. Thông tin từ các module Sức khỏe, Dinh dưỡng và Tập luyện được tổng hợp thành các dữ liệu tóm tắt để người dùng có thể nhanh chóng nắm được tình trạng hiện tại mà không cần truy cập từng module riêng biệt.
+Trong định hướng phát triển, HealthFlow sử dụng cơ sở dữ liệu cục bộ Sqflite để lưu trữ dữ liệu trên thiết bị và hỗ trợ hoạt động trong điều kiện kết nối mạng không ổn định. Firebase Authentication được định hướng sử dụng cho xác thực tài khoản, Cloud Firestore cho lưu trữ dữ liệu từ xa và cơ chế đồng bộ giữa thiết bị với máy chủ. Ngoài ra, hệ thống có thể tích hợp thêm các REST API để lấy dữ liệu món ăn, bài tập hoặc các dịch vụ sức khỏe khác.
+Như vậy, bài toán của đề tài là xây dựng một ứng dụng di động có khả năng tập trung và quản lý các nhóm dữ liệu sức khỏe cá nhân, đồng thời cung cấp cơ chế theo dõi và tổng hợp thông tin theo thời gian.
+2.2. Yêu cầu chức năng
+Yêu cầu chức năng mô tả những chức năng mà hệ thống HealthFlow phải cung cấp cho người dùng. Các chức năng được ký hiệu từ F01 đến F17 và chia thành sáu nhóm.
+2.2.1. Nhóm chức năng quản lý tài khoản
+F01 – Đăng ký tài khoản
+Người dùng có thể tạo tài khoản mới bằng họ tên, email và mật khẩu.
+Hệ thống kiểm tra tính hợp lệ của dữ liệu nhập vào trước khi thực hiện đăng ký: họ tên không được để trống và phải có ít nhất 2 ký tự, email phải đúng định dạng, mật khẩu có ít nhất 6 ký tự và phải khớp với phần nhập lại.
+Email được chuẩn hóa về chữ thường và không được trùng với tài khoản đã tồn tại.
+Mật khẩu không lưu ở dạng văn bản thuần mà được băm kèm email làm muối trước khi lưu.
+Khi đăng ký thành công, hệ thống tạo tài khoản, khởi tạo sẵn một số chỉ số sức khỏe mẫu cho người dùng mới và đưa người dùng vào luồng thiết lập ban đầu.
+F02 – Đăng nhập
+Người dùng nhập email và mật khẩu để đăng nhập vào hệ thống.
+Hệ thống kiểm tra thông tin xác thực. Nếu hợp lệ, hệ thống tạo phiên đăng nhập, lưu mã người dùng vào bộ nhớ thiết bị và đưa người dùng đến màn hình chính.
+Nếu không hợp lệ, hệ thống hiển thị thông báo lỗi. Thông báo cho hai trường hợp sai email và sai mật khẩu được dùng chung để tránh tiết lộ email nào đã tồn tại.
+Khi mở lại ứng dụng, hệ thống khôi phục phiên đăng nhập đã lưu nếu có và đưa người dùng vào đúng màn hình tương ứng.
+F03 – Quản lý hồ sơ cá nhân
+Người dùng có thể xem và cập nhật các thông tin cá nhân như:
+Họ và tên.
+Email (dùng làm tên đăng nhập, không sửa được).
+Giới tính.
+Chiều cao (cm).
+Cân nặng hiện tại (kg).
+Mục tiêu calories hằng ngày (kcal).
+Mục tiêu sức khỏe.
+Ảnh đại diện.
+Khi người dùng cập nhật cân nặng, hệ thống tự động tạo thêm một bản ghi cân nặng mới trong nhật ký chỉ số sức khỏe với ghi chú “Cập nhật từ hồ sơ cá nhân”, nhờ đó biểu đồ theo dõi cân nặng luôn phản ánh đúng dữ liệu mới nhất.
+F04 – Đổi mật khẩu
+Người dùng có thể đổi mật khẩu của tài khoản đang đăng nhập.
+Bắt buộc nhập đúng mật khẩu hiện tại trước khi đặt mật khẩu mới.
+Mật khẩu mới phải có ít nhất 6 ký tự, khớp với phần nhập lại và không được trùng với mật khẩu hiện tại.
+Sau khi đổi thành công, phiên đăng nhập hiện tại vẫn được giữ nguyên.
+2.2.2. Nhóm chức năng theo dõi sức khỏe
+F05 – Ghi nhận chỉ số sức khỏe
+Người dùng có thể thêm dữ liệu chỉ số sức khỏe mới theo từng thời điểm. Các loại chỉ số được nhập tay gồm:
+Cân nặng (kg).
+Huyết áp (mmHg) – nhập hai giá trị tâm thu và tâm trương.
+Nhịp tim (bpm).
+Đường huyết (mg/dL).
+Giấc ngủ (giờ).
+Vận động – số bước chân (bước).
+Mỗi lần ghi nhận phải lưu người dùng, loại chỉ số, giá trị, thời gian ghi nhận và ghi chú nếu có. Riêng chỉ số BMI không cho người dùng nhập tay vì đây là chỉ số dẫn xuất, được hệ thống tự tính từ chiều cao và cân nặng; khi người dùng sửa hoặc xóa một lần cân thì bản ghi BMI đi kèm cũng được cập nhật theo.
+F06 – Xem lịch sử chỉ số
+Người dùng có thể xem lại các dữ liệu sức khỏe đã ghi nhận.
+Hệ thống hiển thị dữ liệu theo thời gian để người dùng theo dõi quá trình thay đổi, kèm chế độ xem theo ngày và theo lịch tháng.
+Người dùng có thể sửa hoặc xóa một bản ghi đã nhập.
+F07 – Xem xu hướng sức khỏe
+Hệ thống so sánh dữ liệu mới nhất với dữ liệu trước đó để thể hiện xu hướng thay đổi.
+Ví dụ: “Giảm 0.3 so với lần trước”, “Không đổi so với lần trước” hoặc “Chưa có dữ liệu so sánh”.
+Mỗi loại chỉ số có một biểu đồ đường thể hiện diễn biến theo thời gian.
+F08 – Tính toán và phân loại chỉ số sức khỏe
+Hệ thống sử dụng chiều cao và cân nặng của người dùng để tính chỉ số BMI, phân loại mức độ và đưa ra nhận xét tổng quan về tình trạng sức khỏe.
+Hệ thống phân loại các chỉ số theo ngưỡng tham chiếu và hiển thị nhãn tương ứng bằng tiếng Việt.
+Hệ thống sinh các nhận xét (insight) gợi ý cải thiện dựa trên dữ liệu gần nhất của người dùng.
+2.2.3. Nhóm chức năng dinh dưỡng và bữa ăn
+F09 – Tìm kiếm món ăn
+Người dùng có thể tìm kiếm món ăn theo tên hoặc theo nhóm món.
+Tìm kiếm cục bộ không phân biệt dấu tiếng Việt, cho phép gõ “pho bo” để tìm “Phở Bò”.
+Nguồn dữ liệu món ăn gồm: danh mục món Việt đóng gói sẵn trong ứng dụng, dữ liệu mẫu ngoại tuyến, và kết quả tra cứu trực tuyến từ USDA FoodData Central cho món quốc tế.
+Khi mất mạng hoặc dịch vụ bên ngoài trả lỗi, hệ thống hiển thị thông báo và vẫn giữ kết quả tìm kiếm cục bộ.
+F10 – Ghi nhận bữa ăn
+Người dùng lựa chọn loại bữa gồm:
+Bữa sáng.
+Bữa trưa.
+Bữa tối.
+Bữa phụ.
+Sau đó người dùng lựa chọn món ăn, nhập khẩu phần (bội số của một phần chuẩn), chọn ngày ăn và có thể tự nhập lại số calories. Hệ thống cho phép thêm nhiều món cùng lúc thông qua giỏ món, lưu sẵn các bữa ăn quen thuộc thành combo, và chép lại toàn bộ bữa ăn của ngày hôm trước.
+F11 – Tính toán Calories và các chất dinh dưỡng
+Hệ thống tính toán giá trị dinh dưỡng dựa trên món ăn và khẩu phần được người dùng nhập vào. Các thông tin chính gồm:
+Calories (kcal).
+Protein (g).
+Carbohydrate (g).
+Fat (g).
+Chất xơ, canxi và sắt đối với các món Việt có dữ liệu thành phần.
+F12 – Xem tổng quan dinh dưỡng
+Hệ thống tổng hợp lượng calories và các chất đã tiêu thụ trong ngày, sau đó hiển thị mức tiêu thụ so với mục tiêu hằng ngày của người dùng.
+Hiển thị số calories còn lại, tiến độ so với mục tiêu và tỉ lệ năng lượng đến từ từng nhóm chất.
+Thống kê được xem theo Ngày, Tuần và Tháng.
+F13 – Theo dõi lượng nước uống
+Người dùng có thể ghi nhận lượng nước uống trong ngày bằng cách chọn nhanh các mức có sẵn hoặc nhập tay.
+Mục tiêu nước mỗi ngày được tính từ cân nặng của người dùng.
+Hệ thống cho phép hoàn tác từng lần ghi nhận nước uống.
+2.2.4. Nhóm chức năng tập luyện
+F14 – Xem danh mục bài tập
+Người dùng có thể xem danh sách bài tập được phân loại theo:
+Nhóm bài tập (ví dụ Đốt mỡ, Thư giãn, Tăng cơ, Tim mạch).
+Cường độ tập luyện: Nhẹ, Vừa, Cao.
+Thời lượng của mỗi bài tập (phút).
+F15 – Ghi nhận buổi tập
+Người dùng có thể ghi nhận một buổi tập đã hoàn thành.
+Thông tin lưu gồm bài tập, thời lượng thực hiện, calories tiêu hao và thời điểm hoàn thành.
+Sau khi ghi nhận, hệ thống cập nhật thời gian tập và năng lượng đã tiêu hao trong ngày, đồng thời hiển thị thông báo xác nhận.
+2.2.5. Nhóm chức năng Dashboard
+F16 – Xem Dashboard tổng quan
+Dashboard hiển thị các thông tin tổng hợp từ các module chính. Các thông tin gồm:
+Chỉ số sức khỏe gần nhất và xu hướng thay đổi.
+Chỉ số BMI và phân loại.
+Mục tiêu và lượng calories đã sử dụng trong ngày.
+Tiến độ tập luyện theo mục tiêu 60 phút mỗi ngày.
+Lượng nước uống và một số thông tin tổng quan khác trong ngày.
+F17 – Điều hướng đến các module
+Từ Dashboard, người dùng có thể chuyển đến các khu vực chức năng của ứng dụng.
+Thanh điều hướng dưới cùng gồm năm mục theo thứ tự: Trang chủ → Sức khỏe → Tập luyện → Dinh dưỡng → Cài đặt.
+Hệ thống duy trì phiên người dùng trong quá trình chuyển đổi giữa các module.
+2.2.6. Nhóm chức năng đồng bộ và tích hợp
+F18 – Lưu trữ cục bộ và đồng bộ dữ liệu (định hướng)
+Hệ thống lưu dữ liệu tại thiết bị của người dùng và có thể đồng bộ lên dịch vụ đám mây.
+Dữ liệu dinh dưỡng và lượng nước uống hiện được lưu bền vững trên thiết bị dưới dạng JSON.
+Ở giai đoạn mở rộng, dữ liệu sẽ được lưu trong cơ sở dữ liệu Sqflite và đồng bộ lên Cloud Firestore khi có kết nối mạng.
+F19 – Tra cứu dữ liệu từ API bên ngoài
+Hệ thống gọi API để tra cứu dữ liệu món ăn quốc tế theo thời gian thực.
+Dịch vụ được sử dụng là USDA FoodData Central.
+Kết quả tra cứu được lưu đệm theo từ khóa để hạn chế số lần gọi API.
+Ứng dụng xử lý các trường hợp quá thời gian chờ, mất mạng, hết lượt gọi hoặc khóa API không hợp lệ bằng một loại ngoại lệ riêng và thông báo cho người dùng.
+2.3. Yêu cầu phi chức năng
+Yêu cầu phi chức năng mô tả các thuộc tính về chất lượng mà hệ thống cần đáp ứng ngoài các chức năng nghiệp vụ.
+2.3.1. Hiệu năng
+Hệ thống cần phản hồi các thao tác thông thường của người dùng trong thời gian hợp lý, đặc biệt đối với các thao tác chuyển màn hình, nhập dữ liệu và truy xuất dữ liệu cục bộ.
+Việc đọc danh mục món ăn từ tệp đóng gói sẵn được thực hiện một lần và lưu đệm trong bộ nhớ; kết quả tra cứu từ dịch vụ bên ngoài cũng được lưu đệm theo từ khóa, nhờ đó giảm đáng kể số lần truy xuất lặp lại.
+2.3.2. Khả năng sử dụng
+Giao diện cần được thiết kế đơn giản, nhất quán và dễ thao tác trên thiết bị di động.
+Các chức năng chính cần được tổ chức rõ ràng để người dùng có thể nhanh chóng tìm được chức năng cần sử dụng. Dashboard đóng vai trò là điểm truy cập trung tâm và hệ thống điều hướng cần được duy trì nhất quán giữa các màn hình.
+Ứng dụng cần có phản hồi trực quan cho các hành động quan trọng, ví dụ thông báo xác nhận sau khi ghi nhận dữ liệu và khả năng hoàn tác đối với các thao tác xóa.
+2.3.3. Bảo mật
+Thông tin xác thực và dữ liệu người dùng cần được bảo vệ trong quá trình đăng nhập và sử dụng hệ thống.
+Mật khẩu không được lưu trực tiếp dưới dạng văn bản thuần trong cơ sở dữ liệu của ứng dụng mà được băm trước khi lưu; email của người dùng được dùng làm muối cho quá trình băm.
+Dữ liệu của từng người dùng phải được gắn với đúng mã tài khoản và mọi truy vấn nhật ký đều phải lọc theo mã người dùng để tránh việc truy cập hoặc hiển thị nhầm dữ liệu giữa các tài khoản.
+2.3.4. Tính tin cậy
+Hệ thống cần có cơ chế xử lý các trường hợp dữ liệu đầu vào không hợp lệ, đăng nhập thất bại, không tìm thấy dữ liệu hoặc mất kết nối mạng.
+Khi thiết bị tạm thời không có mạng, dữ liệu đã được ghi nhận cục bộ cần được giữ lại để có thể sử dụng tiếp và đồng bộ sau khi kết nối được khôi phục.
+2.3.5. Khả năng mở rộng
+Kiến trúc hệ thống cần cho phép bổ sung các module hoặc dịch vụ mới mà không phải thay đổi toàn bộ hệ thống.
+Việc phân chia thành UI, Store/State Management, Repository và tầng dữ liệu giúp hệ thống có thể mở rộng thêm Firebase, API hoặc các nguồn dữ liệu khác trong tương lai.
+2.3.6. Khả năng bảo trì
+Mã nguồn cần được tổ chức thành các module và lớp có trách nhiệm rõ ràng.
+Mỗi nhóm chức năng cần có cấu trúc riêng nhưng vẫn sử dụng được các thành phần dùng chung như theme, điều hướng, giao diện lưu trữ và mô hình dữ liệu.
+Việc tổ chức mã nguồn theo module giúp việc sửa lỗi, kiểm thử và phát triển chức năng mới thuận tiện hơn.
+2.3.7. Khả năng tương thích
+Ứng dụng được phát triển bằng Flutter nhằm hướng đến khả năng chạy trên các thiết bị di động thuộc hệ điều hành được Flutter hỗ trợ.
+Giao diện cần thích ứng với nhiều kích thước màn hình và các thiết lập hiển thị khác nhau của thiết bị.
+2.3.8. Khả năng hoạt động khi mất kết nối
+Các chức năng sử dụng dữ liệu đã lưu cục bộ cần có khả năng hoạt động khi không có kết nối mạng, bao gồm tra cứu danh mục món Việt, ghi nhận bữa ăn và theo dõi chỉ số sức khỏe.
+Dữ liệu phát sinh trong thời gian ngoại tuyến được lưu tại thiết bị và sẽ được đồng bộ với dịch vụ đám mây khi có kết nối mạng trở lại.
+2.4. Use case diagram tổng quát
+Use Case Diagram tổng quát mô tả các chức năng chính của hệ thống HealthFlow và mối quan hệ giữa người dùng với hệ thống.
+Actor chính của hệ thống là User, đại diện cho người sử dụng ứng dụng. Ngoài User, hệ thống còn tương tác với các hệ thống bên ngoài gồm Firebase/Cloud (định hướng) và USDA FoodData Central (đã tích hợp). Các thành phần này không phải người dùng trực tiếp mà là các hệ thống hỗ trợ cung cấp dịch vụ xác thực, lưu trữ và dữ liệu từ bên ngoài.
+Hình 1: Sơ đồ Use case tổng quát của đồ án
+2.4.1. Mô tả các Actor
+User: Là người sử dụng trực tiếp ứng dụng HealthFlow. User thực hiện các thao tác đăng ký, đăng nhập, cập nhật hồ sơ, ghi nhận dữ liệu sức khỏe, quản lý bữa ăn, theo dõi dinh dưỡng, xem và ghi nhận bài tập.
+Firebase / Cloud: Là hệ thống bên ngoài được định hướng sử dụng để hỗ trợ xác thực tài khoản và lưu trữ dữ liệu đám mây trong giai đoạn mở rộng của hệ thống.
+USDA FoodData Central: Là dịch vụ dữ liệu dinh dưỡng bên ngoài, được hệ thống gọi để tra cứu thông tin dinh dưỡng của món ăn quốc tế theo thời gian thực.
+2.4.2. Mô tả quan hệ Use Case
+Một số quan hệ chính trong sơ đồ:
+Ghi nhận chỉ số sức khỏe include Tính toán BMI vì việc tính BMI là một thao tác xử lý liên quan khi dữ liệu cân nặng và chiều cao phù hợp được cung cấp.
+Ghi nhận bữa ăn include Tìm kiếm món ăn vì người dùng cần lựa chọn món ăn trước khi ghi nhận.
+Ghi nhận bữa ăn include Tính Calories & Macro vì hệ thống phải tính toán giá trị dinh dưỡng dựa trên khẩu phần.
+Xem tổng quan dinh dưỡng include Tính Calories & Macro để tổng hợp dữ liệu dinh dưỡng.
+Tìm kiếm món ăn có thể sử dụng Tra cứu dữ liệu bên ngoài khi nguồn dữ liệu được cung cấp thông qua API.
+Đồng bộ dữ liệu liên quan đến trạng thái đăng nhập và hệ thống Firebase trong kiến trúc triển khai mở rộng.
+Dashboard đóng vai trò tổng hợp thông tin từ các module nghiệp vụ và cung cấp khả năng điều hướng giữa các khu vực của ứng dụng.
+2.4.3. Ý nghĩa của Use Case Diagram
+Use Case Diagram là cơ sở để xác định phạm vi chức năng của hệ thống trước khi chuyển sang giai đoạn thiết kế chi tiết. Từ sơ đồ này, nhóm tiếp tục xây dựng Activity Diagram cho từng nghiệp vụ quan trọng và Sequence Diagram để mô tả sự tương tác giữa User, giao diện, Store, Repository và các tầng dữ liệu.
+Đối với HealthFlow, các chức năng được tổ chức thành các nhóm tương ứng với các module chính của hệ thống, giúp việc phân công phát triển và kiểm thử giữa các thành viên được rõ ràng hơn.
+CHƯƠNG 3: THIẾT KẾ HỆ THỐNG
+Chương này trình bày thiết kế hệ thống theo bốn góc nhìn: thiết kế cơ sở dữ liệu, biểu đồ lớp, biểu đồ tuần tự cho các luồng nghiệp vụ chính và sơ đồ triển khai. Phần đặc tả chi tiết được trình bày theo từng module nghiệp vụ, tương ứng với phân công công việc đã nêu ở phần đầu báo cáo. Trong phạm vi báo cáo lần này, phần đặc tả chi tiết của module Dinh dưỡng (Bữa ăn/Món ăn) được trình bày đầy đủ nhất vì đây là module đã hoàn thiện cả tầng dữ liệu lẫn tầng giao diện; ba module còn lại được trình bày ở mức thiết kế chung kèm biểu đồ tuần tự của các luồng nghiệp vụ chính.
+3.1. Thiết kế cơ sở dữ liệu (ERD)
+3.1.1. Module Dinh dưỡng (Bữa ăn/Món ăn)
+Module Dinh dưỡng quản lý hai nhóm dữ liệu có bản chất khác nhau: danh mục món ăn (dữ liệu dùng chung cho mọi người dùng) và nhật ký ăn uống (dữ liệu riêng của từng người dùng). Từ hai nhóm này, nhóm xác định hai thực thể chính là FOOD_ITEM và MEAL_ENTRY; ngoài ra có ba thực thể phụ trợ là MEAL_COMBO và COMBO_ITEM (bữa ăn lưu sẵn) cùng WATER_LOG (lượng nước uống theo ngày). MEAL_ENTRY, MEAL_COMBO và WATER_LOG liên kết với thực thể USER của module Tài khoản thông qua khóa ngoại user_id.
+Danh mục món ăn được tổng hợp từ ba nguồn:
+Món Việt Nam: 199 món được tổng hợp trong tệp Excel dựa trên Bảng thành phần thực phẩm Việt Nam của Viện Dinh dưỡng Quốc gia, sau đó chuyển sang tệp assets/data/vn_foods.json. Giá trị dinh dưỡng của mỗi món bằng tổng giá trị dinh dưỡng của các nguyên liệu theo khối lượng (tra cứu trên cơ sở 100 g).
+Món quốc tế: tra cứu theo thời gian thực từ USDA FoodData Central khi người dùng tìm kiếm. Do hiện chưa có API dinh dưỡng về món Việt đủ tin cậy, nhóm áp dụng mô hình kết hợp (hybrid): dữ liệu nội địa từ Excel cho món Việt và API của USDA cho món quốc tế.
+Dữ liệu mẫu ngoại tuyến: một số món có sẵn trong ứng dụng để vẫn tìm kiếm và ghi nhận được khi không có kết nối mạng, cùng 30 nguyên liệu ăn theo định lượng gram trong tệp assets/data/ingredients.json.
+Hình 2 thể hiện mô hình thực thể – quan hệ (ERD) của module. Các quan hệ và quyết định thiết kế chính như sau:
+Hình 2: Sơ đồ thực thể – quan hệ (ERD) của module Dinh dưỡng
+USER – MEAL_ENTRY (1 – N): một người dùng có nhiều bản ghi ăn uống. Mọi truy vấn nhật ký đều lọc theo user_id để dữ liệu giữa các tài khoản được quản lý độc lập.
+FOOD_ITEM – MEAL_ENTRY (1 – N): một món có thể được ghi nhận nhiều lần. Đây là quan hệ tham chiếu logic: food_id có thể trỏ đến món của USDA (mã dạng usda-<fdcId>) không nằm trong danh mục cục bộ. Vì vậy MEAL_ENTRY lưu kèm tên món (food_name) và các giá trị dinh dưỡng tại thời điểm ghi, giúp lịch sử vẫn hiển thị đúng khi danh mục thay đổi.
+Bữa ăn không tách thành bảng riêng: loại bữa (sáng, trưa, tối, phụ) là thuộc tính slot của MEAL_ENTRY. Ngày ăn được suy ra từ eaten_at nên người dùng có thể xem hoặc ghi nhận bữa ăn cho bất kỳ ngày nào, không chỉ ngày hiện tại.
+Tổng hợp theo ngày không lưu trữ: tổng calo và các chất dinh dưỡng của một ngày được tính từ danh sách MEAL_ENTRY của ngày đó (lớp NutritionSummary), tránh dữ liệu dư thừa và sai lệch.
+USER – MEAL_COMBO (1 – N) và MEAL_COMBO – COMBO_ITEM (1 – N): người dùng lưu sẵn các bữa ăn quen thuộc (ví dụ “phở bò + cà phê đen”) thành combo. Mỗi dòng COMBO_ITEM lưu kèm bản chụp (snapshot) của món và số phần, nên combo vẫn dùng được kể cả khi món đến từ USDA và không còn trong danh mục cục bộ.
+USER – WATER_LOG (1 – N): mỗi người dùng có tối đa một bản ghi lượng nước uống (ml) cho mỗi ngày, khóa chính là cặp (user_id, day). Mục tiêu nước mỗi ngày không được lưu mà tính từ cân nặng (khoảng 33 ml/kg, làm tròn 100 ml, giới hạn 1.500–4.000 ml). Bảng chỉ lưu tổng theo ngày; danh sách từng lần uống chỉ được giữ trong phiên làm việc để hoàn tác, không lưu xuống thiết bị.
+Chi tiết các thuộc tính của FOOD_ITEM và MEAL_ENTRY được mô tả trong Bảng 2 và Bảng 3; các thực thể MEAL_COMBO, COMBO_ITEM và WATER_LOG được mô tả trong Bảng 4.
+Bảng 2: Mô tả thuộc tính thực thể FOOD_ITEM
+Thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String
+PK
+Mã món ăn (ví dụ vn-001, usda-<fdcId>)
+name
+String
+Tên món ăn
+category
+String
+Nhóm món: vietnamese, asian (Món Tây), drink, other
+calories
+Int
+Năng lượng (kcal) cho một khẩu phần chuẩn (món Việt: theo phần; món USDA: trên 100 g)
+protein
+Double
+Lượng Protein (g)
+carbs
+Double
+Lượng Carbohydrate (g)
+fat
+Double
+Lượng chất béo (g)
+serving_label
+String
+Mô tả khẩu phần chuẩn, ví dụ “1 phần (460g)”, “100g”
+source
+String
+Nguồn dữ liệu: vietnam, usda, local (chỉ có ở CatalogFood)
+group
+String
+Nhóm món Việt (Món nước, Món bánh, …); rỗng với món quốc tế
+vegetarian
+Bool
+Cờ món chay
+ingredients
+List<String>
+Danh sách nguyên liệu kèm khối lượng (món Việt)
+fiber
+Double
+Chất xơ (g) cho một khẩu phần; có thể rỗng
+calcium
+Double
+Canxi (mg) cho một khẩu phần; có thể rỗng
+iron
+Double
+Sắt (mg) cho một khẩu phần; có thể rỗng
+serving_grams
+Int
+Khối lượng một khẩu phần (g); 100 với món USDA
+Bảng 3: Mô tả thuộc tính thực thể MEAL_ENTRY
+Thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String
+PK
+Mã bản ghi ăn uống (sinh theo thời gian)
+user_id
+String
+FK → USER.id
+Người dùng sở hữu bản ghi
+food_id
+String
+FK (logic) → FOOD_ITEM.id
+Món ăn đã ghi nhận
+food_name
+String
+Tên món lưu kèm để hiển thị lịch sử
+slot
+String
+Loại bữa: breakfast, lunch, dinner, snack
+portion
+Double
+Hệ số khẩu phần (1 = đúng một phần chuẩn, 0.5 = nửa phần, …)
+calories
+Int
+Năng lượng thực tế (kcal) sau khi nhân khẩu phần hoặc do người dùng tự nhập
+protein, carbs, fat
+Double
+Lượng Protein, Carbohydrate, chất béo thực tế (g)
+eaten_at
+Int
+Thời điểm ăn (epoch, mili giây)
+water_ml
+Int
+Lượng nước (ml) mà món này cộng vào mục Nước uống (chỉ với đồ uống, mặc định 0)
+Bảng 4: Mô tả thuộc tính các thực thể MEAL_COMBO, COMBO_ITEM và WATER_LOG
+Thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+MEAL_COMBO.id
+String
+PK
+Mã combo bữa ăn (sinh theo thời gian)
+MEAL_COMBO.user_id
+String
+FK → USER.id
+Người dùng sở hữu combo
+MEAL_COMBO.name
+String
+Tên combo, ví dụ “Bữa sáng quen thuộc”
+COMBO_ITEM.combo_id
+String
+FK → MEAL_COMBO.id
+Combo chứa món
+COMBO_ITEM.food_id
+String
+FK (logic) → FOOD_ITEM.id
+Món trong combo (có thể là món USDA)
+COMBO_ITEM.food_snapshot
+JSON
+Bản chụp thông tin món (FoodItem) tại thời điểm lưu combo
+COMBO_ITEM.portion
+Double
+Hệ số khẩu phần của món trong combo
+WATER_LOG.user_id
+String
+PK, FK → USER.id
+Người dùng uống nước
+WATER_LOG.day
+String
+PK
+Ngày theo dạng yyyy-MM-dd
+WATER_LOG.water_ml
+Int
+Lượng nước đã uống trong ngày (ml)
+Hiện tại dữ liệu của người dùng được lưu cục bộ bằng shared_preferences thông qua lớp trừu tượng NutritionStore, gồm ba khóa: hf_meals_v1 (nhật ký ăn uống, danh sách JSON), hf_combos_v1 (combo bữa ăn) và hf_water_v1 (lượng nước uống theo ngày). Riêng danh mục món ăn không được lưu bền vững mà được nạp lại mỗi lần chạy: món Việt từ tệp vn_foods.json, món ngoại tuyến là dữ liệu mẫu trong bộ nhớ. Lược đồ trên được thiết kế theo dạng quan hệ để khi tích hợp Sqflite ở giai đoạn sau, mỗi thực thể ánh xạ thành một bảng và chỉ cần bổ sung một lớp cài đặt NutritionStore mới mà không phải thay đổi tầng giao diện.
+Bên cạnh việc lưu loại bữa (slot) và thời điểm ăn (eaten_at) cho từng bản ghi, thiết kế này còn phục vụ việc nhận diện thói quen ăn uống theo thời gian. Các tài liệu về chrononutrition cho rằng thời điểm nạp năng lượng trong ngày có liên quan đến chuyển hóa, và nghiên cứu của Morris et al. ghi nhận sự lệch nhịp sinh học làm suy giảm khả năng dung nạp glucose ở người làm việc theo ca [11]. Vì vậy, dựa trên eaten_at, ở giai đoạn sau module có thể bổ sung cảnh báo khi người dùng ghi nhận bữa ăn năng lượng cao vào khung giờ muộn, sát giờ ngủ (chức năng này chưa được cài đặt trong phiên bản hiện tại). Hiện tại, module đã cộng dồn calo theo ngày rồi đối chiếu với mục tiêu cá nhân (daily_calorie_goal) dựa trên nguyên lý cân bằng năng lượng giữa lượng nạp vào và lượng tiêu hao [12].
+3.1.2. Module Chỉ số sức khỏe
+Module Chỉ số sức khỏe lưu dữ liệu theo dạng nhật ký: mỗi lần đo là một bản ghi (HEALTH_METRIC) gắn với người dùng, loại chỉ số, giá trị, thời điểm đo và ghi chú. Thiết kế này cho phép lưu nhiều lần đo trong cùng một ngày và tính xu hướng theo thời gian thay vì chỉ giữ giá trị mới nhất.
+Thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String
+PK
+Mã bản ghi (sinh theo thời gian)
+user_id
+String
+FK → USER.id
+Người dùng sở hữu bản ghi
+type
+String
+Loại chỉ số: weight, blood_pressure, heart_rate, blood_glucose, sleep, steps, bmi
+value
+Double
+Giá trị chính của chỉ số
+value_secondary
+Double
+Null ngoại trừ huyết áp
+Giá trị tâm trương của huyết áp (ví dụ 120/80)
+recorded_at
+Int
+Thời điểm đo (epoch, mili giây)
+note
+String
+Tối đa 200 ký tự
+Ghi chú của người dùng
+Bảng 5: Mô tả thuộc tính thực thể HEALTH_METRIC
+Hai quyết định thiết kế quan trọng của module:
+Chỉ số BMI là bản ghi dẫn xuất. Mỗi lần cân tạo kèm một bản ghi BMI có mã suy ra từ mã lần cân (bmi-<weightId>), nhờ đó khi người dùng sửa hoặc xóa một lần cân thì hệ thống xác định được đúng bản ghi BMI tương ứng để cập nhật theo. Chỉ số BMI không xuất hiện trong danh sách loại chỉ số cho phép nhập tay.
+Loại chỉ số lưu bằng tên chuỗi thay vì chỉ số thứ tự. Giá trị lưu xuống dữ liệu là chuỗi định danh (ví dụ blood_pressure) nên khi bổ sung loại chỉ số mới vào giữa danh sách, dữ liệu cũ không bị lệch.
+Trong phiên bản hiện tại, nhật ký chỉ số sức khỏe được giữ trong bộ nhớ của tiến trình thông qua lớp InMemoryHealthStore; khi ứng dụng được mở lại, dữ liệu mẫu được khởi tạo lại theo mã người dùng. Lớp trừu tượng HealthStore đã được định nghĩa sẵn với năm phương thức byUser, insert, update, delete và seedIfEmpty để có thể bổ sung một lớp cài đặt mới trên Sqflite mà không phải sửa tầng giao diện.
+3.1.3. Module Tập luyện và module Tài khoản
+Module Tập luyện quản lý hai nhóm dữ liệu có bản chất khác nhau: danh mục dữ liệu bài tập (dữ liệu dùng chung cho mọi người dùng) và nhật ký tập luyện cá nhân (dữ liệu riêng của từng người dùng). Từ hai nhóm này, nhóm xác định hai thực thể chính là EXERCISE (Bài tập) và WORKOUT_SESSION (Buổi tập/Nhật ký tập); ngoài ra có ba thực thể phụ trợ là WORKOUT_PLAN (Chương trình/Lộ trình tập), PLAN_DETAIL (Chi tiết chương trình tập) và SESSION_DETAIL (Chi tiết bài tập trong buổi tập). WORKOUT_SESSION và WORKOUT_PLAN (đối với các chương trình tự tạo) liên kết với thực thể USER của module Authentication thông qua khóa ngoại user_id.
+Danh mục bài tập và chương trình tập được tổng hợp và phân loại từ hai nguồn:
+Dữ liệu hệ thống (System Data): Bao gồm danh sách các bài tập cơ bản tại nhà (Bodyweight, Calisthenics) kèm hình ảnh minh họa (ảnh GIF) và chỉ số năng lượng (KCAL). Đồng thời, hệ thống cung cấp sẵn các chương trình tập phân loại theo cấp độ (Bắt đầu, Trung bình, Nâng cao) và theo nhóm cơ (Bụng, Cánh tay, Ngực,...) như "Bụng Người bắt đầu", "Bụng Trung bình". 
+Dữ liệu do người dùng tạo (Custom/User-Generated Data): Người dùng có thể tự tạo các chương trình tập luyện cá nhân hóa (Tùy chỉnh bài tập - "TẠO CỦA RIÊNG BẠN" hoặc "Chương trình mới") bằng cách chọn các bài tập có sẵn, điều chỉnh thời lượng (giây) hoặc số lượng (reps).
+Mô hình thực thể – quan hệ (ERD) của module Bài tập bao gồm các quan hệ và quyết định thiết kế chính như sau:
+USER – WORKOUT_SESSION (1 – N): Một người dùng có nhiều bản ghi nhật ký buổi tập. Mọi truy vấn lịch sử tập luyện (tổng calo, số phút, chuỗi ngày liên tiếp) đều lọc theo user_id để dữ liệu giữa các tài khoản được quản lý độc lập. 
+USER – WORKOUT_PLAN (1 – N): Một người dùng có thể tự tạo nhiều chương trình tập luyện tùy chỉnh cho riêng mình. (Lưu ý: Các chương trình mặc định của hệ thống sẽ có user_id là null hoặc một ID hệ thống định danh).
+WORKOUT_PLAN – PLAN_DETAIL (1 – N) và EXERCISE – PLAN_DETAIL (1 – N): Đây là mối quan hệ nhiều - nhiều giữa Chương trình tập và Bài tập, được giải quyết thông qua thực thể trung gian PLAN_DETAIL. Một chương trình tập (ví dụ: "Bụng Người bắt đầu" hoặc "Chương trình mới") bao gồm nhiều bài tập (như "Bật nhảy", "Chạm gót chân", "Chống đẩy vào tường"). PLAN_DETAIL lưu trữ các thông số cụ thể cho từng bài tập trong một chương trình nhất định: thứ tự thực hiện, định lượng (theo thời gian - ví dụ "00:30" giây, hoặc theo số reps - ví dụ "x26" lần). 
+WORKOUT_SESSION – SESSION_DETAIL (1 – N) và EXERCISE – SESSION_DETAIL (1 – N): Khi người dùng thực hiện xong một buổi tập (dựa trên một WORKOUT_PLAN hoặc tập tự do), hệ thống sẽ ghi lại lịch sử vào WORKOUT_SESSION (lưu tổng thời gian, tổng Kcal, ngày tập). Thực thể SESSION_DETAIL lưu chi tiết người dùng đã thực hiện những bài tập nào trong buổi đó, với thời gian hoặc số lượng thực tế là bao nhiêu để làm cơ sở tính toán calo đốt cháy chính xác cho từng bài. 
+Hình 3: erd của module bài tập
+Chi tiết các thuộc tính trong các bảng EXERCISE, Bảng WORKOUT_PLAN,.. theo thứ tự bảng 4 đến bảng 10. 
+Bảng 4: EXERCISE (Danh mục bài tập)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+exercise_id
+String (VARCHAR(50))
+PK, NOT NULL
+Mã định danh bài tập (Mã nội bộ hoặc mã từ API).
+name
+String (VARCHAR(100))
+NOT NULL
+Tên bài tập (VD: Chống đẩy, Squat, Plank).
+category
+String (VARCHAR(50))
+NOT NULL
+Phân loại bài tập (VD: Strength, Cardio, Flexibility).
+estimated_calories
+Int
+DEFAULT 0
+Calo ước tính tiêu hao định mức cho lượt tập chuẩn.
+equipment_needed
+List<String>
+NULLABLE
+Dụng cụ hỗ trợ cần thiết (VD: Không dụng cụ, Thảm, Tạ đơn).
+gif_url
+String (TEXT)
+NULLABLE
+Đường dẫn đệm ảnh GIF minh họa động tác.
+description
+String (TEXT)
+NULLABLE
+Mô tả chi tiết hướng dẫn tư thế tập chuẩn.
+kcal_value
+Double
+NOT NULL
+Chỉ số chuyển hóa năng lượng Calo..
+source
+String (VARCHAR(20))
+NOT NULL
+Nguồn dữ liệu (INTERNAL_JSON hoặc EXTERNAL_API).
+difficulty_level
+String (VARCHAR(20))
+NOT NULL
+Cấp độ bài tập (Beginner, Intermediate, Advanced).
+video_url
+String (TEXT)
+NULLABLE
+Link video hướng dẫn động tác chi tiết.
+Bảng 5: WORKOUT_PLAN (Chương trình / Gói tập luyện)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String (VARCHAR(50))
+PK, NOT NULL
+Mã định danh gói/chương trình tập.
+user_id
+String (VARCHAR(50))
+FK (USER.id), NULLABLE
+Mã người dùng tạo. Nếu NULL là gói mẫu hệ thống; nếu có giá trị là gói tùy chỉnh của người dùng.
+plan_name
+String (VARCHAR(100))
+NOT NULL
+Tên chương trình tập (VD: Bụng Người bắt đầu, Thử thách 30 ngày).
+description
+String (TEXT)
+NULLABLE
+Mô tả chi tiết mục tiêu và định hướng của chương trình tập.
+level
+String (VARCHAR(20))
+NOT NULL
+Cấp độ chương trình (Beginner, Intermediate, Advanced).
+target_goal
+String (VARCHAR(50))
+NOT NULL
+Mục tiêu tập luyện (VD: Giảm mỡ, Tăng cơ, Săn chắc).
+Bảng 6: PLAN_ITEM (Chi tiết bài tập trong gói)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+plan_id
+String (VARCHAR(50))
+PK, FK (WORKOUT_PLAN.id)
+Mã gói tập chứa bài tập này.
+exercise_id
+String (VARCHAR(50))
+PK, FK (EXERCISE.exercise_id)
+Mã bài tập được đưa vào gói.
+day_in_plan
+Int
+PK, NOT NULL
+Ngày trong lộ trình (VD: Day 1, Day 2,...).
+order
+Int
+NOT NULL
+Thứ tự thực thi của bài tập trong buổi.
+suggested_sets
+Int
+DEFAULT 1
+Số hiệp (sets) đề xuất thực hiện.
+suggested_reps
+Int
+DEFAULT 10
+Số lần lặp (reps) hoặc số giây đề xuất thực hiện.
+Bảng 7:WORKOUT_SESSION (Lịch sử / Buổi tập thực tế)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String (VARCHAR(50))
+PK, NOT NULL
+Mã định danh buổi tập hoàn thành.
+user_id
+String (VARCHAR(50))
+FK (USER.id), NOT NULL
+Mã người dùng thực hiện buổi tập.
+date
+String (yyyy-MM-dd)
+NOT NULL
+Ngày ghi nhận thực hiện buổi tập.
+session_name
+String (VARCHAR(100))
+NOT NULL
+Tên buổi tập đã hoàn thành (VD: Bụng Người bắt đầu).
+session_location
+String (VARCHAR(100))
+NULLABLE
+Tên vị trí tập luyện do người dùng chọn/nhập.
+workout_location_type
+String (VARCHAR(20))
+DEFAULT 'HOME'
+Loại hình không gian (HOME, GYM, OUTDOOR).
+Bảng 8: WORKOUT_LOG (Chi tiết kết quả từng bài tập trong buổi)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String (VARCHAR(50))
+PK, NOT NULL
+Mã định danh bản ghi chi tiết bài tập.
+workout_session_id
+String (VARCHAR(50))
+FK (WORKOUT_SESSION.id), NOT NULL
+Mã buổi tập tương ứng.
+exercise_id
+String (VARCHAR(50))
+FK (EXERCISE.exercise_id), NOT NULL
+Mã bài tập được thực hiện.
+reps
+Int
+DEFAULT 0
+Số reps/số giây thực tế hoàn thành.
+sets
+Int
+DEFAULT 1
+Số hiệp thực tế thực hiện.
+rest_time_seconds
+Int
+DEFAULT 30
+Thời gian nghỉ giữa các hiệp (giây).
+weight_used_kg
+Double
+DEFAULT 0.0
+Mức tạ sử dụng thêm (kg), 0.0 nếu tập bodyweight.
+estimated_calories
+Int
+NOT NULL
+Lượng Calo tiêu hao thực tế tính bằng công thức ACSM & KCAL.
+Bảng 9: ACTIVITY_LOG (Nhật ký hoạt động & Chuỗi ngày tập)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+user_id
+String (VARCHAR(50))
+PK, FK (USER.id)
+Mã người dùng.
+day
+String (yyyy-MM-dd)
+PK, NOT NULL
+Ngày theo dõi.
+steps_taken
+Int
+DEFAULT 0
+Số bước chân ghi nhận được trong ngày.
+distance_km
+Double
+DEFAULT 0.0
+Quãng đường di chuyển (km).
+total_calories_burned
+Int
+DEFAULT 0
+Tổng Kcal tiêu hao từ tất cả các buổi tập và hoạt động trong ngày.
+Bảng 10: BODY_MEASUREMENT (Lịch sử chỉ số cơ thể & Cân nặng)
+Tên thuộc tính
+Kiểu dữ liệu
+Ràng buộc
+Mô tả
+id
+String (VARCHAR(50))
+PK, NOT NULL
+Mã định danh lượt đo.
+user_id
+String (VARCHAR(50))
+FK (USER.id), NOT NULL
+Mã người dùng.
+date
+Date / Timestamp
+NOT NULL
+Ngày và thời điểm ghi nhận số đo.
+measurement_type
+String (VARCHAR(30))
+NOT NULL
+Loại chỉ số đo (Weight, Chest, Waist, Hip, Arm).
+value
+Double
+NOT NULL
+Giá trị chỉ số đo được (kg cho cân nặng, cm cho số đo vòng).
+Module Tài khoản quản lý thực thể USER với các thuộc tính phục vụ đăng nhập và cá nhân hóa dữ liệu: mã người dùng, họ tên, email, mật khẩu đã băm, giới tính, chiều cao, cân nặng, mục tiêu calories, mục tiêu sức khỏe, đường dẫn ảnh đại diện và thời điểm tạo tài khoản. Âm thanh phản hồi và thiết lập thông báo được lưu bằng hai khóa riêng trong bộ nhớ thiết bị.
+3.2. Class Diagram
+3.2.1. Module Dinh dưỡng (Bữa ăn/Món ăn)
+Module Dinh dưỡng được tổ chức theo luồng UI → State Management → Repository → Data Source đã nêu ở mục 1.4. Class Diagram của module được chia thành hai hình: tầng Model (Hình 3) và tầng Repository cùng các nguồn dữ liệu (Hình 4).
+Tầng Model
+FoodItem: món ăn trong danh mục, gồm tên, nhóm, calo, Protein, Carbohydrate, chất béo và mô tả khẩu phần chuẩn.
+CatalogFood: kế thừa FoodItem, bổ sung nguồn dữ liệu (FoodSource: vietnam, usda, local), nhóm món, cờ món chay, danh sách nguyên liệu, chất xơ, canxi, sắt và khối lượng khẩu phần. Do là lớp con nên mọi nơi nhận FoodItem vẫn sử dụng được.
+MealEntry: một món người dùng đã ghi nhận. Phương thức khởi tạo fromFood nhân giá trị dinh dưỡng theo khẩu phần; nếu người dùng tự nhập calo thì Protein, Carbohydrate và chất béo được co giãn theo cùng tỉ lệ để giữ nguyên tỉ lệ các chất của món. Phương thức copyWith tạo bản sao có đổi một vài trường, dùng khi chép lại bữa hôm trước.
+NutritionSummary: tổng hợp dinh dưỡng của một ngày, cung cấp số calo còn lại so với mục tiêu, tiến độ (giới hạn trong khoảng 0–1 để thanh tiến trình không tràn khi nạp vượt mục tiêu) và tỉ lệ năng lượng đến từ từng chất (Protein 4 kcal/g, Carbohydrate 4 kcal/g, chất béo 9 kcal/g) phục vụ biểu đồ.
+PortionedFood: một món kèm số phần, dùng cho giỏ món và cho các món trong combo; tính sẵn số calo theo khẩu phần.
+MealCombo: bữa ăn lưu sẵn của một người dùng, gồm tên và danh sách PortionedFood; cung cấp tổng calo và dòng mô tả dạng “Phở bò + Cà phê đen”.
+DayCalories: tổng calo ăn vào của một ngày, dùng cho biểu đồ nhiều ngày ở tab Thống kê.
+DayWater: lượng nước uống (ml) của một ngày, dùng cho biểu đồ nước Tuần/Tháng ở tab Thống kê.
+FoodCategory, MealSlot, FoodSource: các kiểu liệt kê (enum) cho nhóm món, loại bữa và nguồn dữ liệu.
+Hình 3: Class Diagram – tầng Model của module Dinh dưỡng
+Tầng Repository và nguồn dữ liệu
+NutritionRepository (kế thừa ChangeNotifier) là điểm truy cập duy nhất của giao diện đối với dữ liệu dinh dưỡng. Lớp này nạp danh mục, nạp nhật ký theo ngày, tìm kiếm món, ghi nhận, sửa hoặc xóa món (có hoàn tác), quản lý giỏ món và combo, chép lại bữa hôm trước, ghi lượng nước uống (chọn nhanh hoặc nhập tay, hoàn tác từng lần) và tính tổng hợp; mỗi khi dữ liệu thay đổi, lớp gọi notifyListeners để các màn hình đang lắng nghe (tab Hôm nay, Thống kê và Dashboard) tự cập nhật. Việc lưu trữ được tách qua giao diện NutritionStore với hai cài đặt: InMemoryNutritionStore (dữ liệu trong bộ nhớ, dùng cho kiểm thử) và PrefsNutritionStore (lưu bền vững bằng shared_preferences với ba khóa hf_meals_v1, hf_combos_v1 và hf_water_v1). Hai nguồn danh mục món được đóng gói riêng: VietnamFoodSource đọc tệp JSON món Việt và lưu đệm kết quả, UsdaFoodService gọi API của USDA.
+Hình 4: Class Diagram – tầng Repository và nguồn dữ liệu của module Dinh dưỡng
+Trách nhiệm của các lớp chính được tóm tắt trong Bảng 5.
+Bảng 6: Trách nhiệm của các lớp trong module Dinh dưỡng
+Lớp
+Tầng
+Trách nhiệm chính
+NutritionScreen
+UI
+Màn hình Dinh dưỡng gồm ba thẻ: Hôm nay (vòng năng lượng, các bữa ăn, thẻ nước uống chọn nhanh lượng, chuyển ngày), Thực đơn (tìm món Việt và món quốc tế, chọn khẩu phần, giỏ món, combo) và Thống kê (tỉ lệ chất, phân bố theo bữa, lượng nước uống; xem theo Ngày, Tuần, Tháng).
+NutritionRepository
+State / Repository
+Nạp danh mục và nhật ký theo ngày, tìm kiếm món (không phân biệt dấu tiếng Việt), tra cứu USDA, ghi nhận, sửa, xóa và hoàn tác món, quản lý giỏ món và combo, chép lại bữa hôm trước, ghi và hoàn tác lượng nước uống, tính NutritionSummary, tổng calo và lượng nước nhiều ngày, thông báo cho giao diện khi dữ liệu thay đổi.
+NutritionStore (InMemory / Prefs)
+Data
+Giao diện lưu trữ danh mục, nhật ký, combo và nước uống với các phương thức catalog, entriesByDay, allEntries, insertEntry, updateEntry, deleteEntry, combos, saveCombo, waterMl, setWaterMl, allWater. PrefsNutritionStore lưu dưới dạng JSON qua ba khóa hf_meals_v1, hf_combos_v1, hf_water_v1.
+VietnamFoodSource
+Data
+Đọc tệp vn_foods.json (món Việt từ Excel) và chuyển thành danh sách CatalogFood; lưu đệm sau lần đọc đầu.
+IngredientSource
+Data
+Đọc tệp ingredients.json (30 nguyên liệu ăn theo định lượng 100 g) để người dùng ghi nhận nguyên liệu riêng lẻ.
+UsdaFoodService
+Data
+Dịch từ khóa tiếng Việt sang tiếng Anh, gọi API foods/search của USDA, phân tích kết quả (calo, Protein, chất béo, Carbohydrate trên 100 g), lưu đệm theo từ khóa, xử lý lỗi mạng, hết lượt gọi hoặc khóa API không hợp lệ bằng UsdaException.
+FoodItem / CatalogFood
+Model
+Mô tả món ăn trong danh mục và thông tin mở rộng (nguồn, nguyên liệu, chất xơ, canxi, sắt).
+MealEntry
+Model
+Bản ghi một món đã ăn theo bữa, khẩu phần và thời điểm; tính sẵn giá trị dinh dưỡng thực tế.
+NutritionSummary
+Model
+Tổng hợp theo ngày: tổng calo, Protein, Carbohydrate, chất béo, calo còn lại, tiến độ và tỉ lệ các chất.
+MealCombo / PortionedFood
+Model
+Bữa ăn lưu sẵn (tên và danh sách món kèm số phần); PortionedFood là một món kèm khẩu phần, dùng cho giỏ món và combo.
+DayCalories / DayWater
+Model
+Tổng calo và lượng nước uống của một ngày, dùng cho biểu đồ ở tab Thống kê.
+FoodCategory / MealSlot / FoodSource
+Model
+Kiểu liệt kê cho nhóm món, loại bữa và nguồn dữ liệu.
+FoodImages
+Theme
+Ánh xạ nhóm món trong danh mục sang ảnh minh họa tương ứng trong assets/images/food/.
+3.2.2. Module Chỉ số sức khỏe
+Module Chỉ số sức khỏe được tổ chức theo cùng luồng UI → Repository → Store → Model, trong đó phần xử lý nghiệp vụ được tách thành ba lớp tiện ích thuần (không phụ thuộc Flutter) để dễ kiểm thử độc lập:
+HealthAssessor – tính chỉ số BMI, phân loại chỉ số theo ngưỡng tham chiếu (HealthLevel: normal, caution, alert, unknown) và xác định khoảng bình thường của từng loại chỉ số.
+HealthValidator – kiểm tra dữ liệu nhập: khoảng giá trị hợp lệ, yêu cầu số nguyên, quan hệ giữa huyết áp trên và huyết áp dưới, thời điểm không ở tương lai và độ dài ghi chú.
+HealthAnalyzer – sinh danh sách lời khuyên và cảnh báo (HealthInsight) từ dữ liệu người dùng, gồm nhận xét theo chỉ số (BMI, huyết áp, đường huyết) và nhận xét theo xu hướng (đường huyết tăng dần, cân nặng tăng/giảm nhanh, cân nặng ổn định).
+Lớp
+Tầng
+Trách nhiệm chính
+HealthScreen
+UI
+Màn hình Sức khỏe gồm bốn tab: Tổng quan (thẻ hero, sáu thẻ chỉ số, lời khuyên), Lịch (chấm dữ liệu theo ngày), Chỉ số (biểu đồ xu hướng 7/30/90 ngày) và Lịch sử (sửa, xóa bản ghi).
+WaterScreen
+UI
+Màn hình Nước uống: thêm nhanh, uống một cốc, nhập số khác, chỉnh lại lượng nước và hoàn tác.
+HealthRepository
+State / Repository
+Nạp nhật ký theo người dùng, thêm và cập nhật chỉ số, tự sinh bản ghi BMI đi kèm mỗi lần cân, xóa bản ghi, cung cấp giá trị mới nhất, xu hướng và chuỗi dữ liệu theo khoảng thời gian.
+HealthStore (InMemory)
+Data
+Năm phương thức byUser, insert, update, delete, seedIfEmpty; hiện cài đặt duy nhất là lưu trong bộ nhớ.
+HealthMetric
+Model
+Một lần ghi nhận chỉ số: loại, giá trị, giá trị phụ (huyết áp dưới), thời điểm, ghi chú và chuỗi hiển thị kèm đơn vị.
+HealthAssessor
+Utility
+Công thức BMI, phân loại chỉ số theo ngưỡng, khoảng bình thường tham khảo.
+HealthAnalyzer
+Utility
+Sinh lời khuyên và cảnh báo theo chỉ số và theo xu hướng.
+HealthValidator
+Utility
+Kiểm tra dữ liệu nhập và trả về thông báo lỗi tiếng Việt.
+HealthVisuals / HealthHeroCard
+Widget
+Hình vẽ minh họa chỉ số (Sparkline, SleepBars, EcgLine) và thẻ tổng quan dạng vòng phân đoạn.
+Bảng 7: Trách nhiệm của các lớp trong module Chỉ số sức khỏe
+3.2.3. Module Tập luyện
+Module Tập luyện được tổ chức như trên theo luồng UI → State Management → Repository → Data Source.
+Tầng Model
+ExerciseItem: bài tập trong danh mục, gồm tên bài tập, nhóm cơ chính, nhóm cơ phụ, calo ước tính, dụng cụ hỗ trợ và mô tả hướng dẫn động tác chuẩn.
+CatalogExercise: kế thừa ExerciseItem, bổ sung nguồn dữ liệu (ExerciseSource: local_json, api, custom), cấp độ độ khó (DifficultyLevel: beginner, intermediate, advanced), cờ không dụng cụ, đường dẫn đệm ảnh GIF/video minh họa và mô tả chi tiết. Do là lớp con nên mọi nơi nhận ExerciseItem vẫn sử dụng được.
+WorkoutLogEntry: một bài tập hoặc buổi tập người dùng đã ghi nhận. Phương thức khởi tạo fromExercise tính lượng calo đốt cháy thực tế dựa trên chỉ số KCAL, thời gian/số rep thực hiện và cân nặng hiện tại của người dùng (theo công thức chuẩn ACSM); nếu người dùng tự điều chỉnh thời gian hoặc mức tạ thì calo tiêu hao được tính toán lại tương ứng. Phương thức copyWith tạo bản sao có đổi một vài trường, dùng khi tập lại buổi trước.
+WorkoutSummary: tổng hợp vận động của một ngày, cung cấp tổng calo đốt cháy, tổng thời gian tập (phút), số bài tập hoàn thành, tiến độ mục tiêu hàng tuần (giới hạn trong khoảng 0–1 để thanh tiến trình không tràn khi vượt mục tiêu) và phân bổ thời gian/calo theo từng nhóm cơ (Ngực, Bụng, Cánh tay, Cẳng tay) phục vụ biểu đồ.
+ConfiguredExercise: một bài tập kèm thông số thiết lập (số hiệp/sets, số lần/reps hoặc thời gian/giây, thời gian nghỉ/rest_time), dùng cho danh sách bài tập trong lộ trình và bài tập tùy chỉnh; tính sẵn lượng calo ước tính.
+WorkoutPlan: chương trình/gói tập luyện lưu sẵn hoặc tự tạo của một người dùng, gồm tên gói, cấp độ, mục tiêu và danh sách ConfiguredExercise; cung cấp tổng thời gian, tổng calo ước tính và dòng mô tả dạng "Bụng Người bắt đầu (16 phút • 10 bài tập)".
+DayWorkoutMetrics: tổng calo đốt cháy và số phút tập luyện của một ngày, dùng cho biểu đồ nhiều ngày ở tab Báo cáo (Thống kê).
+DayWeight: lịch sử cân nặng (kg) và chuỗi ngày tập liên tiếp (Streak) của người dùng, dùng cho biểu đồ theo dõi cân nặng (Hiện tại, Nặng nhất, Nhẹ nhất) và nhật ký điểm danh ở tab Báo cáo.
+ExerciseCategory, MuscleGroup, ExerciseSource, DifficultyLevel: các kiểu liệt kê (enum) cho loại bài tập, nhóm cơ tác động, nguồn dữ liệu và cấp độ luyện tập.
+Hình 6: : Class Diagram – tầng Model của module Dinh dưỡng
+Tầng Repository và Nguồn dữ liệu
+WorkoutRepository (kế thừa ChangeNotifier) là điểm truy cập duy nhất của giao diện đối với dữ liệu tập luyện. Lớp này nạp danh mục bài tập, nạp gói tập mẫu và gói tự tạo, nạp nhật ký theo ngày, tìm kiếm bài tập (không phân biệt dấu tiếng Việt), ghi nhận buổi tập, sửa hoặc xóa bài tập trong chương trình, quản lý chương trình tùy chỉnh, tập lại buổi trước, ghi nhận cân nặng và chuỗi ngày liên tiếp (Streak), tính WorkoutSummary và thông báo cho giao diện mỗi khi dữ liệu thay đổi (notifyListeners) để các màn hình đang lắng nghe (tab Tổng quan, Tùy chỉnh bài tập và Báo cáo) tự cập nhật.
+Việc lưu trữ được tách qua giao diện WorkoutStore với hai cài đặt: InMemoryWorkoutStore (dữ liệu trong bộ nhớ, dùng cho kiểm thử) và PrefsWorkoutStore (lưu bền vững bằng shared_preferences hoặc SQLite với các khóa hf_workouts_v1, hf_plans_v1, hf_weight_v1). Hai nguồn danh mục bài tập được đóng gói riêng: LocalExerciseSource đọc tệp JSON bài tập tại nhà (home_exercises.json) và lưu đệm kết quả; ExerciseApiService gọi API bên ngoài (ExerciseDB / WGER) để lấy bài tập mở rộng và ảnh GIF minh họa.
+Hình 7: Class Diagram – tầng Repository và nguồn dữ liệu của module Tập luyện
+3.3. Sequence Diagram
+Phần này trình bày biểu đồ tuần tự của bốn luồng nghiệp vụ chính: xác thực tài khoản, ghi nhận chỉ số sức khỏe, hoàn thành buổi tập và quản lý bữa ăn. Ba luồng đầu thuộc các module Tài khoản, Chỉ số sức khỏe và Tập luyện; luồng thứ tư được trình bày chi tiết theo ba nhánh tìm kiếm, ghi nhận và xóa món.
+3.3.1. Sequence – Đăng nhập và Đăng ký tài khoản
+Luồng đăng nhập. Người dùng nhập email và mật khẩu trên màn hình đăng nhập; giao diện kiểm tra nhanh định dạng dữ liệu nhập rồi gọi phương thức login của AuthRepository. Repository thực hiện kiểm tra nghiệp vụ lần thứ hai trước khi truy vấn kho tài khoản.
+1.AuthRepository.login() chuẩn hóa email về chữ thường và kiểm tra các trường hợp rỗng, sai định dạng email. Nếu không hợp lệ, repository ném AuthException kèm thông báo tiếng Việt để màn hình hiển thị.
+2.Repository gọi AccountStore.findByEmail() để tìm tài khoản theo email.
+3.Nếu tìm thấy tài khoản, repository so sánh mật khẩu đã băm: giá trị lưu trữ được đối chiếu với kết quả của hàm hashPassword(password, email), trong đó mật khẩu được băm bằng SHA-256 với email làm muối. Trường hợp không tìm thấy tài khoản hoặc sai mật khẩu, hệ thống trả về cùng một thông báo “Email hoặc mật khẩu không đúng.” để không tiết lộ email nào đã tồn tại.
+4.Khi xác thực thành công, repository gán người dùng hiện tại, đọc cờ hoàn thành thiết lập ban đầu của người dùng đó từ bộ nhớ thiết bị, lưu mã người dùng vào khóa logged_in_user_id rồi gọi notifyListeners().
+5.AuthGate đang lắng nghe repository phát hiện trạng thái đăng nhập đã thay đổi và chuyển màn hình: nếu người dùng chưa hoàn thành thiết lập ban đầu thì mở màn hình thiết lập, ngược lại mở màn hình chính.
+Hình 5: Sequence Diagram – Đăng nhập và đăng ký tài khoản
+Luồng đăng ký. Màn hình đăng ký kiểm tra từng ô nhập bằng bộ kiểm tra của biểu mẫu, sau đó gọi AuthRepository.register(). Repository lần lượt kiểm tra họ tên (không rỗng và tối thiểu 2 ký tự), định dạng email, độ dài mật khẩu tối thiểu 6 ký tự và sự khớp nhau giữa mật khẩu với phần nhập lại. Tiếp theo repository kiểm tra email đã tồn tại hay chưa; nếu chưa, hệ thống tạo đối tượng User với mật khẩu đã băm, gọi AccountStore.insert() và khởi tạo sẵn một số chỉ số sức khỏe mẫu cho người dùng mới. Sau khi đăng ký thành công, giao diện hiển thị hộp thoại thông báo “Đăng ký thành công” và đưa người dùng sang màn hình đăng nhập để thực hiện đăng nhập lần đầu. Người dùng mới sau khi đăng nhập sẽ được đưa vào sáu bước thiết lập ban đầu (chọn giới tính, nhập chiều cao và cân nặng, chọn mục tiêu sức khỏe, chọn mục tiêu calories và xem hướng dẫn sử dụng); dữ liệu của bước thiết lập được lưu vào hồ sơ người dùng và đánh dấu hoàn thành bằng khóa onboarding_complete_<mã người dùng>.
+3.3.2. Sequence – Ghi nhận chỉ số sức khỏe
+Luồng ghi nhận chỉ số sức khỏe bắt đầu từ nút “Thêm chỉ số” trên tab Tổng quan của màn hình Sức khỏe.
+1.Người dùng nhấn nút “Thêm chỉ số”; màn hình mở hộp thoại thêm chỉ số với danh sách loại chỉ số cho phép nhập tay (cân nặng, huyết áp, nhịp tim, đường huyết, giấc ngủ, vận động) – chỉ số BMI không nằm trong danh sách này vì là chỉ số dẫn xuất.
+2.Người dùng chọn loại chỉ số, nhập giá trị, thời điểm đo và ghi chú. Khi chọn loại chỉ số là huyết áp, biểu mẫu hiển thị thêm ô nhập huyết áp dưới.
+3.Khi người dùng nhấn “Lưu”, giao diện chuyển giá trị văn bản thành số bằng hàm HealthValidator.parseNumber() (hàm này chấp nhận cả dấu phẩy thập phân). Nếu giá trị không đọc được thành số, thao tác lưu dừng lại.
+4.Giao diện tạo đối tượng HealthMetric với mã sinh theo thời gian (dạng metric-<loại chỉ số>-<micro giây>) rồi gọi phương thức thêm chỉ số của HealthRepository.
+5.HealthRepository gọi HealthStore.insert() để lưu bản ghi và cập nhật lại danh sách chỉ số đang giữ trong bộ nhớ.
+6.Nếu loại chỉ số vừa lưu là cân nặng, repository tạo thêm bản ghi BMI đi kèm với mã suy ra từ mã lần cân (bmi-<mã lần cân>) rồi lưu bản ghi này; sau đó màn hình đồng bộ lại cân nặng trong hồ sơ cá nhân theo giá trị mới nhất.
+7.Repository thông báo cho giao diện; tab Tổng quan tính lại trạng thái của từng chỉ số bằng HealthAssessor.assess(), tính lại xu hướng bằng HealthRepository.trendOf(), sinh lời khuyên mới bằng HealthAnalyzer.analyze() và vẽ lại biểu đồ ở tab Chỉ số.
+8.Hộp thoại đóng lại; các bản ghi mới xuất hiện trong tab Lịch và tab Lịch sử; âm thanh phản hồi được phát cho thao tác lưu.
+Hình 6: Sequence Diagram – Ghi nhận chỉ số sức khỏe
+3.3.3. Sequence – Hoàn thành buổi tập
+Luồng hoàn thành buổi tập bắt đầu từ nút bắt đầu trên thẻ bài tập ở tab Tổng quan hoặc tab Bài tập của màn hình Tập luyện.
+1.Người dùng nhấn nút bắt đầu của một bài tập; màn hình mở lớp phủ chi tiết bài tập hiển thị thời gian, năng lượng tiêu hao dự kiến và cường độ của bài tập.
+2.Người dùng nhấn nút “Hoàn thành bài tập”. Giao diện chuyển nút sang trạng thái đang xử lý để tránh ghi nhận trùng lặp.
+3.Giao diện lấy người dùng hiện tại từ AuthScope; nếu chưa có người dùng đăng nhập thì thao tác dừng lại.
+4.Giao diện gọi WorkoutRepository.completeWorkout(). Repository tạo đối tượng WorkoutLog từ bài tập đang chọn bằng phương thức fromWorkout, gán mã bản ghi sinh theo thời gian và thời điểm hoàn thành là thời điểm hiện tại.
+5.Repository gọi WorkoutStore.insertLog() để lưu bản ghi, sau đó nạp lại nhật ký của ngày hiện tại và gọi notifyListeners().
+6.Lớp phủ chi tiết đóng lại; màn hình hiển thị thông báo xác nhận dạng “Đã ghi nhận <tên bài tập> · <số phút> phút”.
+7.Thẻ tiến trình cập nhật tổng số phút và năng lượng đã tiêu hao trong ngày, đồng thời tính lại phần trăm hoàn thành mục tiêu 60 phút; tab Lịch sử bổ sung bản ghi vừa hoàn thành. Dashboard đọc cùng nguồn dữ liệu này nên cũng được cập nhật theo.
+Hình 7: Sequence Diagram – Hoàn thành buổi tập
+3.3.4. Sequence – Quản lý bữa ăn
+Module Dinh dưỡng có hai luồng nghiệp vụ chính: tìm kiếm món ăn (Hình 5) và quản lý món trong bữa ăn, gồm ghi nhận món (Hình 6) và xóa món (Hình 7). Ngoài ra module còn có luồng ghi nhận lượng nước uống được trình bày ở cuối mục này.
+Luồng 1 – Tìm kiếm món ăn
+1.Khi người dùng nhập từ khóa, giao diện gọi phương thức search của NutritionRepository để lọc ngay danh mục cục bộ (món Việt từ tệp dữ liệu và món ngoại tuyến). Từ khóa được bỏ dấu tiếng Việt nên người dùng có thể gõ “pho bo” để tìm “Phở Bò”.
+2.Sau 500 ms kể từ lần gõ cuối (cơ chế debounce), nếu nguồn đang chọn là “Tất cả” hoặc “Món Tây” (không gọi khi chọn “Món Việt” hoặc “Đồ uống”) và từ khóa có từ 2 ký tự trở lên, giao diện gọi phương thức tra cứu trực tuyến searchUsda.
+3.UsdaFoodService dịch từ khóa sang tiếng Anh, kiểm tra bộ nhớ đệm theo từ khóa rồi gửi yêu cầu HTTPS đến USDA FoodData Central nếu chưa có kết quả lưu đệm.
+4.Kết quả JSON được phân tích thành các đối tượng CatalogFood với giá trị dinh dưỡng tính trên 100 g và trả về giao diện. Nếu từ khóa đã thay đổi trong lúc chờ phản hồi, kết quả cũ bị bỏ qua.
+5.Khi gặp lỗi (quá thời gian chờ, mất mạng, hết lượt gọi, khóa API không hợp lệ), UsdaFoodService ném UsdaException và giao diện hiển thị thông báo lỗi, vẫn giữ kết quả tìm kiếm cục bộ.
+Hình 8: Sequence Diagram – Tìm kiếm món ăn
+Luồng 2 – Ghi nhận món vào bữa ăn
+1.Sau khi chọn món, người dùng chọn loại bữa, khẩu phần, ngày ăn và có thể tự nhập số calo. Giao diện xem trước calo và các chất theo khẩu phần đã chọn.
+2.Khi nhấn “Lưu”, giao diện gọi phương thức addFood; NutritionRepository tạo MealEntry bằng hàm fromFood (nhân khẩu phần, co giãn các chất nếu người dùng tự nhập calo) và gọi insertEntry để lưu xuống NutritionStore (ghi JSON vào bộ nhớ thiết bị).
+3.Repository nạp lại nhật ký của ngày đang xem, tính lại NutritionSummary bằng cách cộng dồn calo, Protein, Carbohydrate và chất béo, sau đó gọi notifyListeners.
+4.Tab Hôm nay và Dashboard tự cập nhật; giao diện hiển thị thông báo xác nhận cho người dùng.
+5.Khi thêm nhiều món một lúc (giỏ món, combo hoặc chức năng “Ăn lại” bữa hôm trước), giao diện gọi commitCart, addCombo hoặc repeatPreviousDay; các hàm này gọi addFoods để ghi từng món bằng insertEntry rồi nạp lại nhật ký và tính tổng hợp một lần.
+Hình 9: Sequence Diagram – Ghi nhận món vào bữa ăn
+Luồng 3 – Xóa món khỏi bữa ăn
+1.Khi người dùng chọn một món đã ghi và xác nhận xóa, Repository cập nhật ngay danh sách và tổng hợp của ngày đang xem để dòng dữ liệu biến mất tức thì.
+2.Repository gọi deleteEntry để loại bản ghi khỏi NutritionStore và nạp lại nhật ký của ngày.
+3.Nếu người dùng nhấn “Hoàn tác”, hàm restoreEntry ghi lại bản ghi vừa xóa và tính lại tổng hợp của ngày.
+4.Nhờ cơ chế lắng nghe của ChangeNotifier, các màn hình liên quan tự vẽ lại mà không cần thao tác làm mới thủ công.
+Hình 10: Sequence Diagram – Xóa món khỏi bữa ăn
+Luồng 4 – Ghi nhận lượng nước uống
+1.Người dùng chọn một mức thêm nhanh (+250 ml, +500 ml, +1 lít), bấm “Uống 1 cốc nước” hoặc nhập số khác trong màn hình Nước uống.
+2.Giao diện gọi NutritionRepository.addWater() với lượng nước tương ứng. Repository cộng lượng nước vào tổng của ngày đang xem, giới hạn tổng trong khoảng 0–10.000 ml, ghi lại phần chênh lệch vào danh sách tạm trong bộ nhớ để phục vụ hoàn tác và lưu tổng mới xuống NutritionStore (khóa hf_water_v1).
+3.Nếu món đồ uống được ghi nhận trong nhật ký ăn uống, lượng nước của món được cộng vào cùng tổng ngày nhưng không đi vào danh sách hoàn tác của nút uống nước.
+4.Giao diện hiển thị thông báo dạng “Đã thêm <số> ml nước” kèm nút “Hoàn tác”; nếu người dùng nhấn “Hoàn tác”, hàm undoWater() trừ lại đúng lượng vừa cộng và trả về giá trị đã trừ.
+5.Mục tiêu nước của ngày được tính từ cân nặng người dùng theo công thức làm tròn 100 ml của tích cân nặng với 33 ml/kg, giới hạn trong khoảng 1.500–4.000 ml; thanh tiến trình và nền nước động cập nhật theo tỉ lệ đã uống trên mục tiêu.
+Hình: Sequence Diagram – Ghi nhận lượng nước uống
+3.4. Deployment Diagram
+Sơ đồ triển khai (Hình 8) mô tả cách HealthFlow được cài đặt và vận hành trên thực tế. Hệ thống gồm hai nút: thiết bị di động của người dùng và dịch vụ đám mây USDA FoodData Central. Ứng dụng không có máy chủ riêng; toàn bộ xử lý nghiệp vụ nằm trên thiết bị, chỉ yêu cầu tra cứu món quốc tế được gửi ra ngoài.
+Hình 11: Deployment Diagram – Triển khai ứng dụng HealthFlow
+Nút 1 – Thiết bị di động (Android/iOS)
+Ứng dụng được viết bằng Flutter/Dart và đóng gói thành một ứng dụng duy nhất chạy hoàn toàn trên thiết bị. Trên nút này có ba nơi chứa dữ liệu với vai trò khác nhau:
+Tài nguyên đóng gói sẵn (assets/data/vn_foods.json và assets/data/ingredients.json): danh mục 199 món Việt và 30 nguyên liệu, được nạp bằng rootBundle nên dùng được khi không có mạng.
+Bộ nhớ thiết bị (shared_preferences): lưu bền vững dữ liệu dinh dưỡng của người dùng thông qua PrefsNutritionStore, gồm nhật ký ăn uống (khóa hf_meals_v1), combo bữa ăn (hf_combos_v1), lượng nước uống (hf_water_v1) và dung tích cốc nước (hf_water_cup_v1), đều ở dạng JSON. Bộ nhớ này cũng lưu mã người dùng đang đăng nhập (logged_in_user_id), cờ hoàn thành thiết lập ban đầu và thiết lập bật/tắt âm thanh (sound_enabled).
+Bộ nhớ tạm trong tiến trình (InMemoryAccountStore, InMemoryHealthStore, InMemoryWorkoutStore): chứa tài khoản, chỉ số sức khỏe, buổi tập và danh mục món mẫu ngoại tuyến trong phiên chạy; dữ liệu này được khởi tạo lại khi ứng dụng được mở lại (danh mục món mẫu được nạp lại mỗi lần chạy).
+Nút 2 – USDA FoodData Central (api.nal.usda.gov)
+Đây là dịch vụ bên ngoài. UsdaFoodService gửi yêu cầu HTTPS GET đến đường dẫn /fdc/v1/foods/search bằng gói http (thời gian chờ 12 giây) để tra cứu món quốc tế; ứng dụng chỉ khai báo quyền INTERNET trên Android. Khi mất mạng hoặc API trả lỗi, ứng dụng hiển thị thông báo và vẫn giữ kết quả từ danh mục cục bộ.
+CHƯƠNG 4: THIẾT KẾ GIAO DIỆN NGƯỜI DÙNG (UI/UX)
+Chương này trình bày sơ đồ điều hướng của ứng dụng, danh sách các màn hình đã triển khai và kết quả giao diện thực tế theo từng nhóm chức năng. Các mô tả dưới đây dựa trên mã nguồn của ứng dụng: tên tab, nhãn, thông báo và bố cục được ghi lại đúng như đã cài đặt. Những vị trí cần bổ sung ảnh chụp màn hình được đánh dấu bằng khung giữ chỗ kèm chú thích.
+4.1. Sơ đồ điều hướng (Navigation Flow)
+Ứng dụng không sử dụng bảng tuyến (named routes) mà điều hướng trực tiếp bằng Navigator.push với MaterialPageRoute. Điểm vào của toàn bộ ứng dụng là widget AuthGate trong tệp main.dart: widget này lắng nghe AuthRepository và quyết định màn hình hiển thị theo ba trạng thái – đang khôi phục phiên đăng nhập, chưa đăng nhập và đã đăng nhập.
+Hình 12: Sơ đồ điều hướng (Navigation Flow) của ứng dụng
+Luồng điều hướng chính của ứng dụng được mô tả như sau:
+1.Khi khởi động, AuthGate hiển thị vòng xoay chờ trong lúc AuthRepository đọc mã người dùng đã lưu trong bộ nhớ thiết bị.
+2.Nếu chưa đăng nhập, ứng dụng mở màn hình chào mừng. Từ đây người dùng có thể mở màn hình đăng nhập hoặc màn hình đăng ký.
+3.Sau khi đăng nhập thành công, AuthGate tự chuyển màn hình: người dùng chưa hoàn thành thiết lập ban đầu được đưa vào sáu bước thiết lập, người dùng đã hoàn thành được đưa thẳng vào màn hình chính. Nhờ cơ chế này, các màn hình đăng nhập và đăng ký không cần tự điều hướng sau khi thành công.
+4.Màn hình chính chứa năm tab theo thứ tự Trang chủ, Sức khỏe, Tập luyện, Dinh dưỡng và Cài đặt; người dùng có thể chuyển tab bằng cách chạm vào thanh điều hướng hoặc vuốt ngang. Các lối vào nhanh trên Dashboard cũng có thể đổi tab, ví dụ chạm vào thẻ năng lượng sẽ mở tab Dinh dưỡng.
+5.Từ tab Cài đặt, người dùng mở được màn hình hồ sơ cá nhân và màn hình mục tiêu sức khỏe; hai màn hình này được mở dưới dạng trang đẩy lên (push) nên vẫn giữ nguyên trạng thái của các tab phía dưới.
+6.Màn hình Nước uống được mở từ module Dinh dưỡng và quay lại bằng nút mũi tên trên thanh tiêu đề.
+7.Khi người dùng nhấn nút quay lại ở màn hình chính, ứng dụng hiển thị hộp thoại xác nhận “Thoát ứng dụng” với hai lựa chọn “Không” và “Có” thay vì thoát ngay.
+Bảng 9 liệt kê toàn bộ màn hình đã triển khai trong phiên bản hiện tại kèm tệp mã nguồn tương ứng.
+Bảng 9: Danh sách các màn hình của ứng dụng
+STT
+Màn hình
+Chức năng chính
+Tệp mã nguồn
+1
+WelcomeScreen
+Chào mừng, giới thiệu bốn điểm nổi bật của ứng dụng
+welcome_screen.dart
+2
+LoginScreen
+Đăng nhập, điền sẵn tài khoản dùng thử, liên kết sang đăng ký
+login_screen.dart
+3
+RegisterScreen
+Đăng ký tài khoản mới kèm điều khoản sử dụng
+register_screen.dart
+4
+OnboardingScreen
+Thiết lập ban đầu sáu bước cho người dùng mới
+onboarding_screen.dart
+5
+MainScreen + AppBottomNav
+Khung chính gồm năm tab và thanh điều hướng dưới cùng
+main_screen.dart, app_bottom_nav.dart
+6
+HomeScreen (Dashboard)
+Lời chào, thẻ năng lượng, hoạt động trong ngày, chỉ số sức khỏe, thói quen hôm nay, lối vào nhanh và mẹo trong ngày
+home_screen.dart
+7
+HealthScreen
+Bốn tab Tổng quan, Lịch, Chỉ số, Lịch sử
+health_screen.dart
+8
+WaterScreen
+Ghi nhận và chỉnh lại lượng nước uống trong ngày
+water_screen.dart
+9
+WorkoutScreen
+Ba tab Tổng quan, Bài tập, Lịch sử
+workout_screen.dart
+10
+NutritionScreen
+Ba tab Hôm nay, Thực đơn, Thống kê
+nutrition_screen.dart
+11
+AddFoodScreen
+Tìm kiếm món ăn, chọn khẩu phần, giỏ món và combo
+add_food_screen.dart
+12
+SettingsScreen
+Cài đặt ứng dụng, âm thanh, thông báo, đăng xuất
+settings_screen.dart
+13
+ProfileDetailScreen
+Xem và cập nhật thông tin hồ sơ cá nhân
+profile_detail_screen.dart
+14
+HealthGoalScreen
+Cập nhật mục tiêu sức khỏe và mục tiêu năng lượng
+health_goal_screen.dart
+Ứng dụng được thiết kế theo phong cách Material Design 3 với bảng màu xanh lá chủ đạo: màu chính #23865B, màu chính đậm #176B46, nền ứng dụng #F5F8F6, màu chữ chính #1D2B24 và màu chữ phụ #77847C. Bộ màu phụ gồm xanh dương #5C9ED6, cam #EAA54B, hồng #E77D98 và tím #8E7CC3 được dùng để phân biệt các nhóm chỉ số. Toàn bộ ứng dụng dùng một họ font duy nhất là Be Vietnam Pro với bốn độ đậm 400, 500, 600 và 700 nhằm hiển thị dấu tiếng Việt cân đối.
+4.2. Kết quả giao diện đã triển khai
+Phần này trình bày kết quả giao diện theo trình tự sử dụng của người dùng: từ màn hình chào mừng, đăng nhập, thiết lập ban đầu, trang chủ, theo dõi sức khỏe, tập luyện cho đến quản lý bữa ăn.
+4.2.1. Giao diện chào mừng, đăng ký và đăng nhập
+Màn hình chào mừng. Đây là màn hình đầu tiên người dùng nhìn thấy khi chưa đăng nhập. Màn hình gồm một vòng tròn ảnh minh họa lớn (đường kính bằng 75% chiều rộng màn hình) và bốn trang nội dung có thể vuốt ngang, mỗi trang giới thiệu một nhóm chức năng:
+Thấu Hiểu Cơ Thể – Theo dõi chỉ số sức khoẻ mỗi ngày.
+Bứt Phá Giới Hạn – Thiết lập mục tiêu, theo dõi tiến độ vận động.
+Quản lý ăn uống – Thiết kế thực đơn khoa học chỉ với vài cú chạm.
+Chào mừng đến với HealthFlow – Trợ lý chăm sóc sức khỏe toàn diện nằm gọn trong túi bạn!
+Phía dưới cùng là hai nút “ĐĂNG NHẬP” và “ĐĂNG KÝ” cùng bốn dấu chấm chỉ báo trang đang xem. Màn hình cũng hiển thị đoạn ghi chú về điều khoản sử dụng và chính sách bảo mật.
+Hình 13: Giao diện chào mừng và giới thiệu ứng dụng
+Màn hình đăng nhập. Màn hình gồm logo ứng dụng, tiêu đề “Đăng nhập”, hai ô nhập email và mật khẩu, ô chọn “Ghi nhớ đăng nhập” (mặc định được bật), liên kết “Quên mật khẩu?”, nút “Đăng nhập”, khối “Tài khoản dùng thử” và hai nút đăng nhập bằng Google, Apple. Khối tài khoản dùng thử hiển thị sẵn thông tin đăng nhập mẫu và cho phép điền tự động vào biểu mẫu. Biểu mẫu kiểm tra dữ liệu hai lớp: lớp giao diện báo “Vui lòng nhập email.”, “Email không hợp lệ.”, “Vui lòng nhập mật khẩu.” và “Mật khẩu cần ít nhất 6 ký tự.”; lớp nghiệp vụ trong AuthRepository kiểm tra lại và hiển thị thông báo dạng “Email hoặc mật khẩu không đúng.” ngay trên biểu mẫu.
+Hình 14: Giao diện đăng ký và đăng nhập
+Màn hình đăng ký. Màn hình gồm các ô họ và tên, email, mật khẩu, nhập lại mật khẩu, ô đánh dấu đồng ý điều khoản sử dụng và nút “Đăng ký”. Sau khi đăng ký thành công, ứng dụng hiển thị hộp thoại “Đăng ký thành công” với nút “Đăng nhập ngay” và đưa người dùng sang màn hình đăng nhập để thực hiện đăng nhập lần đầu; người dùng mới sau đó được dẫn qua sáu bước thiết lập ban đầu. Mật khẩu của người dùng được băm bằng thuật toán SHA-256 với email làm muối trước khi lưu, không lưu mật khẩu ở dạng văn bản thuần.
+4.2.2. Giao diện thiết lập ban đầu và trang chủ
+Sáu bước thiết lập ban đầu. Người dùng mới sau khi đăng nhập lần đầu được đưa qua sáu bước để cá nhân hóa dữ liệu. Mỗi bước có thanh tiến trình ở trên cùng và một nút hành động ở dưới cùng.
+Bước 1 – Chọn giới tính: hai lựa chọn “Nam” và “Nữ” dạng ảnh tròn; hình được chọn sẽ phóng to nhẹ và có viền xanh.
+Bước 2 – Thông số cơ thể: nhập chiều cao (cm) và cân nặng (kg). Ngay khi cả hai giá trị hợp lệ, màn hình hiển thị dòng xem trước dạng “BMI: 20.5 — Bình thường” với nhãn được tô màu theo mức: Thiếu cân (xanh dương), Bình thường (xanh lá), Thừa cân (cam) và Béo phì (đỏ).
+Bước 3 – Mục tiêu của bạn: năm lựa chọn gồm Giảm cân, Giữ dáng, Tăng cơ, Tăng cân và Sống khỏe; mục đang chọn có viền xanh và dấu tích.
+Bước 4 – Mục tiêu calo: nhập mức năng lượng mục tiêu mỗi ngày kèm ba gợi ý tham khảo là 1500 kcal (Giảm cân), 2000 kcal (Giữ cân) và 2500 kcal (Tăng cân).
+Bước 5 – Xác nhận hoàn tất: màn hình chúc mừng “Tuyệt vời!” và thông báo hồ sơ đã sẵn sàng.
+Bước 6 – Hướng dẫn sử dụng: giới thiệu cách theo dõi chỉ số và hoàn thành mục tiêu; nút “Tôi đã hiểu” là bước cuối và cũng là bước lưu dữ liệu thiết lập vào hồ sơ người dùng.
+Hình 15: Giao diện thiết lập ban đầu (onboarding) và mục tiêu sức khỏe
+Trang chủ (Dashboard). Trang chủ là màn hình tổng hợp, được tổ chức thành các khối theo chiều dọc:
+Khối lời chào: nền chuyển sắc xanh, hiển thị ngày tháng theo tiếng Việt, lời chào kèm họ tên người dùng, ảnh đại diện và nút thông báo.
+Thẻ năng lượng: vòng tròn tiến trình thể hiện lượng calories đã nạp trên mục tiêu trong ngày; chạm vào thẻ sẽ mở tab Dinh dưỡng.
+Thẻ hoạt động: tổng số phút tập luyện trong ngày, phần trăm hoàn thành mục tiêu 60 phút và năng lượng đã tiêu hao; chạm vào thẻ sẽ mở tab Tập luyện.
+Mục “Chỉ số sức khỏe” kèm liên kết “Xem tất cả”: hiển thị các chỉ số gần nhất và chỉ số BMI; chạm vào “Xem tất cả” sẽ mở tab Sức khỏe.
+Mục “Thói quen hôm nay” kèm liên kết “Dinh dưỡng”: tóm tắt các bữa ăn đã ghi nhận trong ngày.
+Khối lối vào nhanh: các nút chuyển nhanh đến bốn module chính của ứng dụng.
+Thẻ mẹo trong ngày ở cuối trang.
+Hình 16: Giao diện trang chủ (Dashboard)
+Màn hình cài đặt, hồ sơ và mục tiêu. Tab Cài đặt tập hợp các thiết lập của ứng dụng: bật/tắt âm thanh phản hồi, bật/tắt thông báo nhắc nhở sức khỏe, xem và cập nhật hồ sơ cá nhân, cập nhật mục tiêu sức khỏe và mục tiêu năng lượng, đăng xuất khỏi tài khoản. Hai màn hình hồ sơ và mục tiêu sức khỏe được mở từ đây.
+Màn hình hồ sơ cá nhân: cho phép sửa họ tên, giới tính, chiều cao, cân nặng, ảnh đại diện; email chỉ được xem, không sửa vì đây là tên đăng nhập. Khi người dùng thay đổi cân nặng, hệ thống tự ghi thêm một bản ghi cân nặng mới vào nhật ký chỉ số sức khỏe.
+Màn hình mục tiêu sức khỏe: chọn mục tiêu sức khỏe và nhập mục tiêu năng lượng mỗi ngày. Chiều cao hợp lệ trong khoảng 50–250 cm; cân nặng 10–300 kg; mục tiêu năng lượng 500–8000 kcal mỗi ngày. Nếu dữ liệu nằm ngoài khoảng, ứng dụng hiển thị thông báo lỗi tương ứng ngay dưới ô nhập.
+Khi người dùng rời màn hình hồ sơ hoặc màn hình mục tiêu mà chưa lưu, ứng dụng hiển thị hộp thoại cảnh báo thay đổi chưa được lưu.
+Hình 17: Giao diện cài đặt và hồ sơ cá nhân
+4.2.3. Giao diện theo dõi chỉ số sức khoẻ
+Màn hình Sức khỏe gồm bốn tab: Tổng quan, Lịch, Chỉ số và Lịch sử; mỗi tab có một ảnh nền riêng. Trong lúc dữ liệu đang được nạp, màn hình hiển thị khung xương (skeleton) thay cho nội dung.
+Tab Tổng quan. Đầu tab là thẻ tổng quan dạng vòng phân đoạn thể hiện tỉ lệ các chỉ số đang ở mức ổn, mức lưu ý và mức cảnh báo; thẻ này không phải là “điểm sức khỏe” mà chỉ phản ánh số lượng chỉ số theo từng mức. Tiếp theo là sáu thẻ chỉ số: Cân nặng, BMI, Huyết áp, Nhịp tim, Đường huyết và Giấc ngủ. Mỗi thẻ hiển thị giá trị mới nhất kèm trạng thái phân loại, một hình vẽ nhỏ (đường xu hướng, cột giấc ngủ hoặc đường nhịp tim cách điệu) và viền màu theo mức đánh giá. Chỉ số có mức cảnh báo cao nhất được đưa ra thành một thẻ rộng để người dùng chú ý trước. Cuối tab là mục “Lời khuyên & Cảnh báo Sức khỏe” gồm các thẻ nhận xét do HealthAnalyzer sinh ra, ví dụ “Cảnh báo Béo phì (BMI: 27.4)”, “Cân nặng TĂNG NHANH (+1.2 kg / 14 ngày)” hay “Đường huyết đang tăng dần (+18 mg/dL qua 3 lần đo)”.
+(Chèn hình 20: Ảnh chụp tab Tổng quan của màn hình Sức khỏe)
+Hình 18: Giao diện theo dõi chỉ số sức khỏe
+Tab Lịch. Tab này hiển thị lịch tháng với tiêu đề dạng “Tháng 3 2026”, hàng thứ trong tuần là “Th 2” đến “CN” và các ô ngày có chấm nhỏ báo hiệu ngày đó đã có dữ liệu. Khi chọn một ngày, màn hình hiển thị tiêu đề “Ghi nhận ngày d/M/yyyy” và danh sách các chỉ số đã nhập trong ngày; nếu ngày đó chưa có dữ liệu, ứng dụng hiển thị dòng “Không có chỉ số sức khỏe nào được ghi nhận trong ngày này.”
+Tab Chỉ số. Tab này vẽ biểu đồ xu hướng của một loại chỉ số theo thời gian. Người dùng chọn loại chỉ số bằng dãy chip (bảy loại, bao gồm cả BMI và Vận động) và chọn khoảng thời gian “7 ngày”, “30 ngày” hoặc “90 ngày”. Biểu đồ được vẽ trực tiếp bằng CustomPaint: trục tung là giá trị kèm bốn đường lưới, trục hoành chia theo thời gian thực của các lần đo; vùng nền xanh thể hiện khoảng bình thường tham khảo của chỉ số, riêng huyết áp có thêm hai vạch ngưỡng 120 và 80 và hai đường riêng cho tâm thu, tâm trương. Phía dưới biểu đồ là ba ô thống kê “Thấp nhất”, “Trung bình”, “Cao nhất” và khung thông tin giải thích ý nghĩa vùng xanh.
+Tab Lịch sử. Tab này liệt kê toàn bộ các lần ghi nhận theo thứ tự mới nhất trước, mỗi dòng có biểu tượng theo loại chỉ số, thời điểm ghi (dạng “Hôm nay, 08:30” hoặc “12/03/2026, 08:30”), ghi chú và hai nút sửa, xóa. Hộp thoại xóa hỏi lại bằng câu “Bạn có chắc muốn xóa \"<tên chỉ số>: <giá trị>\" không?”. Nút “Thêm chỉ số” ở cuối danh sách mở hộp thoại nhập chỉ số mới với các trường Loại chỉ số, Giá trị, Thời điểm đo và Ghi chú; khi chọn loại chỉ số là huyết áp, biểu mẫu hiển thị thêm ô “Huyết áp dưới”.
+(Chèn hình 21: Ảnh chụp hộp thoại nhập chỉ số và biểu đồ xu hướng)
+Hình 19: Giao diện nhập chỉ số và biểu đồ xu hướng
+Màn hình Nước uống. Màn hình có nền nước động với ba lớp sóng và bong bóng chuyển động theo tỉ lệ nước đã uống. Thẻ tiến trình hiển thị lượng nước đã uống trên mục tiêu theo đơn vị lít, ví dụ “1,25 / 1,8 L”, kèm dòng trạng thái “Còn thiếu 0,55 L để đạt mục tiêu.” hoặc “Đã đạt mục tiêu nước hôm nay. Giữ nhịp này nhé!”. Người dùng có bốn cách ghi nhận: ba nút thêm nhanh “+250 ml”, “+500 ml”, “+1 lít”; nút “Uống 1 cốc nước” với dung tích cốc có thể chỉnh trong khoảng 50–2000 ml; ô “Nhập số khác” cho phép nhập theo ml hoặc lít; và danh sách “Từ đồ uống đã ghi” liệt kê lượng nước cộng thêm từ các đồ uống trong nhật ký ăn uống. Sau mỗi lần thêm, ứng dụng hiển thị thông báo “Đã thêm <số> ml nước” kèm nút “Hoàn tác”. Mục tiêu nước mỗi ngày được tính từ cân nặng người dùng theo công thức 33 ml cho mỗi kg, làm tròn 100 ml và giới hạn trong khoảng 1.500–4.000 ml.
+(Chèn hình 22: Ảnh chụp màn hình Nước uống)
+Hình 20: Giao diện theo dõi lượng nước uống
+4.2.4. Giao diện các bài tập thể chất
+Màn hình Tập luyện gồm ba tab: Tổng quan, Bài tập và Lịch sử.
+Tab Tổng quan mở đầu bằng thẻ tiến trình: số phút đã tập trong ngày, dòng “Mục tiêu 60 phút”, chip hiển thị năng lượng đã đốt dạng “<n> kcal đã đốt” và vòng tròn tiến trình kèm phần trăm hoàn thành. Bên dưới là mục “Bài tập gợi ý” hiển thị ba bài tập đầu tiên trong danh mục kèm nhãn “Hôm nay”.
+Mỗi bài tập trong danh mục được hiển thị dưới dạng thẻ gồm tên bài tập, dòng phụ “<số> phút · <nhóm bài tập>”, nhãn “Cường độ Nhẹ/Vừa/Cao” và nút bắt đầu. Nhãn trợ giúp của nút bắt đầu có dạng “Bắt đầu <tên bài tập>”.
+Tab Bài tập nhóm danh mục theo nhóm bài tập (Đốt mỡ, Thư giãn, Tăng cơ, Tim mạch) và hiển thị đầy đủ năm bài tập mẫu: Cardio nhẹ (20 phút, 180 kcal, cường độ Nhẹ), Yoga (15 phút, 90 kcal, Nhẹ), Tập sức mạnh (30 phút, 260 kcal, Cao), Đi bộ nhanh (25 phút, 150 kcal, Vừa) và Giãn cơ toàn thân (10 phút, 60 kcal, Nhẹ).
+Khi người dùng chọn một bài tập, ứng dụng mở lớp phủ chi tiết ở đáy màn hình gồm ba ô thông tin “Thời gian”, “Năng lượng”, “Cường độ” và nút “Hoàn thành bài tập”.
+Sau khi xác nhận hoàn thành, ứng dụng hiển thị thông báo dạng “Đã ghi nhận Cardio nhẹ · 20 phút” và cập nhật ngay thẻ tiến trình.
+Tab Lịch sử hiển thị thẻ tổng hợp gồm “Tổng thời gian” và “Năng lượng đốt”, sau đó liệt kê từng buổi tập đã hoàn thành kèm giờ hoàn thành và năng lượng tiêu hao. Nếu chưa có buổi tập nào, ứng dụng hiển thị dòng “Hôm nay bạn chưa hoàn thành buổi tập nào.” kèm gợi ý chọn bài tập ở thẻ “Bài tập”.
+Hình 21: Giao diện module Bài tập thể dục
+Hình 22: Giao diện chi tiết bài tập và ghi nhận hoàn thành
+4.2.5. Giao diện quản lý bữa ăn, món ăn
+Màn hình Dinh dưỡng gồm ba tab: Hôm nay, Thực đơn và Thống kê.
+Tab Hôm nay hiển thị vòng năng lượng của ngày (calories đã nạp trên mục tiêu, số calories còn lại và tỉ lệ năng lượng đến từ Protein, Carbohydrate, chất béo), bốn khối bữa ăn theo thứ tự Bữa sáng, Bữa trưa, Bữa tối và Bữa phụ, thẻ nước uống cho phép chọn nhanh lượng nước, và bộ chọn ngày để xem hoặc ghi nhận bữa ăn của ngày khác.
+Tab Thực đơn là nơi tìm kiếm và chọn món: người dùng có thể lọc theo nhóm món (Tất cả, Món Việt, Món Tây, Đồ uống), gõ từ khóa không dấu để tìm trong 199 món Việt có sẵn và đồng thời tra cứu món quốc tế từ USDA. Mỗi món hiển thị calo, ba chất dinh dưỡng chính và mô tả khẩu phần chuẩn, kèm ảnh minh họa theo nhóm món.
+Khi chọn một món, người dùng chọn loại bữa, chọn khẩu phần (ví dụ 1 phần, 1/2 phần hoặc nhập số gram với nguyên liệu), chọn ngày ăn và có thể tự nhập lại số calories; nếu tự nhập, hệ thống co giãn Protein, Carbohydrate và chất béo theo cùng tỉ lệ để giữ nguyên tỉ lệ các chất của món.
+Người dùng có thể thêm nhiều món vào giỏ món rồi lưu một lần, lưu sẵn các bữa ăn quen thuộc thành combo, hoặc dùng chức năng chép lại toàn bộ bữa ăn của ngày hôm trước.
+Mỗi món đã ghi trong ngày có thể được sửa hoặc xóa; sau khi xóa, ứng dụng hiển thị thông báo kèm nút “Hoàn tác” để khôi phục lại bản ghi.
+Tab Thống kê hiển thị tỉ lệ các nhóm chất, phân bố năng lượng theo bữa và biểu đồ lượng nước uống; người dùng chọn kỳ hạn xem theo Ngày, Tuần (7 ngày) hoặc Tháng (30 ngày).
+(Chèn hình 25: Ảnh chụp màn hình Dinh dưỡng – tab Hôm nay)
+Hình 23: Giao diện module Bữa ăn, Món ăn – tab Hôm nay
+(Chèn hình 26: Ảnh chụp màn hình tìm kiếm và thêm món ăn)
+Hình 24: Giao diện tìm kiếm và thêm món ăn
+(Chèn hình 27: Ảnh chụp màn hình Thống kê dinh dưỡng)
+Hình 25: Giao diện thống kê dinh dưỡng theo Ngày, Tuần, Tháng
+CHƯƠNG 5: CẤU TRÚC VÀ TRIỂN KHAI CHƯƠNG TRÌNH
+5.1. Kiến trúc tổng thể
+HealthFlow được xây dựng theo kiến trúc phân tầng nhằm tách biệt giao diện, trạng thái ứng dụng và truy cập dữ liệu. Cách tổ chức này giúp các thành viên phát triển song song từng module, đồng thời cho phép thay thế nguồn dữ liệu ở giai đoạn sau mà không phải sửa tầng giao diện.
+Hình 26: Kiến trúc phân tầng của ứng dụng HealthFlow
+Bốn tầng của hệ thống và trách nhiệm của từng tầng:
+Tầng giao diện (UI): gồm các màn hình trong thư mục screens và các thành phần dùng chung trong thư mục widgets. Tầng này chỉ hiển thị dữ liệu và chuyển tiếp thao tác của người dùng cho tầng trạng thái, không truy cập trực tiếp vào kho dữ liệu.
+Tầng trạng thái (State Management): gồm bốn lớp ChangeNotifier là AuthRepository, HealthRepository, NutritionRepository và WorkoutRepository, cùng hai lớp kế thừa InheritedNotifier là AuthScope và AppScope. Các repository được khởi tạo một lần duy nhất trong main.dart rồi cung cấp xuống toàn bộ cây widget; nhờ cơ chế lắng nghe của ChangeNotifier, màn hình tự vẽ lại khi dữ liệu thay đổi mà không cần thao tác làm mới thủ công.
+Tầng Repository: chứa toàn bộ nghiệp vụ của từng module: kiểm tra dữ liệu, tính chỉ số BMI, sinh bản ghi BMI đi kèm mỗi lần cân, tính tổng dinh dưỡng trong ngày, tính mục tiêu nước uống, tính tiến độ tập luyện và sinh lời khuyên sức khỏe.
+Tầng dữ liệu (Data Source): gồm hai nhóm. Nhóm thứ nhất là các lớp Store trừu tượng (AccountStore, HealthStore, NutritionStore, WorkoutStore) với cài đặt trong bộ nhớ hoặc trên bộ nhớ thiết bị; nhóm thứ hai là các nguồn dữ liệu bên ngoài gồm tệp JSON đóng gói sẵn trong ứng dụng (vn_foods.json, ingredients.json) và dịch vụ USDA FoodData Central.
+Trong phiên bản hiện tại, dữ liệu dinh dưỡng và lượng nước uống đã được lưu bền vững trên thiết bị; dữ liệu tài khoản, chỉ số sức khỏe và nhật ký tập luyện được giữ trong bộ nhớ của tiến trình. Vì các lớp Store đều là lớp trừu tượng, việc chuyển sang lưu trữ bằng Sqflite chỉ cần bổ sung một lớp cài đặt mới và truyền vào repository tương ứng.
+5.2. Cấu trúc thư mục project
+Mã nguồn của dự án được tổ chức theo trách nhiệm của từng lớp. Thư mục lib gồm 57 tệp Dart được chia thành bảy thư mục con và tệp main.dart ở gốc; thư mục assets gồm 65 tệp tài nguyên.
+Hình 27: Cấu trúc thư mục mã nguồn dự án
+Bảng 10: Cấu trúc thư mục mã nguồn dự án
+healthcare/
+├── lib/
+│   ├── main.dart                  # Điểm vào, khởi tạo repository, AuthGate
+│   ├── data/                      # Tầng dữ liệu: store, repository, scope
+│   │   ├── account_store.dart         # Giao diện + cài đặt lưu tài khoản
+│   │   ├── auth_repository.dart       # Đăng ký, đăng nhập, hồ sơ, phiên
+│   │   ├── auth_scope.dart            # Cung cấp AuthRepository cho cây widget
+│   │   ├── app_scope.dart             # Cung cấp các repository còn lại
+│   │   ├── health_store.dart          # Lưu chỉ số sức khỏe (trong bộ nhớ)
+│   │   ├── health_repository.dart     # Nghiệp vụ chỉ số sức khỏe, BMI đi kèm
+│   │   ├── nutrition_store.dart       # Giao diện lưu trữ dinh dưỡng
+│   │   ├── prefs_nutrition_store.dart # Cài đặt lưu bằng shared_preferences
+│   │   ├── nutrition_repository.dart  # Tìm kiếm, ghi nhận món, nước uống
+│   │   ├── vietnam_food_source.dart   # Đọc danh mục món Việt từ JSON
+│   │   ├── ingredient_source.dart     # Đọc danh mục nguyên liệu từ JSON
+│   │   ├── usda_food_service.dart     # Gọi API USDA FoodData Central
+│   │   ├── workout_store.dart         # Lưu bài tập và nhật ký tập luyện
+│   │   └── workout_repository.dart    # Nghiệp vụ tập luyện và tiến độ
+│   ├── models/                    # Mô hình dữ liệu
+│   │   ├── user.dart, health_metric.dart, nutrition.dart
+│   │   ├── ingredient.dart, meal_combo.dart, workout.dart
+│   ├── screens/                   # Mười bốn màn hình của ứng dụng
+│   │   ├── welcome_screen.dart, login_screen.dart, register_screen.dart
+│   │   ├── onboarding_screen.dart, main_screen.dart, home_screen.dart
+│   │   ├── health_screen.dart, water_screen.dart, workout_screen.dart
+│   │   ├── nutrition_screen.dart, add_food_screen.dart
+│   │   └── settings_screen.dart, profile_detail_screen.dart,
+│   │       health_goal_screen.dart
+│   ├── services/                  # Dịch vụ nền
+│   │   ├── audio_service.dart         # Âm thanh phản hồi
+│   │   └── notification_service.dart  # Thông báo cục bộ
+│   ├── theme/                     # Giao diện dùng chung
+│   │   ├── app_theme.dart             # Bảng màu, font, theme Material 3
+│   │   └── food_images.dart           # Ánh xạ nhóm món sang ảnh minh họa
+│   ├── utils/                     # Hàm tiện ích, không phụ thuộc giao diện
+│   │   ├── health_assessor.dart       # Công thức BMI, phân loại chỉ số
+│   │   ├── health_analyzer.dart       # Sinh lời khuyên và cảnh báo
+│   │   ├── health_validator.dart      # Kiểm tra dữ liệu nhập
+│   │   ├── series_summary.dart        # Thống kê chuỗi dữ liệu
+│   │   └── sha256.dart                # Cài đặt SHA-256 cho mật khẩu
+│   └── widgets/                   # Thành phần giao diện dùng chung (13 tệp)
+│       ├── app_bottom_nav.dart, app_buttons.dart, app_card.dart
+│       ├── app_text_field.dart, section_title.dart, error_banner.dart
+│       ├── health_hero_card.dart, health_insight_card.dart
+│       ├── health_visuals.dart, health_form_fields.dart
+│       └── screen_backdrop.dart, alert_background_wrapper.dart, fitlife_logo.dart
+├── assets/
+│   ├── data/                      # vn_foods.json (199 món), ingredients.json (30 nguyên liệu)
+│   ├── fonts/                     # Bốn tệp Be Vietnam Pro (400/500/600/700)
+│   ├── images/                    # 54 ảnh: auth (5), core (2), food (29), home (11),
+│   │                              #          welcome (7)
+│   └── sounds/                    # Bốn tệp âm thanh phản hồi
+├── test/                          # Mười tệp kiểm thử tự động, 166 trường hợp
+├── android/, ios/, web/, windows/, linux/, macos/   # Nền tảng đích
+├── pubspec.yaml                   # Khai báo gói phụ thuộc, tài nguyên, font
+└── README.md                      # Giới thiệu dự án
+Cách chia thư mục này giúp mỗi thành viên làm việc độc lập trên module của mình: phần nghiệp vụ nằm trong thư mục data và utils, phần giao diện nằm trong thư mục screens và widgets, còn các mô hình dữ liệu dùng chung nằm trong thư mục models.
+Các gói phụ thuộc của dự án được khai báo trong tệp pubspec.yaml; phiên bản dưới đây là phiên bản thực tế đang dùng trong dự án.
+Bảng 11: Danh sách các gói thư viện sử dụng trong dự án
+STT
+Gói thư viện
+Phiên bản
+Mục đích sử dụng
+Loại
+1
+flutter
+SDK
+Bộ khung phát triển giao diện đa nền tảng
+Bắt buộc
+2
+cupertino_icons
+1.0.9
+Bộ biểu tượng theo phong cách iOS
+Gián tiếp
+3
+http
+1.6.0
+Gửi yêu cầu HTTPS đến dịch vụ dinh dưỡng USDA
+Trực tiếp
+4
+shared_preferences
+2.5.6
+Lưu bền vững dữ liệu nhỏ dạng khóa – giá trị trên thiết bị
+Trực tiếp
+5
+image_picker
+1.2.4
+Chọn ảnh đại diện từ thư viện ảnh của thiết bị
+Trực tiếp
+6
+flutter_local_notifications
+22.3.1
+Hiển thị thông báo cục bộ và xin quyền thông báo
+Trực tiếp
+7
+audioplayers
+6.8.1
+Phát âm thanh phản hồi cho thao tác của người dùng
+Trực tiếp
+8
+flutter_lints
+6.0.0
+Bộ quy tắc kiểm tra chất lượng mã nguồn Dart
+Phát triển
+9
+flutter_launcher_icons
+0.13.1
+Sinh biểu tượng ứng dụng cho Android và iOS
+Phát triển
+10
+flutter_test
+SDK
+Khung kiểm thử tự động của Flutter
+Phát triển
+Ngoài các gói trực tiếp nêu trên, quá trình phân giải phụ thuộc của Flutter còn cài đặt thêm các gói gián tiếp; tổng số gói được ghi nhận trong tệp pubspec.lock là 106.
+5.3. Kết quả deploy và kiểm thử UI/UX
+Kết quả biên dịch và đóng gói. Dự án biên dịch thành công cho nền tảng Android ở chế độ gỡ lỗi; tệp cài đặt sinh ra tại build/app/outputs/flutter-apk/app-debug.apk với dung lượng khoảng 143 MB (dung lượng lớn do bản gỡ lỗi chứa toàn bộ thư viện và tài nguyên chưa được tối ưu; bản phát hành sẽ nhỏ hơn đáng kể). Ứng dụng được đóng gói với tên hiển thị “HealthFlow” và khai báo quyền thông báo trên Android.
+Kiểm thử UI/UX. Nhóm kiểm thử giao diện theo hai cách. Cách thứ nhất là chạy ứng dụng trên thiết bị và trình tự thực hiện lại các luồng nghiệp vụ chính: đăng ký, đăng nhập, thiết lập ban đầu, ghi nhận chỉ số, ghi nhận bữa ăn, ghi nhận buổi tập và theo dõi lượng nước uống. Cách thứ hai là đối chiếu giao diện với các nguyên tắc khả năng sử dụng đã tham khảo ở Chương 1, cụ thể là: trạng thái hệ thống luôn được hiển thị (khung xương khi đang nạp dữ liệu, nút ở trạng thái đang xử lý khi gửi biểu mẫu), mọi hành động quan trọng đều có phản hồi (thông báo xác nhận, âm thanh, rung nhẹ), thao tác xóa đều phải xác nhận và các thao tác có thể hoàn tác đều có nút “Hoàn tác”.
+Kiểm thử tự động. Nhóm xây dựng bộ kiểm thử tự động bằng gói flutter_test cho tầng dữ liệu, các hàm tính toán chỉ số và một số thành phần giao diện. Tổng cộng có 166 trường hợp kiểm thử trong 10 tệp, được tóm tắt trong Bảng 12.
+Bảng 12: Kết quả kiểm thử tự động của dự án
+STT
+Tệp kiểm thử
+Số trường hợp
+Nội dung kiểm thử
+1
+data_layer_test.dart
+43
+Hàm băm SHA-256, băm mật khẩu, đăng nhập, đăng ký, kiểm tra định dạng email, đổi mật khẩu, hồ sơ người dùng, chỉ số sức khỏe, dinh dưỡng, tập luyện, lưu trữ tài khoản
+2
+health_analyzer_test.dart
+33
+Trường hợp không có dữ liệu, BMI khớp với HealthAssessor, chọn đúng BMI của lần cân mới nhất, thiếu chiều cao, huyết áp, đường huyết, xu hướng cân nặng theo thời gian thực
+3
+health_bmi_history_test.dart
+18
+BMI tự ghi theo từng lần cân, bù BMI cho dữ liệu cũ, BMI trong giao diện và biểu đồ
+4
+health_assessor_test.dart
+14
+Ngưỡng BMI chuẩn Châu Á, huyết áp theo AHA/AMA, nhịp tim – đường huyết – giấc ngủ, hàm assess theo bản ghi
+5
+health_validator_test.dart
+14
+Đọc số từ chuỗi, kiểm tra giá trị đơn, kiểm tra huyết áp, kiểm tra thời điểm và ghi chú
+6
+quick_entry_test.dart
+12
+Giỏ món, đồ uống gắn với lượng nước uống, combo và hoàn tác, NutritionSummary
+7
+health_chart_test.dart
+10
+Chuỗi dữ liệu theo khoảng thời gian, khoảng bình thường tham khảo, thống kê chuỗi
+8
+widget_test.dart
+9
+Luồng giao diện cơ bản của ứng dụng
+9
+health_data_test.dart
+7
+Thêm và sửa chỉ số sức khỏe
+10
+health_calendar_test.dart
+6
+Nhóm dữ liệu theo ngày cho tab Lịch
+Các nhóm kiểm thử quan trọng nhất gồm: kiểm tra hàm băm mật khẩu và luồng xác thực; kiểm tra tính đúng đắn của công thức BMI và các ngưỡng phân loại chỉ số theo bộ ngưỡng tham chiếu; kiểm tra việc sinh bản ghi BMI đi kèm mỗi lần cân và việc bù BMI cho dữ liệu cũ; kiểm tra các câu lời khuyên sinh ra có khớp với ngưỡng đánh giá hay không; và kiểm tra luồng ghi nhận món ăn, giỏ món, combo cùng việc đồng bộ lượng nước uống từ đồ uống đã ghi.
+Kết quả kiểm thử được dùng để phát hiện và sửa lỗi trong quá trình phát triển, đặc biệt ở phần tính chỉ số BMI và phần sinh lời khuyên – hai phần có nhiều nhánh điều kiện và dễ phát sinh sai lệch ngưỡng nếu không được kiểm tra tự động.
+CHƯƠNG 6: KẾT LUẬN
+6.1. Kết quả đạt được
+Sau quá trình phân tích, thiết kế và triển khai, nhóm đã hoàn thành một ứng dụng di động chạy được trên nền tảng Android với các kết quả chính như sau.
+Về chức năng. Ứng dụng đã hiện thực đầy đủ bốn nhóm chức năng nghiệp vụ đặt ra trong phạm vi đề tài:
+Quản lý tài khoản: đăng ký tài khoản mới có kiểm tra dữ liệu, đăng nhập bằng email và mật khẩu với mật khẩu được băm bằng SHA-256 theo email làm muối, ghi nhớ phiên đăng nhập giữa các lần mở ứng dụng, đổi mật khẩu, xem và cập nhật hồ sơ cá nhân, đăng xuất.
+Thiết lập ban đầu: quy trình sáu bước giúp cá nhân hóa dữ liệu cho người dùng mới, gồm chọn giới tính, nhập chiều cao và cân nặng, chọn mục tiêu sức khỏe, chọn mục tiêu năng lượng và xem hướng dẫn sử dụng.
+Theo dõi chỉ số sức khỏe: ghi nhận bảy loại chỉ số (cân nặng, huyết áp, nhịp tim, đường huyết, giấc ngủ, vận động và BMI dẫn xuất), tính chỉ số BMI tự động theo từng lần cân, phân loại chỉ số theo ngưỡng tham chiếu, xem dữ liệu theo lịch tháng, xem biểu đồ xu hướng theo 7, 30 hoặc 90 ngày và nhận các lời khuyên, cảnh báo sinh tự động.
+Dinh dưỡng và bữa ăn: tìm kiếm trong danh mục 199 món Việt kèm 30 nguyên liệu ăn theo định lượng, tra cứu món quốc tế theo thời gian thực từ USDA FoodData Central, ghi nhận món theo bốn loại bữa và theo khẩu phần, quản lý giỏ món và combo bữa ăn, chép lại bữa ăn của ngày hôm trước, xóa và hoàn tác, tổng hợp calories cùng ba nhóm chất chính, thống kê theo ngày, tuần và tháng.
+Theo dõi lượng nước uống: mục tiêu nước tính tự động theo cân nặng, ba cách ghi nhận nhanh, nhập tay theo ml hoặc lít, chỉnh sửa dung tích cốc và hoàn tác từng lần ghi nhận.
+Tập luyện: danh mục bài tập phân theo nhóm và cường độ, ghi nhận buổi tập đã hoàn thành, theo dõi tiến độ theo mục tiêu 60 phút mỗi ngày.
+Dashboard: tổng hợp dữ liệu từ ba module Sức khỏe, Dinh dưỡng và Tập luyện thành một màn hình tổng quan, kèm các lối vào nhanh đến từng module.
+Về kiến trúc và chất lượng mã nguồn. Dự án được tổ chức thành bốn tầng rõ ràng (giao diện – trạng thái – repository – nguồn dữ liệu) với 57 tệp Dart và bảy thư mục chức năng. Việc truy cập dữ liệu được tách qua bốn lớp lưu trữ trừu tượng, nhờ đó có thể thay thế nguồn lưu trữ ở giai đoạn sau mà không phải sửa tầng giao diện. Các phần xử lý nghiệp vụ quan trọng (tính BMI, phân loại chỉ số, sinh lời khuyên, kiểm tra dữ liệu nhập) được đặt trong các lớp tiện ích thuần, không phụ thuộc Flutter, nên có thể kiểm thử tự động độc lập.
+Về dữ liệu. Nhóm đã xây dựng được danh mục 199 món ăn Việt Nam cùng 30 nguyên liệu ăn theo định lượng gram, đồng thời tích hợp thành công dịch vụ dữ liệu dinh dưỡng USDA cho món quốc tế theo mô hình kết hợp giữa dữ liệu nội địa và dữ liệu trực tuyến.
+Về trải nghiệm người dùng. Ứng dụng có phản hồi rõ ràng cho hầu hết thao tác: âm thanh và rung nhẹ khi tương tác, thông báo xác nhận sau khi ghi nhận dữ liệu, khả năng hoàn tác ở những thao tác dễ nhầm lẫn, khung xương khi đang nạp dữ liệu và trạng thái đang xử lý trên nút bấm khi gửi biểu mẫu.
+Về kiểm thử. Nhóm đã xây dựng 166 trường hợp kiểm thử tự động trong 10 tệp, tập trung vào tầng dữ liệu và các hàm tính toán chỉ số. Kết quả chạy kiểm thử thực tế và các trường hợp còn thất bại được trình bày chi tiết ở mục 6.2 và Phụ lục B.
+6.2. Hạn chế
+Bên cạnh các kết quả đạt được, đồ án còn những hạn chế cần được khắc phục:
+Về lưu trữ dữ liệu. Chỉ dữ liệu dinh dưỡng, lượng nước uống, dung tích cốc nước, phiên đăng nhập và thiết lập âm thanh được lưu bền vững trên thiết bị. Dữ liệu tài khoản, chỉ số sức khỏe và nhật ký tập luyện hiện chỉ được giữ trong bộ nhớ của tiến trình nên được khởi tạo lại khi ứng dụng mở lại. Đây là hạn chế lớn nhất của phiên bản hiện tại và cũng là hạng mục được ưu tiên trong giai đoạn tiếp theo.
+Về kiểm tra dữ liệu nhập. Hộp thoại “Thêm chỉ số” chưa áp dụng đầy đủ bộ kiểm tra khoảng giá trị của HealthValidator như hộp thoại “Sửa”: khi người dùng nhập một giá trị không đọc được thành số, thao tác lưu dừng lại nhưng không có thông báo lỗi; khi giá trị nằm ngoài khoảng hợp lệ, hệ thống vẫn lưu.
+Về tính nhất quán của nghiệp vụ. Nhật ký tập luyện chưa kiểm tra trùng lặp nên cùng một bài tập có thể được ghi nhận nhiều lần trong ngày; thao tác xóa chỉ số sức khỏe chưa có cơ chế hoàn tác như thao tác xóa món ăn; năng lượng tiêu hao của bài tập là giá trị định sẵn trong danh mục chứ chưa tính theo cân nặng người dùng và cường độ tập luyện.
+Về chất lượng kiểm thử. Trong 166 trường hợp kiểm thử hiện có, một số trường hợp đã thất bại do dữ liệu danh mục món ăn thay đổi (từ dữ liệu mẫu sang 199 món Việt đọc từ tệp Excel) và do luồng giao diện chưa ổn định trong môi trường kiểm thử. Các trường hợp này cần được cập nhật lại theo dữ liệu mới trước khi bàn giao chính thức.
+Về tính năng còn thiếu so với thiết kế. Các chức năng định hướng như đồng bộ dữ liệu với Firebase, xác thực qua Firebase Authentication, thông báo nhắc nhở theo lịch và tra cứu dữ liệu bài tập từ API bên ngoài chưa được triển khai; thông báo hiện chỉ ở dạng thông báo tức thời dùng cho việc thử nghiệm luồng cấp quyền.
+Về tài liệu thiết kế. Phần đặc tả chi tiết (ERD, Class Diagram, Sequence Diagram) hiện được trình bày đầy đủ nhất cho module Dinh dưỡng; ba module còn lại cần được bổ sung sơ đồ tương ứng để báo cáo hoàn chỉnh và đồng đều giữa các thành viên.
+6.3. Hướng phát triển
+Trên cơ sở các hạn chế đã nêu, nhóm xác định các hạng mục phát triển tiếp theo theo thứ tự ưu tiên sau:
+Bổ sung tầng lưu trữ bền vững bằng Sqflite. Hiện thực lớp cài đặt mới cho bốn giao diện lưu trữ đã có (AccountStore, HealthStore, WorkoutStore và NutritionStore) theo mô hình quan hệ đã thiết kế ở Chương 3, qua đó dữ liệu tài khoản, chỉ số sức khỏe và nhật ký tập luyện được giữ lại sau khi đóng ứng dụng.
+Tích hợp Firebase. Sử dụng Firebase Authentication cho xác thực tài khoản, Cloud Firestore cho lưu trữ và đồng bộ dữ liệu giữa các thiết bị, Firebase Cloud Messaging cho thông báo đẩy; đồng thời bổ sung cơ chế xếp hàng dữ liệu phát sinh khi ngoại tuyến để đồng bộ khi có mạng trở lại.
+Hoàn thiện kiểm tra dữ liệu và thông báo lỗi. Áp dụng đầy đủ HealthValidator cho hộp thoại thêm chỉ số, hiển thị thông báo lỗi cụ thể theo từng loại chỉ số và bổ sung cơ chế hoàn tác cho thao tác xóa chỉ số sức khỏe.
+Nâng cấp nghiệp vụ tập luyện. Bổ sung bộ lọc và tìm kiếm bài tập, lưu bền vững nhật ký tập luyện, tính năng lượng tiêu hao theo cân nặng người dùng và chỉ số cường độ tập luyện (MET), đồng thời hỗ trợ thời lượng thực tế thay vì chỉ dùng thời lượng định sẵn của bài tập.
+Mở rộng dữ liệu dinh dưỡng. Bổ sung cơ chế cập nhật danh mục món ăn theo phiên bản, cho phép người dùng tự thêm món và nguyên liệu mới, và lưu đệm kết quả tra cứu từ dịch vụ bên ngoài xuống thiết bị để dùng lại khi ngoại tuyến.
+Cải thiện khả năng sử dụng và khả năng tiếp cận. Hỗ trợ chế độ tối, kiểm thử giao diện với các mức phóng to chữ của hệ điều hành và bổ sung nhãn trợ giúp cho các biểu tượng chưa có nhãn.
+Cập nhật và mở rộng bộ kiểm thử. Sửa các trường hợp kiểm thử đã lỗi thời theo dữ liệu danh mục mới, xử lý nguyên nhân giao diện không ổn định trong môi trường kiểm thử (các hiệu ứng động lặp vô hạn), bổ sung kiểm thử cho module tập luyện, cho tầng lưu trữ bền vững và kiểm thử tích hợp cho các luồng nghiệp vụ chính.
+Bổ sung tài liệu thiết kế. Hoàn thiện ERD, Class Diagram và Sequence Diagram cho ba module còn lại để báo cáo và tài liệu bàn giao được đồng đều, đầy đủ.
+Kết thúc đồ án, nhóm đã xây dựng được một sản phẩm chạy được với đầy đủ bốn nhóm chức năng theo yêu cầu của đề tài, đồng thời hình thành được quy trình làm việc theo module và nền tảng kiến trúc đủ linh hoạt để tiếp tục mở rộng trong giai đoạn tiếp theo.
+TÀI LIỆU THAM KHẢO
+[1] 
+Y. R. Park, G. Lee, S. Y. Shin and D. W. Bates, "Analysis of User Characteristics Influencing Usage of a Tethered Mobile Personal Health Record," Journal of Medical Internet Research (JMIR) / BMC Health Services Research, 2016. 
+[2] 
+Z. Galavi and e. al., "Heuristics used for evaluating the usability of mobile health applications: A systematic literature review," International Journal of Medical Informatics, 2024. 
+[3] 
+P. Arslan and e. al., "Human-Centred Design in digital health dashboard development," Digital Health / BMC Medical Informatics, 2023. 
+[4] 
+Khoa Công Nghệ Thông Tin, Giáo trình phát triển ứng dụng di động, Thành phố Hồ Chí Minh: Trường Đại Học Công Thương, 2025. 
+[5] 
+T. /. A. Roux, "SQLite plugin for Flutter (sqflite package)," 2026. [Online]. Available: https://pub.dev/packages/sqflite](https://pub.dev/packages/sqflite.
+[6] 
+Flutter team, "shared_preferences plugin for Flutter," 2024. [Online]. Available: https://pub.dev/packages/shared_preferences.
+[7] 
+Google Firebase Team, "Authenticate with Firebase using password-based accounts on Flutter," 2024. [Online]. Available: https://firebase.google.com/docs/auth/flutter/password-auth.
+[8] 
+Google Firebase Team, "Cloud Firestore – Add data and get data on Flutter," 2024. [Online]. Available: https://firebase.google.com/docs/firestore.
+[9] 
+Google Firebase Team, "Firebase Cloud Messaging for Flutter," 2024. [Online]. Available: https://firebase.google.com/docs/cloud-messaging/flutter/client.
+[10] 
+U.S. Department of Agriculture (USDA), "FoodData Central API Guide," 2020. [Online]. Available: https://fdc.nal.usda.gov](https://fdc.nal.usda.gov.
+[11] 
+C. J. Morris and e. al., "Circadian misalignment and glucose tolerance in shift workers," Proceedings of the National Academy of Sciences (PNAS), 2015. 
+[12] 
+K. D. Hall and e. al., Energy balance and its components: implications for body weight regulation, 2012. 
+[13] 
+W. E. Consultation and C. Nishida, "Appropriate body-mass index for Asian populations and its implications for policy and intervention strategies," The Lancet, Vols. Vol. 363, No. 9403, no. pp. 157–163, 2004. 
+[14] 
+D. Shimbo and e. al., "2020 AHA/AMA classification of blood pressure," Circulation, 2020. 
+[15] 
+V. D. d. Q. gia, Bảng thành phần thực phẩm Việt Nam, NXB Y học, 2017. 
+[16] 
+Flutter Team, "Accessibility and text scaling in Flutter," 2024. [Online]. Available: https://docs.flutter.dev/ui/accessibility.
+[17] 
+Dart Team, "dart:convert library and JSON encoding," 2024. [Online]. Available: https://dart.dev/libraries/dart-convert.
+[18] 
+National Institute of Standards and Technology (NIST), "FIPS PUB 180-4: Secure Hash Standard (SHS)," 2015.
+PHỤ LỤC A: THÔNG TIN DỰ ÁN VÀ MÔI TRƯỜNG PHÁT TRIỂN
+Bảng dưới đây tổng hợp các thông tin định danh của dự án và môi trường phát triển đã dùng để xây dựng và kiểm thử ứng dụng.
+Hạng mục
+Giá trị
+Tên dự án (package)
+healthcare
+Tên sản phẩm hiển thị
+HealthFlow
+Phiên bản dự án
+1.0.0+1
+Mô hình phát triển
+Ứng dụng di động đa nền tảng (Flutter)
+Phiên bản Flutter đã dùng
+Flutter 3.47.2, kênh stable
+Phiên bản Dart SDK
+3.13.2 (ràng buộc khai báo: ^3.13.2)
+Công cụ biên dịch
+Android Gradle, chế độ gỡ lỗi
+Sản phẩm biên dịch
+build/app/outputs/flutter-apk/app-debug.apk (khoảng 143 MB)
+Tổng số tệp mã nguồn Dart
+57 tệp trong thư mục lib
+Tổng số tệp kiểm thử
+10 tệp trong thư mục test
+Tổng số trường hợp kiểm thử
+166 (151 kiểm thử đơn vị, 15 kiểm thử giao diện)
+Số gói phụ thuộc (pubspec.lock)
+106 gói
+Số tài nguyên đóng gói
+65 tệp trong thư mục assets
+Danh mục món ăn
+199 món Việt (9 nhóm, 99 món chay) và 30 nguyên liệu
+Ngôn ngữ giao diện
+Tiếng Việt
+Nền tảng đích đã cấu hình
+Android, iOS, Web, Windows, Linux, macOS
+PHỤ LỤC B: KẾT QUẢ CHẠY KIỂM THỬ TỰ ĐỘNG
+Phụ lục này ghi lại kết quả chạy bộ kiểm thử tự động của dự án bằng lệnh flutter test trên toàn bộ thư mục test. Kết quả được trình bày trung thực, bao gồm cả các trường hợp chưa đạt.
+Nhóm kiểm thử
+Số trường hợp
+Đạt
+Chưa đạt
+Ghi chú
+Kiểm thử đơn vị tầng dữ liệu (data_layer_test.dart)
+43
+37
+6
+5 trường hợp thuộc nhóm Dinh dưỡng, 1 trường hợp thuộc nhóm Đăng ký
+Kiểm thử sinh lời khuyên (health_analyzer_test.dart)
+33
+33
+0
+Đạt toàn bộ
+Kiểm thử BMI theo lịch sử cân (health_bmi_history_test.dart)
+18
+18
+0
+Đạt toàn bộ
+Kiểm thử phân loại chỉ số (health_assessor_test.dart)
+14
+14
+0
+Đạt toàn bộ
+Kiểm thử dữ liệu nhập (health_validator_test.dart)
+14
+14
+0
+Đạt toàn bộ
+Kiểm thử ghi nhanh món ăn và nước uống (quick_entry_test.dart)
+12
+12
+0
+Đạt toàn bộ
+Kiểm thử biểu đồ và thống kê (health_chart_test.dart)
+10
+10
+0
+Đạt toàn bộ
+Kiểm thử giao diện (widget_test.dart)
+9
+0
+9
+Chưa đạt do giao diện không ổn định trong môi trường kiểm thử
+Kiểm thử dữ liệu chỉ số (health_data_test.dart)
+7
+7
+0
+Đạt toàn bộ
+Kiểm thử lịch theo dõi (health_calendar_test.dart)
+6
+6
+0
+Đạt toàn bộ
+Tổng cộng
+166
+151
+15
+Tỉ lệ đạt 91,0%
+Các trường hợp chưa đạt và nguyên nhân:
+Nhóm Dinh dưỡng (5 trường hợp): các trường hợp này được viết khi danh mục món ăn còn dùng dữ liệu mẫu trong bộ nhớ (món có mã food-pho-bo, food-trung-luoc). Sau khi bổ sung danh mục 199 món Việt đọc từ tệp dữ liệu, các món mẫu thuộc nhóm món Việt không còn trong danh mục nên các trường hợp tìm theo mã món cũ không tìm thấy dữ liệu. Riêng trường hợp kiểm tra tìm kiếm mong đợi kết quả “Phở bò” trong khi danh mục mới trả về tên món đầy đủ từ tệp Excel như “Phở Bò Chay”, “Phở Bò Tái / Nạm”. Đây là lỗi thời của dữ liệu kiểm thử, không phải lỗi nghiệp vụ của ứng dụng.
+Nhóm Đăng ký (1 trường hợp): trường hợp “đăng ký thành công thì đăng nhập luôn” mong đợi người dùng được đăng nhập ngay sau khi đăng ký. Trên thực tế, luồng đăng ký hiện tại đưa người dùng sang màn hình đăng nhập để thực hiện đăng nhập lần đầu, nên kỳ vọng của trường hợp kiểm thử không còn khớp với hành vi của ứng dụng.
+Nhóm giao diện (9 trường hợp): cả chín trường hợp đều dừng ở bước chờ giao diện ổn định và hết thời gian chờ. Nguyên nhân được xác định là do một số hiệu ứng động chạy liên tục (nền động, hiệu ứng minh họa) khiến khung kiểm thử không đạt được trạng thái ổn định. Cần điều chỉnh cách kiểm thử hoặc tách các hiệu ứng động khỏi phạm vi kiểm thử.
+Các nhóm kiểm thử đạt toàn bộ gồm 102 trường hợp thuộc bảy tệp kiểm thử module Sức khỏe và 12 trường hợp thuộc tệp kiểm thử ghi nhanh món ăn, nước uống; đây là những phần nghiệp vụ có nhiều công thức tính toán và ngưỡng phân loại nhất nên việc kiểm thử tự động đạt toàn bộ là kết quả quan trọng của đồ án.

@@ -426,7 +426,7 @@ class _PinnedDayBarDelegate extends SliverPersistentHeaderDelegate {
   ) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
         child: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -582,9 +582,12 @@ class _EnergyCard extends StatelessWidget {
           children: [
             // Ảnh nền
             Positioned.fill(
-              child: Image.asset(
-                'assets/images/home/calorie_bg.jpg',
-                fit: BoxFit.cover,
+              child: ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+                child: Image.asset(
+                  'assets/images/home/calorie_bg.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             // Lớp phủ gradient trong suốt
