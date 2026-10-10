@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -236,8 +235,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         // Header thông tin người dùng với hình nền mờ
         Container(
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
+            image: DecorationImage(
+              image: const ResizeImage(AssetImage('assets/images/auth/auth_bg.jpg'), height: 400),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withValues(alpha: 0.35),
+                BlendMode.darken,
+              ),
+            ),
             boxShadow: [
               BoxShadow(
                 color: AppTheme.primary.withValues(alpha: 0.35),
@@ -246,25 +254,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
-                    child: Image(
-                      image: const ResizeImage(AssetImage('assets/images/auth/auth_bg.jpg'), height: 400),
-                      fit: BoxFit.cover,
-                      color: Colors.black.withValues(alpha: 0.35),
-                      colorBlendMode: BlendMode.darken,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
@@ -362,10 +353,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ],
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ],
@@ -1074,12 +1061,10 @@ class _CalorieCard extends StatelessWidget {
               children: [
                 // Background image
                 Positioned.fill(
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                    child: Image.asset(
-                      'assets/images/welcome/welcome_food.jpg',
-                      fit: BoxFit.cover,
-                    ),
+                  child: Image.asset(
+                    'assets/images/welcome/welcome_food.jpg',
+                    fit: BoxFit.cover,
+                    
                   ),
                 ),
                 // Gradient overlay cho phép hình nền hiện rõ hơn
