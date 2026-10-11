@@ -42,6 +42,13 @@ dependencies:
   # Xuất báo cáo sức khỏe PDF gửi bác sĩ (dùng font BeVietnamPro có sẵn).
   pdf: ^3.11.1
   printing: ^5.13.2
+  timezone: ^0.11.1
+  # Xuất báo cáo PDF/CSV và chia sẻ file.
+  path_provider: ^2.1.0
+  share_plus: ">=11.0.0"
+  cross_file: ^0.3.4
+  # Quét mã vạch (tra Open Food Facts).
+  mobile_scanner: ^7.0.0
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +60,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/core/logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

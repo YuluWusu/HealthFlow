@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
 import '../models/nutrition.dart';
+import '../utils/nutrient_estimator.dart';
 
 /// Nguồn của một món trong danh mục.
 enum FoodSource { vietnam, usda, local }
@@ -24,11 +25,13 @@ class CatalogFood extends FoodItem {
     required super.carbs,
     required super.fat,
     required super.servingLabel,
+    super.fiber,
+    super.sugar,
+    super.sodium,
     this.source = FoodSource.local,
     this.group = '',
     this.vegetarian = false,
     this.ingredients = const [],
-    this.fiber,
     this.calcium,
     this.iron,
     this.servingGrams,
@@ -41,14 +44,18 @@ class CatalogFood extends FoodItem {
   final bool vegetarian;
   final List<String> ingredients;
 
-  /// Chất xơ (g), canxi (mg), sắt (mg) cho một khẩu phần.
-  final double? fiber;
+  /// Canxi (mg), sắt (mg) cho một khẩu phần (chất xơ, đường, natri nằm ở
+  /// [FoodItem]).
   final double? calcium;
   final double? iron;
   final int? servingGrams;
 
   factory CatalogFood.fromVietnamJson(Map<String, dynamic> j) {
     final grams = (j['servingGrams'] as num).toInt();
+    final ingredients = List<String>.from(j['ingredients'] as List? ?? const []);
+    // File JSON chưa có đường/natri: ước tính từ nguyên liệu. Sau này nếu file
+    // có sẵn hai trường `sugar`/`sodium` thì dùng số đó.
+    final estimate = NutrientEstimator.forDish(ingredients);
     return CatalogFood(
       id: j['id'] as String,
       name: j['name'] as String,
@@ -61,8 +68,10 @@ class CatalogFood extends FoodItem {
       source: FoodSource.vietnam,
       group: j['group'] as String? ?? '',
       vegetarian: j['vegetarian'] as bool? ?? false,
-      ingredients: List<String>.from(j['ingredients'] as List? ?? const []),
-      fiber: (j['fiber'] as num?)?.toDouble(),
+      ingredients: ingredients,
+      fiber: (j['fiber'] as num?)?.toDouble() ?? 0,
+      sugar: (j['sugar'] as num?)?.toDouble() ?? estimate.sugar,
+      sodium: (j['sodium'] as num?)?.toDouble() ?? estimate.sodium,
       calcium: (j['calcium'] as num?)?.toDouble(),
       iron: (j['iron'] as num?)?.toDouble(),
       servingGrams: grams,

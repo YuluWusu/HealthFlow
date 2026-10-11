@@ -10,12 +10,16 @@ import 'screens/main_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'services/audio_service.dart';
+import 'services/meal_reminder_service.dart';
 import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AudioService().init();
   final prefs = await SharedPreferences.getInstance();
+  // Đặt lại lịch nhắc ăn/uống theo múi giờ hiện tại; lỗi ở đây không được làm
+  // app không mở được.
+  MealReminderService().rescheduleAll().catchError((Object _) {});
   runApp(HealthFlowApp(prefs: prefs));
 }
 
@@ -46,7 +50,10 @@ class _HealthFlowAppState extends State<HealthFlowApp> {
     _data = AppData(
       nutrition: prefs == null
           ? null
-          : NutritionRepository(store: PrefsNutritionStore(prefs)),
+          : NutritionRepository(
+              store: PrefsNutritionStore(prefs),
+              prefs: prefs,
+            ),
     );
     _auth.restoreSession();
   }
