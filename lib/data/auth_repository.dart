@@ -261,6 +261,8 @@ class AuthRepository extends ChangeNotifier {
     double? weightKg,
     int? dailyCalorieGoal,
     String? gender,
+    double? targetWeightKg,
+    bool clearTargetWeight = false,
     String? avatarPath,
   }) async {
     final user = _currentUser;
@@ -280,6 +282,8 @@ class AuthRepository extends ChangeNotifier {
       weightKg: weightKg,
       dailyCalorieGoal: dailyCalorieGoal,
       gender: gender,
+      targetWeightKg: targetWeightKg,
+      clearTargetWeight: clearTargetWeight,
       avatarPath: avatarPath,
     );
     await _accounts.update(updated);

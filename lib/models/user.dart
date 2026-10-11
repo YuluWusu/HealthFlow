@@ -26,6 +26,10 @@ class User {
   /// Giới tính người dùng ('male' hoặc 'female').
   final String gender;
 
+  /// Cân nặng mong muốn (kg). `null` nếu người dùng chưa đặt, dùng cho phần
+  /// dự báo "bao lâu nữa đạt mục tiêu" trên màn hình Sức khỏe.
+  final double? targetWeightKg;
+
   /// Đường dẫn tệp ảnh đại diện trên thiết bị (null nếu chưa đặt ảnh).
   final String? avatarPath;
 
@@ -41,6 +45,7 @@ class User {
     this.dailyCalorieGoal = 2000,
     this.healthGoal = 'Giữ dáng',
     this.gender = 'male',
+    this.targetWeightKg,
     this.avatarPath,
     required this.createdAt,
   });
@@ -78,6 +83,10 @@ class User {
     int? dailyCalorieGoal,
     String? healthGoal,
     String? gender,
+    double? targetWeightKg,
+
+    // Đặt `true` để xóa cân nặng mong muốn (truyền `null` thì giữ nguyên).
+    bool clearTargetWeight = false,
     String? avatarPath,
   }) {
     return User(
@@ -90,6 +99,8 @@ class User {
       dailyCalorieGoal: dailyCalorieGoal ?? this.dailyCalorieGoal,
       healthGoal: healthGoal ?? this.healthGoal,
       gender: gender ?? this.gender,
+      targetWeightKg:
+          clearTargetWeight ? null : (targetWeightKg ?? this.targetWeightKg),
       avatarPath: avatarPath != null
           ? (avatarPath.isEmpty ? null : avatarPath)
           : this.avatarPath,
@@ -108,6 +119,7 @@ class User {
       'daily_calorie_goal': dailyCalorieGoal,
       'health_goal': healthGoal,
       'gender': gender,
+      'target_weight_kg': targetWeightKg,
       'avatar_path': avatarPath,
       'created_at': createdAt.millisecondsSinceEpoch,
     };
@@ -124,6 +136,7 @@ class User {
       dailyCalorieGoal: (map['daily_calorie_goal'] as num?)?.toInt() ?? 2000,
       healthGoal: map['health_goal'] as String? ?? 'Giữ dáng',
       gender: map['gender'] as String? ?? 'male',
+      targetWeightKg: (map['target_weight_kg'] as num?)?.toDouble(),
       avatarPath: map['avatar_path'] as String?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         (map['created_at'] as num?)?.toInt() ?? 0,

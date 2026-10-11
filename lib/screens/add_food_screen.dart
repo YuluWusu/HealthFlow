@@ -20,7 +20,14 @@ class AddFoodScreen extends StatefulWidget {
   /// Buổi ăn mặc định khi thêm món.
   final MealSlot initialSlot;
 
-  const AddFoodScreen({super.key, this.initialSlot = MealSlot.breakfast});
+  /// Mở màn hình ở chế độ định lượng (gram).
+  final bool initialByGrams;
+
+  const AddFoodScreen({
+    super.key,
+    this.initialSlot = MealSlot.breakfast,
+    this.initialByGrams = false,
+  });
 
   @override
   State<AddFoodScreen> createState() => _AddFoodScreenState();
@@ -33,13 +40,14 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   MealSlot _selectedSlot = MealSlot.breakfast;
 
   /// `false`: ăn theo món (danh mục). `true`: ăn theo định lượng (gram).
-  bool _byGrams = false;
+  late bool _byGrams;
   String? _selectedGroup;
 
   @override
   void initState() {
     super.initState();
     _selectedSlot = widget.initialSlot;
+    _byGrams = widget.initialByGrams;
   }
 
   @override
