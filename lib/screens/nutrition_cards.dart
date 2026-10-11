@@ -3,9 +3,7 @@ import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../data/auth_scope.dart';
 import '../data/nutrition_repository.dart';
-import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
-import '../models/nutrition_goals.dart';
 import '../services/audio_service.dart';
 import '../theme/app_theme.dart';
 import '../utils/meal_suggester.dart';
@@ -203,7 +201,6 @@ class _GoalBar extends StatelessWidget {
     required this.color,
     this.warnWhenOver = false,
     this.isLimit = false,
-    this.footnote,
   });
 
   final String label;
