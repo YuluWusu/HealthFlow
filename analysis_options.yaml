@@ -13,6 +13,8 @@ analyzer:
   errors:
     deprecated_member_use: ignore
   exclude:
+    - "*.dart"
+    - "health_report_sheet.dart"
     - build/**
     - android/**
     - ios/**

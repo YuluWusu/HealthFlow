@@ -44,6 +44,7 @@ class NutritionRepository extends ChangeNotifier {
     UsdaFoodService? usda,
     IngredientSource? ingredientSource,
     SharedPreferences? prefs,
+  // ignore: prefer_initializing_formals
   })  : _prefs = prefs,
         _store = store ?? InMemoryNutritionStore(),
         _ingredientSource = ingredientSource ?? IngredientSource(),

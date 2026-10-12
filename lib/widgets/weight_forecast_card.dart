@@ -71,7 +71,7 @@ class WeightForecastCard extends StatelessWidget {
             ),
           ),
         ),
-        if (trailing != null) trailing,
+        ?trailing,
       ],
     );
   }
