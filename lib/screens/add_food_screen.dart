@@ -9,7 +9,6 @@ import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
 import '../theme/food_images.dart';
-import '../services/audio_service.dart';
 
 /// Màn hình 7 trong bản thiết kế: thêm món ăn vào nhật ký.
 ///
@@ -20,15 +19,8 @@ import '../services/audio_service.dart';
 class AddFoodScreen extends StatefulWidget {
   /// Buổi ăn mặc định khi thêm món.
   final MealSlot initialSlot;
-  
-  /// Mở màn hình ở chế độ định lượng (gram).
-  final bool initialByGrams;
 
-  const AddFoodScreen({
-    super.key,
-    this.initialSlot = MealSlot.breakfast,
-    this.initialByGrams = false,
-  });
+  const AddFoodScreen({super.key, this.initialSlot = MealSlot.breakfast});
 
   @override
   State<AddFoodScreen> createState() => _AddFoodScreenState();
@@ -41,14 +33,13 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   MealSlot _selectedSlot = MealSlot.breakfast;
 
   /// `false`: ăn theo món (danh mục). `true`: ăn theo định lượng (gram).
-  late bool _byGrams;
+  bool _byGrams = false;
   String? _selectedGroup;
 
   @override
   void initState() {
     super.initState();
     _selectedSlot = widget.initialSlot;
-    _byGrams = widget.initialByGrams;
   }
 
   @override
@@ -102,9 +93,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                     suffixIcon: _searchController.text.isEmpty
                         ? null
                         : IconButton(
-                            onPressed: ()  {
-              AudioService().playTap();
-
+                            onPressed: () {
                               _searchController.clear();
                               setState(() {});
                             },
@@ -127,7 +116,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                             itemCount: ingredients.length,
                             itemBuilder: (context, index) {
                               final ing = ingredients[index];
-                              return _IngredientTile(
+                              return IngredientTile(
                                 ingredient: ing,
                                 onTap: () => _openGramSheet(ing),
                               );
@@ -245,7 +234,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _GramSheet(
+      builder: (_) => GramSheet(
         ingredient: ingredient,
         onAdd: (grams) => nutrition.addIngredientToCart(ingredient, grams),
       ),
@@ -1005,15 +994,39 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   tooltip: 'Quay lại',
                 ),
                 const Spacer(),
-                _CircleIconButton(
-                  icon: Icons.favorite_border_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Danh sách món yêu thích sẽ có ở bản sau.'),
-                    ),
-                  ),
-                  tooltip: 'Yêu thích',
-                ),
+                Builder(builder: (context) {
+                  final nutrition =
+                      AppScope.of(context, listen: false).nutrition;
+                  return ListenableBuilder(
+                    listenable: nutrition,
+                    builder: (context, _) {
+                      final fav = nutrition.isFavorite(food.id);
+                      return _CircleIconButton(
+                        icon: fav
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        iconColor: fav ? AppTheme.danger : null,
+                        onTap: () {
+                          nutrition.toggleFavorite(food);
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(seconds: 2),
+                                content: Text(
+                                  fav
+                                      ? 'Đã bỏ ${food.name} khỏi yêu thích.'
+                                      : 'Đã thêm ${food.name} vào yêu thích.',
+                                ),
+                              ),
+                            );
+                        },
+                        tooltip: fav ? 'Bỏ yêu thích' : 'Yêu thích',
+                      );
+                    },
+                  );
+                }),
               ],
             ),
           ),
@@ -1071,11 +1084,13 @@ class _CircleIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final String tooltip;
+  final Color? iconColor;
 
   const _CircleIconButton({
     required this.icon,
     required this.onTap,
     required this.tooltip,
+    this.iconColor,
   });
 
   @override
@@ -1092,7 +1107,7 @@ class _CircleIconButton extends StatelessWidget {
             color: Colors.white.withValues(alpha: 0.92),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, size: 18, color: AppTheme.textPrimary),
+          child: Icon(icon, size: 18, color: iconColor ?? AppTheme.textPrimary),
         ),
       ),
     );
@@ -1432,11 +1447,11 @@ class _NoResult extends StatelessWidget {
 
 
 /// Một dòng nguyên liệu trong chế độ "Theo định lượng".
-class _IngredientTile extends StatelessWidget {
+class IngredientTile extends StatelessWidget {
   final Ingredient ingredient;
   final VoidCallback onTap;
 
-  const _IngredientTile({required this.ingredient, required this.onTap});
+  const IngredientTile({required this.ingredient, required this.onTap});
 
   static String _n(double v) =>
       v % 1 == 0 ? v.toInt().toString() : v.toStringAsFixed(1).replaceAll('.', ',');
@@ -1503,22 +1518,22 @@ class _IngredientTile extends StatelessWidget {
 }
 
 /// Bảng nhập số gram: gõ trực tiếp hoặc chọn nhanh, kcal và macro tính ngay.
-class _GramSheet extends StatefulWidget {
+class GramSheet extends StatefulWidget {
   final Ingredient ingredient;
   final int initialGrams;
   final void Function(int grams) onAdd;
 
-  const _GramSheet({
+  const GramSheet({
     required this.ingredient,
     required this.onAdd,
     this.initialGrams = 100,
   });
 
   @override
-  State<_GramSheet> createState() => _GramSheetState();
+  State<GramSheet> createState() => _GramSheetState();
 }
 
-class _GramSheetState extends State<_GramSheet> {
+class _GramSheetState extends State<GramSheet> {
   late final TextEditingController _controller =
       TextEditingController(text: '${widget.initialGrams}');
 

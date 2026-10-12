@@ -1,6 +1,5 @@
+import '../utils/nutrient_estimator.dart';
 import 'nutrition.dart';
-
-const String kIngredientIdPrefix = 'ing_';
 
 /// Nguyên liệu/thực phẩm đơn lẻ, dinh dưỡng tính trên 100 g.
 ///
@@ -44,14 +43,21 @@ class Ingredient {
 
   /// Quy về [FoodItem] với một "phần" = 100 g, để dùng chung toàn bộ luồng
   /// nhật ký/giỏ/thống kê hiện có: ăn `g` gram = `g / 100` phần.
-  FoodItem toFoodItem() => FoodItem(
-        id: '$kIngredientIdPrefix$id',
-        name: name,
-        category: FoodCategory.other,
-        calories: calories.round(),
-        protein: protein,
-        carbs: carbs,
-        fat: fat,
-        servingLabel: '100g',
-      );
+  FoodItem toFoodItem() {
+    // Xơ/đường/natri chưa có trong bảng nguyên liệu nên ước tính theo tên, nhóm.
+    final est = NutrientEstimator.forIngredient(name, 100);
+    return FoodItem(
+      id: '$kIngredientIdPrefix$id',
+      name: name,
+      category: FoodCategory.other,
+      calories: calories.round(),
+      protein: protein,
+      carbs: carbs,
+      fat: fat,
+      servingLabel: '100g',
+      fiber: NutrientEstimator.fiberPer100g(name, group),
+      sugar: est.sugar,
+      sodium: est.sodium,
+    );
+  }
 }

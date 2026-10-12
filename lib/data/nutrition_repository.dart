@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/nutrition_store.dart';
 import '../models/ingredient.dart';
 import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
+import '../models/nutrition_goals.dart';
+import '../models/recipe.dart';
+import '../utils/achievements.dart';
+import '../utils/meal_suggester.dart';
 import 'ingredient_source.dart';
 import 'usda_food_service.dart';
 import 'vietnam_food_source.dart';
@@ -36,12 +43,15 @@ class NutritionRepository extends ChangeNotifier {
     VietnamFoodSource? vietnam,
     UsdaFoodService? usda,
     IngredientSource? ingredientSource,
-  })  : _store = store ?? InMemoryNutritionStore(),
+    SharedPreferences? prefs,
+  })  : _prefs = prefs,
+        _store = store ?? InMemoryNutritionStore(),
         _ingredientSource = ingredientSource ?? IngredientSource(),
         _vietnam = vietnam ?? VietnamFoodSource(),
         _usda = usda ?? UsdaFoodService();
 
   final NutritionStore _store;
+  final SharedPreferences? _prefs;
   final VietnamFoodSource _vietnam;
   final UsdaFoodService _usda;
   final IngredientSource _ingredientSource;
@@ -49,6 +59,7 @@ class NutritionRepository extends ChangeNotifier {
   // Nguyên liệu để ăn theo định lượng (gram), tách riêng khỏi danh mục món.
   List<Ingredient> _ingredients = const [];
 
+  List<FoodItem> _baseCatalog = const [];
   List<FoodItem> _catalog = const [];
   List<MealEntry> _todayEntries = const [];
   NutritionSummary _summary = NutritionSummary.empty;
@@ -178,7 +189,8 @@ class NutritionRepository extends ChangeNotifier {
         ? seed
         : seed.where((f) => f.category != FoodCategory.vietnamese);
 
-    _catalog = List.unmodifiable([...vietnamese, ...fallback]);
+    _baseCatalog = List.unmodifiable([...vietnamese, ...fallback]);
+    _rebuildCatalog();
 
     try {
       _ingredients = await _ingredientSource.load();
@@ -186,6 +198,14 @@ class NutritionRepository extends ChangeNotifier {
       debugPrint('Không đọc được ingredients.json: $e');
     }
     notifyListeners();
+  }
+
+  /// Danh mục hiển thị = món tự nấu của người dùng + danh mục chung.
+  void _rebuildCatalog() {
+    _catalog = List.unmodifiable([
+      for (final r in _recipes) r.toFoodItem(),
+      ..._baseCatalog,
+    ]);
   }
 
   /// Nạp nhật ký của một ngày và tính sẵn phần tổng hợp.
@@ -207,7 +227,9 @@ class NutritionRepository extends ChangeNotifier {
     _waterMl = await _store.waterMl(userId, _selectedDay);
     _cupMl = await _store.waterCupMl(userId) ?? defaultCupMl;
     _combos = await _store.combos(userId);
+    _loadExtras(userId);
     await _refreshSuggestions(userId);
+    _checkCelebration(userId);
     notifyListeners();
   }
 
@@ -242,6 +264,17 @@ class NutritionRepository extends ChangeNotifier {
         return latest[b]!.eatenAt.compareTo(latest[a]!.eatenAt);
       });
     _frequentFoods = [for (final id in ids.take(8)) foodFromEntry(latest[id]!)];
+
+    // "Gần đây": các món khác nhau ăn gần nhất (mới nhất trước).
+    final recent = latest.values.toList()
+      ..sort((a, b) => b.eatenAt.compareTo(a.eatenAt));
+    _recentFoods = [for (final e in recent.take(10)) foodFromEntry(e)];
+
+    _achievements = computeAchievements(
+      entries: all,
+      calorieGoal: _calorieGoal,
+      now: now,
+    );
   }
 
   /// Dựng lại món từ một dòng nhật ký: ưu tiên món gốc trong danh mục, nếu
@@ -260,6 +293,9 @@ class NutritionRepository extends ChangeNotifier {
       carbs: entry.carbs / p,
       fat: entry.fat / p,
       servingLabel: entry.isByGrams ? '100g' : '1 phần',
+      fiber: entry.fiber / p,
+      sugar: entry.sugar / p,
+      sodium: entry.sodium / p,
     );
   }
 
@@ -401,7 +437,7 @@ class NutritionRepository extends ChangeNotifier {
       slot: entry.slot,
       eatenAt: entry.eatenAt,
       portion: portion,
-    );
+    ).withNote(note: entry.note, photoPath: entry.photoPath);
     await _store.updateEntry(updated);
     await _shiftWater(
       entry.userId,
@@ -503,7 +539,9 @@ class NutritionRepository extends ChangeNotifier {
     for (var i = 0; i < source.length; i++) {
       water += source[i].waterMl;
       await _store.insertEntry(
-        source[i].copyWith(id: 'meal-${base + i}', eatenAt: eatenAt),
+        source[i]
+            .copyWith(id: 'meal-${base + i}', eatenAt: eatenAt)
+            .withNote(),
       );
     }
     await _shiftWater(userId, eatenAt, water);
@@ -620,6 +658,264 @@ class NutritionRepository extends ChangeNotifier {
     ];
   }
 
+  // -------------------------------------------------------------------------
+  // Cài đặt phụ lưu bằng shared_preferences (theo từng người dùng):
+  // yêu thích, công thức tự nấu, chế độ ăn, mục tiêu macro, mốc ăn mừng.
+  // Không có prefs (kiểm thử) thì giữ trong bộ nhớ tạm.
+  // -------------------------------------------------------------------------
+
+  final Map<String, String> _mem = {};
+
+  String? _read(String key) => _prefs != null ? _prefs.getString(key) : _mem[key];
+
+  Future<void> _write(String key, String value) async {
+    if (_prefs != null) {
+      await _prefs.setString(key, value);
+    } else {
+      _mem[key] = value;
+    }
+  }
+
+  Future<void> _remove(String key) async {
+    if (_prefs != null) {
+      await _prefs.remove(key);
+    } else {
+      _mem.remove(key);
+    }
+  }
+
+  static String _favKey(String u) => 'hf_fav_v1_$u';
+  static String _recipeKey(String u) => 'hf_recipes_v1_$u';
+  static String _modeKey(String u) => 'hf_diet_mode_v1_$u';
+  static String _macroKey(String u) => 'hf_macro_goal_v1_$u';
+  static String _celebKey(String u) => 'hf_goal_celebrated_v1_$u';
+
+  List<FoodItem> _favorites = const [];
+  List<FoodItem> _recentFoods = const [];
+  List<Recipe> _recipes = const [];
+  DietMode? _dietModeOverride;
+  MacroGoalConfig? _macroConfig;
+  NutritionAchievements _achievements = NutritionAchievements.empty;
+  bool _pendingCelebration = false;
+
+  List<T> _decodeList<T>(String? raw, T Function(Map<String, Object?>) build) {
+    if (raw == null || raw.isEmpty) return <T>[];
+    try {
+      final out = <T>[];
+      for (final item in jsonDecode(raw) as List<dynamic>) {
+        try {
+          out.add(build(Map<String, Object?>.from(item as Map)));
+        } catch (_) {}
+      }
+      return out;
+    } catch (_) {
+      return <T>[];
+    }
+  }
+
+  void _loadExtras(String userId) {
+    _favorites = _decodeList(_read(_favKey(userId)), FoodItem.fromMap);
+    _recipes = _decodeList(_read(_recipeKey(userId)), Recipe.fromMap);
+    _rebuildCatalog();
+
+    final mode = _read(_modeKey(userId));
+    _dietModeOverride = mode == null ? null : DietMode.fromStoreName(mode);
+
+    final macro = _read(_macroKey(userId));
+    if (macro == null || macro.isEmpty) {
+      _macroConfig = null;
+    } else {
+      try {
+        _macroConfig = MacroGoalConfig.fromMap(
+          Map<String, Object?>.from(jsonDecode(macro) as Map),
+        );
+      } catch (_) {
+        _macroConfig = null;
+      }
+    }
+  }
+
+  // --- Yêu thích / gần đây ---
+
+  List<FoodItem> get favoriteFoods => _favorites;
+  List<FoodItem> get recentFoods => _recentFoods;
+
+  bool isFavorite(String foodId) => _favorites.any((f) => f.id == foodId);
+
+  Future<void> toggleFavorite(FoodItem food) async {
+    final userId = _userId;
+    if (userId == null) return;
+    if (isFavorite(food.id)) {
+      _favorites = _favorites.where((f) => f.id != food.id).toList();
+    } else {
+      _favorites = [food, ..._favorites];
+    }
+    notifyListeners();
+    await _write(
+      _favKey(userId),
+      jsonEncode([for (final f in _favorites) f.toMap()]),
+    );
+  }
+
+  // --- Món tự nấu (công thức) ---
+
+  List<Recipe> get recipes => _recipes;
+
+  /// Lưu (hoặc ghi đè nếu truyền [id]) một công thức. Món sinh ra xuất hiện
+  /// ngay trong danh mục tìm kiếm.
+  Future<Recipe> saveRecipe({
+    required String userId,
+    required String name,
+    required int servings,
+    required List<RecipeItem> items,
+    String? id,
+  }) async {
+    final recipe = Recipe(
+      id: id ?? '${DateTime.now().microsecondsSinceEpoch}',
+      userId: userId,
+      name: name.trim().isEmpty ? 'Món tự nấu' : name.trim(),
+      servings: servings < 1 ? 1 : servings,
+      items: List.of(items),
+    );
+    _recipes = [
+      recipe,
+      ..._recipes.where((r) => r.id != recipe.id),
+    ];
+    _rebuildCatalog();
+    notifyListeners();
+    await _write(
+      _recipeKey(userId),
+      jsonEncode([for (final r in _recipes) r.toMap()]),
+    );
+    return recipe;
+  }
+
+  Future<void> deleteRecipe(String recipeId) async {
+    final userId = _userId;
+    if (userId == null) return;
+    _recipes = _recipes.where((r) => r.id != recipeId).toList();
+    _rebuildCatalog();
+    notifyListeners();
+    await _write(
+      _recipeKey(userId),
+      jsonEncode([for (final r in _recipes) r.toMap()]),
+    );
+  }
+
+  // --- Chế độ ăn và mục tiêu macro ---
+
+  DietMode? get dietModeOverride => _dietModeOverride;
+  MacroGoalConfig? get macroConfig => _macroConfig;
+
+  /// Chế độ đang dùng: lựa chọn riêng nếu có, không thì theo mục tiêu sức khỏe
+  /// trong hồ sơ.
+  DietMode effectiveDietMode(String healthGoal) =>
+      _dietModeOverride ?? DietMode.fromHealthGoal(healthGoal);
+
+  /// Đặt chế độ ăn; `null` để quay về theo hồ sơ.
+  Future<void> setDietMode(DietMode? mode) async {
+    final userId = _userId;
+    if (userId == null) return;
+    _dietModeOverride = mode;
+    notifyListeners();
+    if (mode == null) {
+      await _remove(_modeKey(userId));
+    } else {
+      await _write(_modeKey(userId), mode.storeName);
+    }
+  }
+
+  /// Đặt mục tiêu macro tự chọn; `null` để dùng tỉ lệ của chế độ ăn.
+  Future<void> setMacroConfig(MacroGoalConfig? config) async {
+    final userId = _userId;
+    if (userId == null) return;
+    _macroConfig = config;
+    notifyListeners();
+    if (config == null) {
+      await _remove(_macroKey(userId));
+    } else {
+      await _write(_macroKey(userId), jsonEncode(config.toMap()));
+    }
+  }
+
+  MacroTargets macroTargets(String healthGoal) => resolveMacroTargets(
+        calorieGoal: _summary.calorieGoal,
+        mode: effectiveDietMode(healthGoal),
+        custom: _macroConfig,
+      );
+
+  NutrientLimits nutrientLimits(String healthGoal) =>
+      effectiveDietMode(healthGoal).limitsFor(_summary.calorieGoal);
+
+  // --- Chuỗi ngày và huy hiệu ---
+
+  NutritionAchievements get achievements => _achievements;
+
+  /// Hôm nay vừa đạt mục tiêu lần đầu? Trả về `true` đúng một lần để giao
+  /// diện phát âm thanh/hiện chúc mừng.
+  bool takePendingCelebration() {
+    final pending = _pendingCelebration;
+    _pendingCelebration = false;
+    return pending;
+  }
+
+  void _checkCelebration(String userId) {
+    if (!isToday || !_achievements.todayGoalReached) return;
+    final now = DateTime.now();
+    final today = '${now.year}-${now.month}-${now.day}';
+    if (_read(_celebKey(userId)) == today) return;
+    _pendingCelebration = true;
+    _write(_celebKey(userId), today);
+  }
+
+  // --- Gợi ý bữa theo calo còn lại ---
+
+  /// Gợi ý món cho phần calo/đạm còn lại của ngày đang xem.
+  List<MealSuggestion> mealSuggestions(String healthGoal) {
+    final remainingKcal = _summary.remainingCalories;
+    final remainingProtein =
+        macroTargets(healthGoal).proteinG - _summary.protein;
+    return MealSuggester.suggest(
+      catalog: _catalog,
+      remainingKcal: remainingKcal,
+      remainingProtein: remainingProtein,
+      eatenFoodIds: {for (final e in _todayEntries) e.foodId},
+      mode: effectiveDietMode(healthGoal),
+    );
+  }
+
+  // --- Ghi chú và ảnh cho từng dòng ---
+
+  /// Đặt ghi chú/ảnh của một dòng nhật ký (null/rỗng để xóa).
+  Future<void> updateEntryNote(
+    MealEntry entry, {
+    String? note,
+    String? photoPath,
+  }) async {
+    await _store.updateEntry(entry.withNote(note: note, photoPath: photoPath));
+    await loadDay(userId: entry.userId, calorieGoal: _calorieGoal);
+  }
+
+  // --- Báo cáo ---
+
+  /// Các dòng nhật ký từ ngày [from] đến hết ngày [to] (cũ đến mới).
+  Future<List<MealEntry>> entriesInRange(
+    String userId,
+    DateTime from,
+    DateTime to,
+  ) async {
+    final start = _dateOnly(from);
+    final end = _dateOnly(to).add(const Duration(days: 1));
+    final all = await _store.allEntries(userId);
+    return all
+        .where((e) => !e.eatenAt.isBefore(start) && e.eatenAt.isBefore(end))
+        .toList()
+      ..sort((a, b) => a.eatenAt.compareTo(b.eatenAt));
+  }
+
+  /// Mục tiêu calo hiện tại (dùng cho báo cáo).
+  int get calorieGoal => _calorieGoal;
+
   void clear() {
     _todayEntries = const [];
     _summary = NutritionSummary.empty;
@@ -632,6 +928,14 @@ class NutritionRepository extends ChangeNotifier {
     _waterLog.clear();
     _selectedDay = _dateOnly(DateTime.now());
     _userId = null;
+    _favorites = const [];
+    _recentFoods = const [];
+    _recipes = const [];
+    _dietModeOverride = null;
+    _macroConfig = null;
+    _achievements = NutritionAchievements.empty;
+    _pendingCelebration = false;
+    _rebuildCatalog();
     notifyListeners();
   }
 
@@ -657,11 +961,17 @@ class NutritionRepository extends ChangeNotifier {
     var protein = 0.0;
     var carbs = 0.0;
     var fat = 0.0;
+    var fiber = 0.0;
+    var sugar = 0.0;
+    var sodium = 0.0;
     for (final entry in entries) {
       calories += entry.calories;
       protein += entry.protein;
       carbs += entry.carbs;
       fat += entry.fat;
+      fiber += entry.fiber;
+      sugar += entry.sugar;
+      sodium += entry.sodium;
     }
     return NutritionSummary(
       calories: calories,
@@ -669,6 +979,9 @@ class NutritionRepository extends ChangeNotifier {
       carbs: carbs,
       fat: fat,
       calorieGoal: calorieGoal,
+      fiber: fiber,
+      sugar: sugar,
+      sodium: sodium,
     );
   }
 }
