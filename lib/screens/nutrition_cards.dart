@@ -214,7 +214,6 @@ class _GoalBar extends StatelessWidget {
 
   /// `true` nếu mục tiêu là mức **tối đa** (đường, natri): ghi "tối đa".
   final bool isLimit;
-  final String? footnote;
 
   @override
   Widget build(BuildContext context) {
@@ -267,13 +266,6 @@ class _GoalBar extends StatelessWidget {
             ),
           ),
         ),
-        if (footnote != null) ...[
-          const SizedBox(height: 3),
-          Text(
-            footnote!,
-            style: const TextStyle(fontSize: 10.5, color: AppTheme.textSecondary),
-          ),
-        ],
       ],
     );
   }
