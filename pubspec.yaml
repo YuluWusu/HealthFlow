@@ -38,16 +38,18 @@ dependencies:
   shared_preferences: ^2.3.2
   image_picker: ^1.2.4
   flutter_local_notifications: ^22.3.1
-  timezone: ^0.11.1
-  # Xuất báo cáo PDF/CSV và chia sẻ file.
-  path_provider: ^2.1.0
-  pdf: ^3.11.0
-  share_plus: ">=11.0.0"
-  cross_file: ^0.3.4
-  # Quét mã vạch (tra Open Food Facts).
-  mobile_scanner: ^7.0.0
+  audioplayers: ^6.8.1
+    timezone: ^0.11.1
+    # Xuất báo cáo PDF/CSV và chia sẻ file
+    path_provider: ^2.1.0
+    pdf: ^3.11.1
+    printing: ^5.13.2
+    share_plus: ">=11.0.0"
+    cross_file: ^0.3.4
+    # Quét mã vạch (tra Open Food Facts)
+    mobile_scanner: ^7.0.0
 
-dev_dependencies:
+  dev_dependencies:
   flutter_test:
     sdk: flutter
 
