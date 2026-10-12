@@ -50,7 +50,7 @@ dependencies:
   # Quét mã vạch (tra Open Food Facts).
   mobile_scanner: ^7.0.0
 
-  dev_dependencies:
+dev_dependencies:
   flutter_test:
     sdk: flutter
 
