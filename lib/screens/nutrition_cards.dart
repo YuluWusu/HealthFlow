@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_conditional_assignment
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
