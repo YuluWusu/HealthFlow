@@ -408,8 +408,7 @@ class _BodyFocusAndWorkoutsState extends State<_BodyFocusAndWorkouts> {
     {'label': 'Ngực', 'prefix': 'Ngực'},
     {'label': 'Chân', 'prefix': 'Chân'},
     {'label': 'Mông', 'prefix': 'Mông'},
-    {'label': 'Vai', 'prefix': 'Vai'},
-    {'label': 'Lưng', 'prefix': 'Lưng'},
+    {'label': 'Vai & Lưng', 'prefix': 'Vai & Lưng'},
   ];
 
   @override
@@ -487,6 +486,54 @@ class _BodyFocusAndWorkoutsState extends State<_BodyFocusAndWorkouts> {
           ),
         ),
         const SizedBox(height: 20),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: SizedBox(
+            height: 124,
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  _muscleImage(selectedPrefix),
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: 28),
+                    child: const Icon(Icons.fitness_center_rounded, color: Colors.white54, size: 56),
+                  ),
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [Colors.black.withValues(alpha: 0.68), Colors.transparent],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(selectedPrefix, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        const Text('Chọn cấp độ để xem bài tập', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
         for (final item in workouts)
           _WorkoutTile(
             workout: item,
@@ -569,14 +616,12 @@ class _CustomWorkoutListScreenState extends State<_CustomWorkoutListScreen> {
   final List<Map<String, dynamic>> _customWorkouts = [
     {
       'name': 'NEW',
-      'minutes': 3,
+      'minutes': 8,
       'exercises': 4,
-      'exerciseList': [
-        {'name': 'Chống đẩy vào tường', 'reps': 'x15', 'image': 'assets/images/exercise/logo_bung1.png'},
-        {'name': 'Đấm', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung2.png'},
-        {'name': 'Giang cánh tay sang hai bên', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung3.png'},
-        {'name': 'Gập người 90/90', 'reps': 'x10', 'image': 'assets/images/exercise/logo_bung1.png'},
-      ]
+      'exerciseList': _exercisesForMuscle('Cánh tay')
+          .take(4)
+          .map((exercise) => Map<String, dynamic>.from(exercise))
+          .toList(),
     },
   ];
 
@@ -663,11 +708,6 @@ class _EditCustomWorkoutScreenState extends State<_EditCustomWorkoutScreen> {
       if (widget.initialWorkout!['exerciseList'] != null) {
         _exercises.addAll(List<Map<String, dynamic>>.from(widget.initialWorkout!['exerciseList'] as List<dynamic>));
       }
-    } else {
-      _exercises.addAll([
-        {'name': 'Chống đẩy vào tường', 'reps': 'x10', 'image': 'assets/images/exercise/logo_bung1.png'},
-        {'name': 'Đấm', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung2.png'},
-      ]);
     }
   }
 
@@ -681,9 +721,44 @@ class _EditCustomWorkoutScreenState extends State<_EditCustomWorkoutScreen> {
     );
     if (result != null && result.isNotEmpty) {
       setState(() {
-        _exercises.addAll(result);
+        final existingNames = _exercises
+            .map((exercise) => (exercise['name'] as String).trim().toLowerCase())
+            .toSet();
+        _exercises.addAll(
+          result.where((exercise) => existingNames.add(
+            (exercise['name'] as String).trim().toLowerCase(),
+          )),
+        );
       });
     }
+  }
+
+  void _adjustExerciseAmount(int index, int delta) {
+    setState(() {
+      final current = _exercises[index]['reps'] as String;
+      final timeParts = current.split(':');
+      if (timeParts.length == 2) {
+        final minutes = int.tryParse(timeParts[0]);
+        final seconds = int.tryParse(timeParts[1]);
+        if (minutes != null && seconds != null) {
+          final totalSeconds = (minutes * 60 + seconds + delta * 5).clamp(5, 5999);
+          _exercises[index]['reps'] =
+              '${(totalSeconds ~/ 60).toString().padLeft(2, '0')}:${(totalSeconds % 60).toString().padLeft(2, '0')}';
+          return;
+        }
+      }
+
+      final countMatch = RegExp(r'x(\d+)').firstMatch(current);
+      if (countMatch != null) {
+        final count = int.parse(countMatch.group(1)!);
+        final updatedCount = (count + delta).clamp(1, 999);
+        _exercises[index]['reps'] = current.replaceRange(
+          countMatch.start,
+          countMatch.end,
+          'x$updatedCount',
+        );
+      }
+    });
   }
 
   @override
@@ -745,6 +820,7 @@ class _EditCustomWorkoutScreenState extends State<_EditCustomWorkoutScreen> {
               child: ReorderableListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: _exercises.length,
+                buildDefaultDragHandles: false,
                 onReorder: (oldIndex, newIndex) {
                   setState(() {
                     if (newIndex > oldIndex) newIndex -= 1;
@@ -755,11 +831,14 @@ class _EditCustomWorkoutScreenState extends State<_EditCustomWorkoutScreen> {
                 itemBuilder: (context, index) {
                   final ex = _exercises[index];
                   return Container(
-                    key: ValueKey('${ex['name']}_$index'),
+                    key: ValueKey('${ex['name']}_${ex['image']}'),
                     margin: const EdgeInsets.only(bottom: 16),
                     child: Row(
                       children: [
-                        const Icon(Icons.menu, color: AppTheme.textSecondary, size: 20),
+                        ReorderableDragStartListener(
+                          index: index,
+                          child: const Icon(Icons.drag_handle_rounded, color: AppTheme.textSecondary, size: 24),
+                        ),
                         const SizedBox(width: 12),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
@@ -779,24 +858,35 @@ class _EditCustomWorkoutScreenState extends State<_EditCustomWorkoutScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(color: AppTheme.background, borderRadius: BorderRadius.circular(6)),
-                                    child: const Icon(Icons.remove, size: 14),
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(color: AppTheme.background, borderRadius: BorderRadius.circular(8)),
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      tooltip: 'Giảm 1 lần hoặc 5 giây',
+                                      onPressed: () => _adjustExerciseAmount(index, -1),
+                                      icon: const Icon(Icons.remove, size: 16),
+                                    ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 8),
                                   Text(ex['reps'] as String, style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary)),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 8),
                                   Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(color: AppTheme.background, borderRadius: BorderRadius.circular(6)),
-                                    child: const Icon(Icons.add, size: 14),
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(color: AppTheme.background, borderRadius: BorderRadius.circular(8)),
+                                    child: IconButton(
+                                      padding: EdgeInsets.zero,
+                                      tooltip: 'Tăng 1 lần hoặc 5 giây',
+                                      onPressed: () => _adjustExerciseAmount(index, 1),
+                                      icon: const Icon(Icons.add, size: 16),
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.swap_vert, color: AppTheme.primary),
                       ],
                     ),
                   );
@@ -850,22 +940,33 @@ class _AddExerciseSheet extends StatefulWidget {
 }
 
 class _AddExerciseSheetState extends State<_AddExerciseSheet> {
-  final List<Map<String, dynamic>> _recommended = [
-    {'name': 'Chống đẩy vào tường', 'reps': 'x10', 'image': 'assets/images/exercise/logo_bung1.png'},
-    {'name': 'Đấm', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung2.png'},
-    {'name': 'Giang cánh tay sang hai bên', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung3.png'},
-    {'name': 'Căng bắp chân phải', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung1.png'},
-    {'name': 'Duỗi mông bên trái', 'reps': '00:20', 'image': 'assets/images/exercise/logo_bung2.png'},
-  ];
-  
-  final List<Map<String, dynamic>> _recent = [
-    {'name': 'Gập người 90/90', 'reps': 'x10', 'image': 'assets/images/exercise/logo_bung3.png'},
+  static const _muscleGroups = [
+    'Bụng',
+    'Cánh tay',
+    'Cẳng tay',
+    'Ngực',
+    'Chân',
+    'Mông',
+    'Vai & Lưng',
   ];
 
   final Set<Map<String, dynamic>> _selected = {};
 
+  Map<String, List<Map<String, dynamic>>> get _availableByMuscle {
+    final seenNames = <String>{};
+    return {
+      for (final muscle in _muscleGroups)
+        muscle: [
+          for (final exercise in _exercisesForMuscle(muscle))
+            if (seenNames.add((exercise['name'] ?? '').trim().toLowerCase()))
+              Map<String, dynamic>.from(exercise),
+        ],
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final availableByMuscle = _availableByMuscle;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -900,7 +1001,7 @@ class _AddExerciseSheetState extends State<_AddExerciseSheet> {
                       children: [
                         Icon(Icons.filter_alt_outlined, size: 16, color: AppTheme.textSecondary),
                         SizedBox(width: 8),
-                        Text('Tất cả các khu vực (370)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+                        Text('Tất cả nhóm cơ (46 bài)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
                       ],
                     ),
                   ),
@@ -926,13 +1027,15 @@ class _AddExerciseSheetState extends State<_AddExerciseSheet> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 children: [
-                  const Text('Được khuyến nghị', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600, fontSize: 14)),
-                  const SizedBox(height: 16),
-                  ..._recommended.map((ex) => _buildItem(ex)),
-                  const SizedBox(height: 24),
-                  const Text('Gần đây', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600, fontSize: 14)),
-                  const SizedBox(height: 16),
-                  ..._recent.map((ex) => _buildItem(ex)),
+                  const Text('Bài tập theo nhóm cơ', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.w600, fontSize: 14)),
+                  const SizedBox(height: 12),
+                  for (final muscle in _muscleGroups) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 12),
+                      child: Text(muscle, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.textPrimary)),
+                    ),
+                    ...availableByMuscle[muscle]!.map(_buildItem),
+                  ],
                   const SizedBox(height: 80),
                 ],
               ),
@@ -962,47 +1065,83 @@ class _AddExerciseSheetState extends State<_AddExerciseSheet> {
   }
 
   Widget _buildItem(Map<String, dynamic> ex) {
-    final isSelected = _selected.contains(ex);
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (isSelected) _selected.remove(ex);
-          else _selected.add(ex);
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        color: Colors.transparent,
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                ex['image'] as String,
-                width: 50, height: 50, fit: BoxFit.cover,
-                errorBuilder: (c,e,s) => Container(width: 50, height: 50, color: AppTheme.lightGreen, child: const Icon(Icons.fitness_center_rounded, color: AppTheme.primary)),
-              ),
+    final exerciseName = ex['name'] as String;
+    final isSelected = _selected.any((item) => item['name'] == exerciseName);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () {
+          setState(() {
+            if (isSelected) {
+              _selected.removeWhere((item) => item['name'] == exerciseName);
+            } else {
+              _selected.add(ex);
+            }
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.primary.withValues(alpha: 0.09) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? AppTheme.primary : AppTheme.background,
+              width: isSelected ? 1.5 : 1,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(ex['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                  const SizedBox(height: 4),
-                  Text(ex['reps'] as String, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                ],
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(9),
+                child: Image.asset(
+                  ex['image'] as String,
+                  width: 54,
+                  height: 54,
+                  fit: BoxFit.cover,
+                  errorBuilder: (c, e, s) => Container(
+                    width: 54,
+                    height: 54,
+                    color: AppTheme.lightGreen,
+                    child: const Icon(Icons.fitness_center_rounded, color: AppTheme.primary),
+                  ),
+                ),
               ),
-            ),
-            Container(
-              width: 20, height: 20,
-              decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primary : AppTheme.background,
-                shape: BoxShape.circle,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(ex['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    const SizedBox(height: 4),
+                    Text(ex['reps'] as String, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+                  ],
+                ),
               ),
-              child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
-            ),
-          ],
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppTheme.primary : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isSelected ? AppTheme.primary : AppTheme.textSecondary.withValues(alpha: 0.35),
+                  ),
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 140),
+                  transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                  child: isSelected
+                      ? const Icon(Icons.check, key: ValueKey('selected'), color: Colors.white, size: 16)
+                      : const SizedBox(key: ValueKey('unselected')),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1231,23 +1370,145 @@ void _openWorkoutDetail(BuildContext context, WorkoutRepository repository, Work
   Navigator.push(context, MaterialPageRoute(builder: (_) => _WorkoutDetailScreen(repository: repository, workout: workout)));
 }
 
+String _muscleSlug(String muscle) {
+  switch (muscle) {
+    case 'Bụng': return 'abs';
+    case 'Cánh tay': return 'arm';
+    case 'Cẳng tay': return 'forearm';
+    case 'Ngực': return 'chest';
+    case 'Chân': return 'leg';
+    case 'Mông': return 'glutes';
+    case 'Vai & Lưng': return 'shoulders_back';
+    default: return 'abs';
+  }
+}
+
+String _muscleLevelImage(String muscle, WorkoutIntensity intensity) {
+  final level = switch (intensity) {
+    WorkoutIntensity.light => 'beginner',
+    WorkoutIntensity.moderate => 'intermediate',
+    WorkoutIntensity.intense => 'advanced',
+  };
+  return 'assets/images/exercise/muscle_${_muscleSlug(muscle)}_$level.png';
+}
+
+String _movementImage(String exerciseSlug) {
+  const available = <String>{
+    'abs_crunch',
+    'arm_circles',
+    'arm_curls',
+    'heel_touches',
+    'knee_pushups',
+    'leg_raises',
+    'mountain_climbers',
+    'plank',
+    'reverse_flys',
+    'russian_twist',
+    'shoulder_taps',
+    'straight_punches',
+    'triceps_dips',
+    'triceps_extensions',
+    'wall_pushups',
+    'wrist_curls',
+    'wrist_extensions',
+  };
+  const aliases = <String, String>{
+    'wall_pushups_chest': 'wall_pushups',
+    'pike_pushups': 'triceps_dips',
+    'lateral_raises': 'reverse_flys',
+    'y_raises': 'reverse_flys',
+    'plank_shoulder_taps': 'shoulder_taps',
+    'pushups': 'triceps_dips',
+    'wide_pushups': 'triceps_dips',
+    'incline_pushups': 'wall_pushups',
+  };
+  final assetName = aliases[exerciseSlug] ??
+      (available.contains(exerciseSlug) ? exerciseSlug : null);
+  if (assetName == null) {
+    return 'assets/images/exercise/workout_hero_bg.png';
+  }
+  return 'assets/images/exercise/exercise_$assetName.png';
+}
+
+String _muscleImage(String muscle) =>
+    _muscleLevelImage(muscle, WorkoutIntensity.light);
+
+List<Map<String, String>> _exercisesForMuscle(String muscle) {
+  final byMuscle = <String, List<Map<String, String>>>{
+    'Bụng': [
+      {'name': 'Gập bụng cơ bản', 'reps': 'x15', 'image': _movementImage('abs_crunch')},
+      {'name': 'Plank', 'reps': '00:30', 'image': _movementImage('plank')},
+      {'name': 'Leo núi', 'reps': 'x20', 'image': _movementImage('mountain_climbers')},
+      {'name': 'Chạm gót chân', 'reps': 'x26', 'image': _movementImage('heel_touches')},
+      {'name': 'Vặn người chéo', 'reps': 'x20', 'image': _movementImage('russian_twist')},
+      {'name': 'Nâng chân', 'reps': 'x12', 'image': _movementImage('leg_raises')},
+    ],
+    'Cánh tay': [
+      {'name': 'Chống đẩy vào tường', 'reps': 'x15', 'image': _movementImage('wall_pushups')},
+      {'name': 'Đấm thẳng', 'reps': '00:30', 'image': _movementImage('straight_punches')},
+      {'name': 'Cuốn tay không tạ', 'reps': 'x15', 'image': _movementImage('arm_curls')},
+      {'name': 'Chống đẩy gối', 'reps': 'x10', 'image': _movementImage('knee_pushups')},
+      {'name': 'Duỗi cơ tay sau', 'reps': 'x12', 'image': _movementImage('triceps_extensions')},
+      {'name': 'Plank chạm vai', 'reps': 'x20', 'image': _movementImage('shoulder_taps')},
+    ],
+    'Cẳng tay': [
+      {'name': 'Gập cổ tay', 'reps': 'x15', 'image': _movementImage('wrist_curls')},
+      {'name': 'Duỗi cổ tay', 'reps': 'x15', 'image': _movementImage('wrist_extensions')},
+      {'name': 'Kéo tay', 'reps': '00:30', 'image': _movementImage('arm_scissors')},
+      {'name': 'Xoay tay', 'reps': '00:30', 'image': _movementImage('arm_circles')},
+      {'name': 'Tập cơ tay sau', 'reps': 'x8', 'image': _movementImage('triceps_dips')},
+      {'name': 'Ép vai sau', 'reps': '00:30', 'image': _movementImage('reverse_flys')},
+    ],
+    'Ngực': [
+      {'name': 'Chống đẩy cơ bản', 'reps': 'x12', 'image': _movementImage('pushups')},
+      {'name': 'Chống đẩy rộng tay', 'reps': 'x10', 'image': _movementImage('wide_pushups')},
+      {'name': 'Chống đẩy vào tường', 'reps': 'x15', 'image': _movementImage('wall_pushups_chest')},
+      {'name': 'Ép ngực đứng', 'reps': '00:30', 'image': _movementImage('standing_chest_squeeze')},
+      {'name': 'Chống đẩy dốc', 'reps': 'x10', 'image': _movementImage('incline_pushups')},
+      {'name': 'Plank lên xuống', 'reps': 'x10', 'image': _movementImage('up_down_plank')},
+    ],
+    'Chân': [
+      {'name': 'Squat', 'reps': 'x15', 'image': _movementImage('squat')},
+      {'name': 'Chùng chân', 'reps': 'x12 mỗi bên', 'image': _movementImage('lunges')},
+      {'name': 'Bật nhảy tại chỗ', 'reps': '00:30', 'image': _movementImage('jumping_jacks')},
+      {'name': 'Nâng bắp chân', 'reps': 'x20', 'image': _movementImage('calf_raises')},
+      {'name': 'Ngồi dựa tường', 'reps': '00:30', 'image': _movementImage('wall_sit')},
+      {'name': 'Squat bật nhảy', 'reps': 'x10', 'image': _movementImage('jump_squats')},
+    ],
+    'Mông': [
+      {'name': 'Cầu mông', 'reps': 'x15', 'image': _movementImage('glute_bridge')},
+      {'name': 'Đá chân ra sau', 'reps': 'x12 mỗi bên', 'image': _movementImage('donkey_kicks')},
+      {'name': 'Clamshell', 'reps': 'x15 mỗi bên', 'image': _movementImage('clamshell')},
+      {'name': 'Cầu mông một chân', 'reps': 'x10 mỗi bên', 'image': _movementImage('single_leg_glute_bridge')},
+      {'name': 'Fire hydrant', 'reps': 'x12 mỗi bên', 'image': _movementImage('fire_hydrants')},
+      {'name': 'Squat sumo', 'reps': 'x15', 'image': _movementImage('sumo_squat')},
+    ],
+    'Vai & Lưng': [
+      {'name': 'Đẩy vai không tạ', 'reps': 'x12', 'image': _movementImage('pike_pushups')},
+      {'name': 'Superman', 'reps': 'x12', 'image': _movementImage('superman')},
+      {'name': 'Nâng tay sang ngang', 'reps': 'x12', 'image': _movementImage('lateral_raises')},
+      {'name': 'Bird-dog', 'reps': 'x10 mỗi bên', 'image': _movementImage('bird_dog')},
+      {'name': 'Vòng tay', 'reps': '00:30', 'image': _movementImage('arm_circles')},
+      {'name': 'Tư thế em bé', 'reps': '00:30', 'image': _movementImage('childs_pose')},
+      {'name': 'Đẩy vai chữ Y', 'reps': 'x12', 'image': _movementImage('y_raises')},
+      {'name': 'Nâng tay chân đối diện', 'reps': 'x12', 'image': _movementImage('opposite_arm_leg_raise')},
+      {'name': 'Plank chạm vai', 'reps': 'x20', 'image': _movementImage('plank_shoulder_taps')},
+      {'name': 'Cobra nâng ngực', 'reps': '00:20', 'image': _movementImage('cobra_stretch')},
+      {'name': 'Nâng tay trước', 'reps': 'x12', 'image': _movementImage('front_raises')},
+      {'name': 'Good morning', 'reps': 'x15', 'image': _movementImage('good_morning')},
+    ],
+  };
+  return byMuscle[muscle] ?? byMuscle['Bụng']!;
+}
+
 class _WorkoutDetailScreen extends StatelessWidget {
   final WorkoutRepository repository;
   final Workout workout;
 
   const _WorkoutDetailScreen({required this.repository, required this.workout});
 
-  // Tạo danh sách bài tập giả
   List<Map<String, String>> get _exercises {
-    final exerciseData = <Map<String, String>>[
-      {'name': 'Bật nhảy', 'reps': '00:30'},
-      {'name': 'Chạm gót chân', 'reps': 'x26'},
-      {'name': 'Vặn chéo', 'reps': 'x20'},
-      {'name': 'Leo núi', 'reps': 'x20'},
-      {'name': 'Gập bụng', 'reps': 'x15'},
-      {'name': 'Plank', 'reps': '00:30'},
-    ];
-    // Thêm bài tập dựa theo cường độ
+    final exerciseData = _exercisesForMuscle(workout.category);
     final count = workout.intensity == WorkoutIntensity.light
         ? 4
         : workout.intensity == WorkoutIntensity.moderate
@@ -1280,7 +1541,15 @@ class _WorkoutDetailScreen extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset('assets/images/exercise/workout_hero_bg.png', fit: BoxFit.cover),
+                  Image.asset(
+                    _muscleLevelImage(workout.category, workout.intensity),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: AppTheme.primary.withValues(alpha: 0.35),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.fitness_center_rounded, color: Colors.white70, size: 56),
+                    ),
+                  ),
                   const DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -1336,7 +1605,7 @@ class _WorkoutDetailScreen extends StatelessWidget {
                         final exerciseMaps = exercises.map((e) => <String, dynamic>{
                           'name': e['name']!,
                           'reps': e['reps']!,
-                          'image': 'assets/images/exercise/logo_bung1.png',
+                          'image': e['image']!,
                         }).toList();
 
                         Navigator.push(
@@ -1387,7 +1656,7 @@ class _WorkoutDetailScreen extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(
-                          'assets/images/exercise/logo_bung1.png',
+                          ex['image'] ?? 'assets/images/exercise/logo_bung1.png',
                           width: 56,
                           height: 56,
                           fit: BoxFit.cover,
@@ -1440,11 +1709,7 @@ class _WorkoutTile extends StatelessWidget {
   });
 
   String get _imagePath {
-    switch (workout.intensity) {
-      case WorkoutIntensity.light: return 'assets/images/exercise/logo_bung1.png';
-      case WorkoutIntensity.moderate: return 'assets/images/exercise/logo_bung2.png';
-      case WorkoutIntensity.intense: return 'assets/images/exercise/logo_bung3.png';
-    }
+    return _muscleLevelImage(workout.category, workout.intensity);
   }
 
   int get _bolts {
@@ -1505,7 +1770,7 @@ class _WorkoutTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '${workout.durationMinutes} phút • ${workout.durationMinutes ~/ 1.5} Bài tập',
+                    '${workout.durationMinutes} phút • ${workout.intensity == WorkoutIntensity.light ? 4 : workout.intensity == WorkoutIntensity.moderate ? 5 : 6} bài tập',
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
