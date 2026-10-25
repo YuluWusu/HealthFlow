@@ -147,6 +147,24 @@ class _WaterScreenState extends State<WaterScreen> {
     setState(() {});
   }
 
+  Future<void> _editGoal(NutritionRepository nutrition, int current) async {
+    final user = AuthScope.of(context, listen: false).currentUser;
+    if (user == null) return;
+    final picked = await showDialog<int>(
+      context: context,
+      builder: (_) => _GoalDialog(
+        initial: current,
+        isCustom: NutritionRepository.customWaterGoalMl != null,
+      ),
+    );
+    if (picked == null) return;
+    // -1: quay về mục tiêu tự động theo cân nặng.
+    await nutrition.setWaterGoal(
+      userId: user.id,
+      ml: picked < 0 ? null : picked,
+    );
+  }
+
   Future<void> _editCup(NutritionRepository nutrition) async {
     final user = AuthScope.of(context, listen: false).currentUser;
     if (user == null) return;
@@ -201,7 +219,11 @@ class _WaterScreenState extends State<WaterScreen> {
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: EdgeInsets.fromLTRB(20, topPad + 6, 20, 32),
             children: [
-              _ProgressCard(ml: nutrition.waterMl, goal: goal),
+              _ProgressCard(
+                ml: nutrition.waterMl,
+                goal: goal,
+                onEditGoal: () => _editGoal(nutrition, goal),
+              ),
               const SizedBox(height: 22),
               const _SectionLabel('Thêm nhanh'),
               const SizedBox(height: 10),
@@ -383,10 +405,15 @@ class _SectionLabel extends StatelessWidget {
 
 /// Thẻ tiến độ: số lít đã uống, mục tiêu và còn thiếu bao nhiêu.
 class _ProgressCard extends StatelessWidget {
-  const _ProgressCard({required this.ml, required this.goal});
+  const _ProgressCard({
+    required this.ml,
+    required this.goal,
+    required this.onEditGoal,
+  });
 
   final int ml;
   final int goal;
+  final VoidCallback onEditGoal;
 
   @override
   Widget build(BuildContext context) {
@@ -440,6 +467,14 @@ class _ProgressCard extends StatelessWidget {
                     color: AppTheme.textSecondary,
                   ),
                 ),
+              ),
+              const Spacer(),
+              IconButton(
+                onPressed: onEditGoal,
+                tooltip: 'Đổi mục tiêu nước',
+                visualDensity: VisualDensity.compact,
+                icon: const Icon(Icons.edit_rounded,
+                    size: 20, color: AppTheme.blue),
               ),
             ],
           ),
@@ -680,6 +715,95 @@ class _DrinkList extends StatelessWidget {
 }
 
 /// Hộp thoại đặt dung tích "1 cốc nước".
+/// Hộp thoại đặt mục tiêu nước mỗi ngày. Trả về ml, hoặc -1 = tự động.
+class _GoalDialog extends StatefulWidget {
+  const _GoalDialog({required this.initial, required this.isCustom});
+
+  final int initial;
+  final bool isCustom;
+
+  @override
+  State<_GoalDialog> createState() => _GoalDialogState();
+}
+
+class _GoalDialogState extends State<_GoalDialog> {
+  static const _presets = [1500, 2000, 2500, 3000];
+
+  late final TextEditingController _controller =
+      TextEditingController(text: '${widget.initial}');
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  int get _value => int.tryParse(_controller.text.trim()) ?? 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final valid = _value >= 500 && _value <= 6000;
+
+    return AlertDialog(
+      title: const Text('Mục tiêu nước mỗi ngày'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final ml in _presets)
+                ChoiceChip(
+                  label: Text('$ml ml'),
+                  selected: _value == ml,
+                  onSelected: (_) => setState(() {
+                    _controller.text = '$ml';
+                  }),
+                  showCheckmark: false,
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(
+              suffixText: 'ml',
+              helperText: 'Từ 500 đến 6000 ml',
+              isDense: true,
+              filled: true,
+              fillColor: AppTheme.background,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        if (widget.isCustom)
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(-1),
+            child: const Text('Tự động'),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Hủy'),
+        ),
+        FilledButton(
+          onPressed: valid ? () => Navigator.of(context).pop(_value) : null,
+          child: const Text('Lưu'),
+        ),
+      ],
+    );
+  }
+}
+
 class _CupDialog extends StatefulWidget {
   const _CupDialog({required this.initial});
 

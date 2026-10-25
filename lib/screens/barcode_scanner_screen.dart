@@ -7,6 +7,7 @@ import '../data/auth_scope.dart';
 import '../data/nutrition_repository.dart';
 import '../models/nutrition.dart';
 import '../services/open_food_facts_service.dart';
+import 'product_entry_screen.dart';
 import '../theme/app_theme.dart';
 
 /// Quét mã vạch bao bì rồi tra Open Food Facts để ghi nhanh vào nhật ký.
@@ -64,10 +65,13 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     BarcodeProduct? product;
     String? error;
     try {
-      product = await _service.lookup(code);
-      if (product == null) {
-        error = 'Chưa có sản phẩm mã $code trong Open Food Facts '
-            'hoặc thiếu thông tin calo.';
+      // Sản phẩm đã tự nhập trước đó thì dùng luôn, không cần mạng.
+      product = await LocalBarcodeStore.find(code) ?? await _service.lookup(code);
+      if (product == null && mounted) {
+        product = await Navigator.of(context).push<BarcodeProduct>(
+          MaterialPageRoute(builder: (_) => ProductEntryScreen(code: code)),
+        );
+        if (product != null) await LocalBarcodeStore.save(product);
       }
     } on OpenFoodFactsException catch (e) {
       error = e.message;

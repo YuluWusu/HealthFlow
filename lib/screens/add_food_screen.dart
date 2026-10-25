@@ -11,6 +11,7 @@ import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
 import '../theme/food_images.dart';
+import '../services/audio_service.dart';
 
 /// Màn hình 7 trong bản thiết kế: thêm món ăn vào nhật ký.
 ///
@@ -103,7 +104,9 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                     suffixIcon: _searchController.text.isEmpty
                         ? null
                         : IconButton(
-                            onPressed: () {
+                            onPressed: ()  {
+              AudioService().playTap();
+
                               _searchController.clear();
                               setState(() {});
                             },
@@ -246,6 +249,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => GramSheet(
         ingredient: ingredient,
+        initialGrams: ingredient.isSeasoning ? 5 : 100,
         onAdd: (grams) => nutrition.addIngredientToCart(ingredient, grams),
       ),
     );
@@ -619,13 +623,19 @@ class _CartSheetState extends State<_CartSheet> {
       ? '${gramsOfPortion(item.portion)}g'
       : _portionText(item.portion);
 
-  /// Nguyên liệu tăng/giảm 50 g mỗi lần bấm.
-  static double _stepDown(PortionedFood item) => isIngredientFoodId(item.food.id)
-      ? item.portion - 0.5
-      : _down(item.portion);
-  static double _stepUp(PortionedFood item) => isIngredientFoodId(item.food.id)
-      ? item.portion + 0.5
-      : _up(item.portion);
+  /// Nguyên liệu tăng/giảm theo bước nhỏ khi ít (gia vị 5 g), lớn khi nhiều
+  /// (50 g). Xem [gramStepUp] / [gramStepDown].
+  static double _stepDown(PortionedFood item) {
+    if (!isIngredientFoodId(item.food.id)) return _down(item.portion);
+    final g = gramsOfPortion(item.portion);
+    return (g - gramStepDown(g)) / 100;
+  }
+
+  static double _stepUp(PortionedFood item) {
+    if (!isIngredientFoodId(item.food.id)) return _up(item.portion);
+    final g = gramsOfPortion(item.portion);
+    return (g + gramStepUp(g)) / 100;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -716,10 +726,10 @@ class _CartSheetState extends State<_CartSheet> {
                                   _stepDown(item),
                                 ),
                                 icon: Icon(
-                                  item.portion <= 0.5
+                                  _stepDown(item) <= 0
                                       ? Icons.delete_outline_rounded
                                       : Icons.remove_circle_outline_rounded,
-                                  color: item.portion <= 0.5
+                                  color: _stepDown(item) <= 0
                                       ? AppTheme.danger
                                       : null,
                                 ),
@@ -1506,6 +1516,16 @@ class IngredientTile extends StatelessWidget {
                           color: AppTheme.textSecondary,
                         ),
                       ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Mỗi 100g: đường ${_n(ingredient.sugar)}g · '
+                        'muối ${_n(double.parse(saltGramsOf(ingredient.sodium).toStringAsFixed(1)))}g · '
+                        'xơ ${_n(ingredient.fiber)}g',
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1540,14 +1560,19 @@ class GramSheet extends StatefulWidget {
   });
 
   @override
-  State<GramSheet> createState() => _GramSheetState();
+  State<GramSheet> createState() => GramSheetState();
 }
 
-class _GramSheetState extends State<GramSheet> {
+class GramSheetState extends State<GramSheet> {
   late final TextEditingController _controller =
       TextEditingController(text: '${widget.initialGrams}');
 
-  static const _quick = [50, 100, 150, 200, 300];
+  static const _quickDefault = [50, 100, 150, 200, 300];
+  static const _quickSeasoning = [2, 5, 10, 15, 20];
+
+  /// Gia vị dùng rất ít nên chọn nhanh theo vài gram thay vì hàng trăm gram.
+  List<int> get _quick =>
+      widget.ingredient.isSeasoning ? _quickSeasoning : _quickDefault;
 
   int get _grams => int.tryParse(_controller.text.trim()) ?? 0;
 
@@ -1635,6 +1660,16 @@ class _GramSheetState extends State<GramSheet> {
                     ),
                 ],
               ),
+              if (ing.isSeasoning) ...[
+                const SizedBox(height: 8),
+                const Text(
+                  '1 muỗng cà phê ≈ 5g · 1 muỗng canh ≈ 15g',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
               const SizedBox(height: 14),
               Container(
                 width: double.infinity,
@@ -1659,6 +1694,16 @@ class _GramSheetState extends State<GramSheet> {
                       'Đạm ${_n(ing.proteinFor(g))}g · '
                       'Carb ${_n(ing.carbsFor(g))}g · '
                       'Béo ${_n(ing.fatFor(g))}g',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Đường ${_n(ing.sugarFor(g))}g · '
+                      'Muối ${_n(saltGramsOf(ing.sodiumFor(g)))}g · '
+                      'Xơ ${_n(ing.fiberFor(g))}g',
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppTheme.textSecondary,

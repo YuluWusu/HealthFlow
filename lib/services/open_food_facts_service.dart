@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/nutrition.dart';
 
@@ -42,6 +43,37 @@ class BarcodeProduct {
   final double fiberPer100;
   final double sugarPer100;
   final double sodiumMgPer100;
+
+  Map<String, Object?> toMap() => {
+        'code': code,
+        'name': name,
+        'brand': brand,
+        'serving': servingGrams,
+        'kcal': kcalPer100,
+        'protein': proteinPer100,
+        'carbs': carbsPer100,
+        'fat': fatPer100,
+        'fiber': fiberPer100,
+        'sugar': sugarPer100,
+        'sodium': sodiumMgPer100,
+      };
+
+  factory BarcodeProduct.fromMap(Map<String, dynamic> m) {
+    double d(String k) => (m[k] as num?)?.toDouble() ?? 0;
+    return BarcodeProduct(
+      code: m['code'] as String,
+      name: m['name'] as String,
+      brand: (m['brand'] as String?) ?? '',
+      servingGrams: d('serving') > 0 ? d('serving') : 100,
+      kcalPer100: d('kcal'),
+      proteinPer100: d('protein'),
+      carbsPer100: d('carbs'),
+      fatPer100: d('fat'),
+      fiberPer100: d('fiber'),
+      sugarPer100: d('sugar'),
+      sodiumMgPer100: d('sodium'),
+    );
+  }
 
   String get displayName => brand.isEmpty ? name : '$name ($brand)';
 
@@ -160,5 +192,27 @@ class OpenFoodFactsService {
       sugarPer100: num100('sugars_100g') ?? 0,
       sodiumMgPer100: sodiumG * 1000,
     );
+  }
+}
+
+/// Sản phẩm người dùng tự nhập hoặc chụp bảng dinh dưỡng, lưu trên máy theo
+/// mã vạch để lần sau quét ra ngay (kể cả khi mất mạng).
+class LocalBarcodeStore {
+  static const _key = 'hf_barcode_products_v1';
+
+  static Future<Map<String, dynamic>> _all() async {
+    final raw = (await SharedPreferences.getInstance()).getString(_key);
+    return raw == null ? {} : Map<String, dynamic>.from(jsonDecode(raw) as Map);
+  }
+
+  static Future<BarcodeProduct?> find(String code) async {
+    final m = (await _all())[code];
+    return m == null ? null : BarcodeProduct.fromMap(Map<String, dynamic>.from(m as Map));
+  }
+
+  static Future<void> save(BarcodeProduct p) async {
+    final all = await _all();
+    all[p.code] = p.toMap();
+    await (await SharedPreferences.getInstance()).setString(_key, jsonEncode(all));
   }
 }

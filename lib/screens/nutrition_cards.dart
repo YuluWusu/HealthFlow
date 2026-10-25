@@ -89,6 +89,7 @@ void _toast(BuildContext context, String text, {SnackBarAction? action}) {
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
+ persist: false, duration: const Duration(seconds: 5),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         content: Text(text),
@@ -549,6 +550,10 @@ class _QuickAddCardState extends State<QuickAddCard> {
   // 0 = Yêu thích, 1 = Gần đây, 2 = Hay ăn. null: tự chọn tab đầu có dữ liệu.
   int? _tab;
 
+  /// Mặc định chỉ hiện vài món; bấm "Xem thêm" để mở hết.
+  static const int _previewCount = 4;
+  bool _expanded = false;
+
   List<FoodItem> _foods(int tab) {
     final n = widget.nutrition;
     switch (tab) {
@@ -625,7 +630,10 @@ class _QuickAddCardState extends State<QuickAddCard> {
                   label: Text(labels[i]),
                   selected: tab == i,
                   showCheckmark: false,
-                  onSelected: (_) => setState(() => _tab = i),
+                  onSelected: (_) => setState(() {
+                    _tab = i;
+                    _expanded = false;
+                  }),
                   labelStyle: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -648,12 +656,14 @@ class _QuickAddCardState extends State<QuickAddCard> {
                   : 'Chưa có dữ liệu.',
               style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
             )
-          else
+          else ...[
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                for (final food in foods)
+                for (final food in _expanded
+                    ? foods
+                    : foods.take(_previewCount))
                   _QuickChip(
                     food: food,
                     favorite: n.isFavorite(food.id),
@@ -662,6 +672,30 @@ class _QuickAddCardState extends State<QuickAddCard> {
                   ),
               ],
             ),
+            if (foods.length > _previewCount)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  icon: Icon(
+                    _expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    size: 20,
+                  ),
+                  label: Text(
+                    _expanded
+                        ? 'Thu gọn'
+                        : 'Xem thêm ${foods.length - _previewCount} món',
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.primary,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              ),
+          ],
         ],
       ),
     );

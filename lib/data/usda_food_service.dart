@@ -187,10 +187,10 @@ class UsdaFoodService {
       carbs: one(nutrients[1005]),
       servingLabel: '100g',
       source: FoodSource.usda,
-      fiber: one(nutrients[1079]),
-      // 1093 = Natri (mg); 2000 = Tổng đường (g), bản cũ dùng 269.
+      sugar: one(nutrients[2000]),
       sodium: (nutrients[1093] ?? 0).roundToDouble(),
-      sugar: one(nutrients[2000] ?? nutrients[269]),
+      fiber: one(nutrients[1079]),
+      hasFiberData: nutrients[1079] != null,
       calcium: nutrients[1087],
       iron: nutrients[1089],
       servingGrams: 100,
