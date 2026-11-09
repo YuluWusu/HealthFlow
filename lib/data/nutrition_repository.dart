@@ -31,6 +31,91 @@ class DayWater {
   final int ml;
 }
 
+/// Đường (g), natri (mg) và chất xơ (g) của một khẩu phần đã ăn.
+class NutrientAmounts {
+  const NutrientAmounts(this.sugar, this.sodium, this.fiber);
+
+  static const NutrientAmounts zero = NutrientAmounts(0, 0, 0);
+
+  final double sugar;
+  final double sodium;
+  final double fiber;
+}
+
+/// Tổng dinh dưỡng của một ngày, dùng cho thống kê nhiều ngày.
+class DayNutrition {
+  const DayNutrition(
+    this.day, {
+    this.calories = 0,
+    this.protein = 0,
+    this.carbs = 0,
+    this.fat = 0,
+    this.sugar = 0,
+    this.sodium = 0,
+    this.fiber = 0,
+    this.fruitGrams = 0,
+    this.veggieGrams = 0,
+    this.entries = 0,
+  });
+
+  final DateTime day;
+  final int calories;
+  final double protein;
+  final double carbs;
+  final double fat;
+  final double sugar;
+  final double sodium;
+  final double fiber;
+
+  /// Số gram trái cây / rau củ ăn theo định lượng trong ngày.
+  final double fruitGrams;
+  final double veggieGrams;
+
+  /// Số dòng nhật ký; 0 nghĩa là ngày không ghi gì.
+  final int entries;
+
+  bool get hasData => entries > 0;
+
+  /// Muối quy đổi từ natri (g).
+  double get salt => saltGramsOf(sodium);
+}
+
+/// Một món góp nhiều nhất vào đường/muối/béo trong khoảng thời gian.
+class FoodContribution {
+  const FoodContribution(this.name, this.amount);
+
+  final String name;
+  final double amount;
+}
+
+/// Báo cáo dinh dưỡng nhiều ngày: từng ngày + các món đóng góp nhiều nhất.
+class NutritionReport {
+  const NutritionReport({
+    required this.days,
+    this.topSugar = const [],
+    this.topSodium = const [],
+    this.topFat = const [],
+  });
+
+  static const NutritionReport empty = NutritionReport(days: []);
+
+  final List<DayNutrition> days;
+  final List<FoodContribution> topSugar;
+  final List<FoodContribution> topSodium;
+  final List<FoodContribution> topFat;
+
+  /// Chỉ các ngày có ghi nhật ký.
+  List<DayNutrition> get loggedDays =>
+      days.where((d) => d.hasData && d.calories > 0).toList();
+}
+
+class _DayAcc {
+  int calories = 0;
+  double protein = 0, carbs = 0, fat = 0, sugar = 0, sodium = 0, fiber = 0;
+  double fruit = 0, veggie = 0;
+  int entries = 0;
+}
+
 /// Truy vấn danh mục món ăn và nhật ký ăn uống.
 ///
 /// Danh mục gồm:
@@ -59,6 +144,8 @@ class NutritionRepository extends ChangeNotifier {
 
   // Nguyên liệu để ăn theo định lượng (gram), tách riêng khỏi danh mục món.
   List<Ingredient> _ingredients = const [];
+  Map<String, Ingredient> _ingredientIndex = const {};
+  Map<String, FoodItem> _catalogIndex = const {};
 
   List<FoodItem> _baseCatalog = const [];
   List<FoodItem> _catalog = const [];
@@ -126,7 +213,25 @@ class NutritionRepository extends ChangeNotifier {
   bool get canUndoWater => _waterLog.isNotEmpty;
 
   /// Mục tiêu nước/ngày ≈ 33 ml mỗi kg thể trọng, làm tròn 100 ml.
+  /// Nếu người dùng tự đặt mục tiêu nước thì dùng số đó thay cho công thức.
+  static int? _customWaterGoalMl;
+  static int? get customWaterGoalMl => _customWaterGoalMl;
+  static String _waterGoalKey(String u) => 'hf_water_goal_v1_$u';
+
+  /// Đặt mục tiêu nước (ml, 500–6000). Truyền null để quay về tự động.
+  Future<void> setWaterGoal({required String userId, int? ml}) async {
+    _customWaterGoalMl = ml?.clamp(500, 6000).toInt();
+    if (_customWaterGoalMl == null) {
+      await _remove(_waterGoalKey(userId));
+    } else {
+      await _write(_waterGoalKey(userId), '$_customWaterGoalMl');
+    }
+    notifyListeners();
+  }
+
   static int waterGoalFor(double weightKg) {
+    final custom = _customWaterGoalMl;
+    if (custom != null) return custom;
     final ml = (weightKg * 33 / 100).round() * 100;
     return ml.clamp(1500, 4000).toInt();
   }
@@ -159,6 +264,93 @@ class NutritionRepository extends ChangeNotifier {
           return DayCalories(day, totals[day] ?? 0);
         }(),
     ];
+  }
+
+  /// Dinh dưỡng của [days] ngày liên tiếp kết thúc ở [endDay], xếp từ cũ đến
+  /// mới. Ngày không có món nào trả về toàn số 0 (`hasData == false`).
+  Future<List<DayNutrition>> nutritionLastDays(
+    String userId,
+    DateTime endDay, {
+    int days = 7,
+  }) async {
+    final report = await nutritionReport(userId, endDay, days: days);
+    return report.days;
+  }
+
+  /// Báo cáo đầy đủ của [days] ngày kết thúc ở [endDay]: số liệu từng ngày và
+  /// những món đóng góp nhiều đường/muối/béo nhất.
+  Future<NutritionReport> nutritionReport(
+    String userId,
+    DateTime endDay, {
+    int days = 7,
+  }) async {
+    final entries = await _store.allEntries(userId);
+    final end = _dateOnly(endDay);
+    final start = DateTime(end.year, end.month, end.day - (days - 1));
+    final acc = <DateTime, _DayAcc>{};
+    final sugarBy = <String, double>{};
+    final sodiumBy = <String, double>{};
+    final fatBy = <String, double>{};
+
+    for (final e in entries) {
+      final d = _dateOnly(e.eatenAt);
+      if (d.isBefore(start) || d.isAfter(end)) continue;
+      final a = acc.putIfAbsent(d, _DayAcc.new);
+      final m = _microOf(e);
+      a.calories += e.calories;
+      a.protein += e.protein;
+      a.carbs += e.carbs;
+      a.fat += e.fat;
+      a.sugar += m.sugar;
+      a.sodium += m.sodium;
+      a.fiber += m.fiber;
+      a.entries += 1;
+      final ing = ingredientOfFoodId(e.foodId);
+      if (ing != null) {
+        final g = gramsOfPortion(e.portion).toDouble();
+        if (ing.isFruit) a.fruit += g;
+        if (ing.group == 'Rau củ') a.veggie += g;
+      }
+      sugarBy[e.foodName] = (sugarBy[e.foodName] ?? 0) + m.sugar;
+      sodiumBy[e.foodName] = (sodiumBy[e.foodName] ?? 0) + m.sodium;
+      fatBy[e.foodName] = (fatBy[e.foodName] ?? 0) + e.fat;
+    }
+
+    List<FoodContribution> top(Map<String, double> by) {
+      final list = [
+        for (final e in by.entries)
+          if (e.value > 0) FoodContribution(e.key, e.value),
+      ]..sort((a, b) => b.amount.compareTo(a.amount));
+      return list.take(3).toList();
+    }
+
+    final out = <DayNutrition>[
+      for (var i = days - 1; i >= 0; i--)
+        () {
+          final day = DateTime(end.year, end.month, end.day - i);
+          final a = acc[day];
+          if (a == null) return DayNutrition(day);
+          return DayNutrition(
+            day,
+            calories: a.calories,
+            protein: a.protein,
+            carbs: a.carbs,
+            fat: a.fat,
+            sugar: a.sugar,
+            sodium: a.sodium,
+            fiber: a.fiber,
+            fruitGrams: a.fruit,
+            veggieGrams: a.veggie,
+            entries: a.entries,
+          );
+        }(),
+    ];
+    return NutritionReport(
+      days: out,
+      topSugar: top(sugarBy),
+      topSodium: top(sodiumBy),
+      topFat: top(fatBy),
+    );
   }
 
   /// Chuyển sang xem một ngày khác và nạp lại nhật ký của ngày đó.
@@ -195,8 +387,14 @@ class NutritionRepository extends ChangeNotifier {
 
     try {
       _ingredients = await _ingredientSource.load();
+      _ingredientIndex = {for (final i in _ingredients) i.id: i};
     } catch (e) {
       debugPrint('Không đọc được ingredients.json: $e');
+    }
+    // Danh mục vừa nạp xong: tính lại tổng ngày (bản ghi cũ cần tra danh mục).
+    final userId = _userId;
+    if (userId != null) {
+      _summary = _buildSummary(_todayEntries, _calorieGoal);
     }
     notifyListeners();
   }
@@ -207,6 +405,7 @@ class NutritionRepository extends ChangeNotifier {
       for (final r in _recipes) r.toFoodItem(),
       ..._baseCatalog,
     ]);
+    _catalogIndex = {for (final f in _catalog) f.id: f};
   }
 
   /// Nạp nhật ký của một ngày và tính sẵn phần tổng hợp.
@@ -228,6 +427,7 @@ class NutritionRepository extends ChangeNotifier {
     _waterMl = await _store.waterMl(userId, _selectedDay);
     _cupMl = await _store.waterCupMl(userId) ?? defaultCupMl;
     _combos = await _store.combos(userId);
+    _customWaterGoalMl = int.tryParse(_read(_waterGoalKey(userId)) ?? '');
     _loadExtras(userId);
     await _refreshSuggestions(userId);
     _checkCelebration(userId);
@@ -294,10 +494,40 @@ class NutritionRepository extends ChangeNotifier {
       carbs: entry.carbs / p,
       fat: entry.fat / p,
       servingLabel: entry.isByGrams ? '100g' : '1 phần',
-      fiber: entry.fiber / p,
-      sugar: entry.sugar / p,
-      sodium: entry.sodium / p,
+      sugar: _microOf(entry).sugar / p,
+      sodium: _microOf(entry).sodium / p,
+      fiber: _microOf(entry).fiber / p,
     );
+  }
+
+  /// Nguyên liệu tương ứng với món ăn theo gram (id dạng `ing_xxx`), nếu có.
+  Ingredient? ingredientOfFoodId(String foodId) {
+    if (!isIngredientFoodId(foodId) || foodId.length <= 4) return null;
+    return _ingredientIndex[foodId.substring(4)];
+  }
+
+  /// Đường/natri/chất xơ của một dòng nhật ký. Bản ghi lưu từ phiên bản cũ
+  /// (chưa có các số này) được tính lại từ danh mục hoặc bảng nguyên liệu.
+  NutrientAmounts _microOf(MealEntry e) {
+    if (e.hasMicro) return NutrientAmounts(e.sugar, e.sodium, e.fiber);
+    final ing = ingredientOfFoodId(e.foodId);
+    if (ing != null) {
+      final g = gramsOfPortion(e.portion).toDouble();
+      return NutrientAmounts(
+        ing.sugarFor(g),
+        ing.sodiumFor(g),
+        ing.fiberFor(g),
+      );
+    }
+    final food = _catalogIndex[e.foodId];
+    if (food != null) {
+      return NutrientAmounts(
+        food.sugar * e.portion,
+        food.sodium * e.portion,
+        food.fiber * e.portion,
+      );
+    }
+    return NutrientAmounts.zero;
   }
 
   /// Tìm món trong danh mục có sẵn (Excel + dữ liệu offline).
@@ -933,6 +1163,7 @@ class NutritionRepository extends ChangeNotifier {
     _recentFoods = const [];
     _recipes = const [];
     _dietModeOverride = null;
+    _customWaterGoalMl = null;
     _macroConfig = null;
     _achievements = NutritionAchievements.empty;
     _pendingCelebration = false;
@@ -954,7 +1185,7 @@ class NutritionRepository extends ChangeNotifier {
     return buffer.toString();
   }
 
-  static NutritionSummary _buildSummary(
+  NutritionSummary _buildSummary(
     List<MealEntry> entries,
     int calorieGoal,
   ) {
@@ -962,17 +1193,18 @@ class NutritionRepository extends ChangeNotifier {
     var protein = 0.0;
     var carbs = 0.0;
     var fat = 0.0;
-    var fiber = 0.0;
     var sugar = 0.0;
     var sodium = 0.0;
+    var fiber = 0.0;
     for (final entry in entries) {
       calories += entry.calories;
       protein += entry.protein;
       carbs += entry.carbs;
       fat += entry.fat;
-      fiber += entry.fiber;
-      sugar += entry.sugar;
-      sodium += entry.sodium;
+      final m = _microOf(entry);
+      sugar += m.sugar;
+      sodium += m.sodium;
+      fiber += m.fiber;
     }
     return NutritionSummary(
       calories: calories,
@@ -980,9 +1212,9 @@ class NutritionRepository extends ChangeNotifier {
       carbs: carbs,
       fat: fat,
       calorieGoal: calorieGoal,
-      fiber: fiber,
       sugar: sugar,
       sodium: sodium,
+      fiber: fiber,
     );
   }
 }

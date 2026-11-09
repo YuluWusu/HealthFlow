@@ -170,6 +170,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 45,
         fat: 12,
         servingLabel: '1 tô (300g)',
+        sugar: 3,
+        sodium: 1300,
+        fiber: 1.5,
       ),
       FoodItem(
         id: 'food-com-ga',
@@ -180,6 +183,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 52,
         fat: 14,
         servingLabel: '1 phần',
+        sugar: 2,
+        sodium: 900,
+        fiber: 1.5,
       ),
       FoodItem(
         id: 'food-banh-mi-thit',
@@ -190,6 +196,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 38,
         fat: 10,
         servingLabel: '1 ổ',
+        sugar: 3,
+        sodium: 700,
+        fiber: 2,
       ),
       FoodItem(
         id: 'food-salad-rau-cu',
@@ -200,6 +209,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 18,
         fat: 6,
         servingLabel: '1 phần',
+        sugar: 6,
+        sodium: 250,
+        fiber: 4,
       ),
       FoodItem(
         id: 'food-trung-luoc',
@@ -210,6 +222,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 1,
         fat: 5,
         servingLabel: '1 quả',
+        sugar: 0.4,
+        sodium: 62,
+        fiber: 0,
       ),
       // Nhóm món Tây
       FoodItem(
@@ -221,6 +236,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 42,
         fat: 7,
         servingLabel: '1 bát',
+        sugar: 12,
+        sodium: 100,
+        fiber: 4,
       ),
       FoodItem(
         id: 'food-uc-ga-ap-chao',
@@ -231,6 +249,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 2,
         fat: 12,
         servingLabel: '150g',
+        sugar: 0,
+        sodium: 500,
+        fiber: 0,
       ),
       FoodItem(
         id: 'food-pasta-bo',
@@ -241,6 +262,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 58,
         fat: 16,
         servingLabel: '1 đĩa',
+        sugar: 8,
+        sodium: 800,
+        fiber: 4,
       ),
       // Nhóm đồ uống
       FoodItem(
@@ -252,6 +276,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 30,
         fat: 9,
         servingLabel: '1 hộp (100ml)',
+        sugar: 15,
+        sodium: 70,
+        fiber: 0,
       ),
       FoodItem(
         id: 'food-sinh-to-bo',
@@ -262,6 +289,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 24,
         fat: 14,
         servingLabel: '1 ly (300ml)',
+        sugar: 20,
+        sodium: 40,
+        fiber: 5,
       ),
       FoodItem(
         id: 'food-nuoc-cam',
@@ -272,6 +302,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 26,
         fat: 0,
         servingLabel: '1 ly (250ml)',
+        sugar: 21,
+        sodium: 5,
+        fiber: 0.5,
       ),
       FoodItem(
         id: 'food-ca-phe-sua',
@@ -282,6 +315,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 18,
         fat: 4,
         servingLabel: '1 ly (200ml)',
+        sugar: 15,
+        sodium: 40,
+        fiber: 0,
       ),
       // Nhóm khác
       FoodItem(
@@ -293,6 +329,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 8,
         fat: 15,
         servingLabel: '30g',
+        sugar: 2,
+        sodium: 5,
+        fiber: 3,
       ),
       FoodItem(
         id: 'food-banh-quy-yen-mach',
@@ -303,6 +342,9 @@ class InMemoryNutritionStore implements NutritionStore {
         carbs: 20,
         fat: 5,
         servingLabel: '3 cái',
+        sugar: 7,
+        sodium: 120,
+        fiber: 2,
       ),
     ];
   }

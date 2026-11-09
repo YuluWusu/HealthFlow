@@ -5,6 +5,7 @@ import 'dart:io' show File;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart'
     show FilteringTextInputFormatter, HapticFeedback, SystemUiOverlayStyle;
 
@@ -13,15 +14,19 @@ import '../data/auth_scope.dart';
 import '../data/nutrition_repository.dart';
 import '../data/usda_food_service.dart';
 import '../data/vietnam_food_source.dart';
+import '../services/food_photo_service.dart';
 import '../models/ingredient.dart';
 import '../models/meal_combo.dart';
 import '../models/nutrition.dart';
 import '../theme/app_theme.dart';
 import '../theme/food_images.dart';
+import '../utils/nutrition_insights.dart';
 import 'add_food_screen.dart';
 import 'entry_note_sheet.dart';
 import 'meal_reminder_sheet.dart';
 import 'nutrition_cards.dart';
+import 'recipe_builder_screen.dart';
+import 'seasoning_card.dart';
 import 'water_screen.dart';
 
 /// Màn hình Dinh dưỡng.
@@ -407,6 +412,11 @@ class _TodayTab extends StatelessWidget {
                 _StaggerIn(
                   index: 3,
                   child: QuickAddCard(nutrition: nutrition),
+                ),
+                const SizedBox(height: 14),
+                _StaggerIn(
+                  index: 4,
+                  child: SeasoningCard(nutrition: nutrition),
                 ),
                 const SizedBox(height: 10),
                 _StaggerIn(
@@ -1023,6 +1033,10 @@ class _MealBanner extends StatelessWidget {
 }
 
 /// Thẻ một bữa ăn kèm danh sách món đã thêm.
+/// Dòng nhật ký này có phải gia vị nêm thêm (muối, đường, nước mắm...) không.
+bool _isSeasoningEntry(NutritionRepository n, MealEntry e) =>
+    n.ingredientOfFoodId(e.foodId)?.isSeasoning ?? false;
+
 class _MealCard extends StatelessWidget {
   const _MealCard({
     required this.slot,
@@ -1040,10 +1054,27 @@ class _MealCard extends StatelessWidget {
   final List<MealEntry> entries;
   final NutritionRepository nutrition;
 
+  /// Mô tả dưới tên bữa: chỉ liệt kê món chính, gia vị gộp thành "+N gia vị".
+  String _descriptionText() {
+    final dishes = [
+      for (final e in entries)
+        if (!_isSeasoningEntry(nutrition, e)) e.foodName,
+    ];
+    final spices = entries.length - dishes.length;
+    if (spices == 0) return description;
+    if (dishes.isEmpty) return 'Chỉ có gia vị nêm thêm';
+    return '${dishes.join(' + ')} · +$spices gia vị';
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = _slotColor(slot);
     final share = totalCalories > 0 ? calories / totalCalories : 0.0;
+    // Món chính trước, gia vị nêm thêm xếp sau.
+    final sorted = [
+      ...entries.where((e) => !_isSeasoningEntry(nutrition, e)),
+      ...entries.where((e) => _isSeasoningEntry(nutrition, e)),
+    ];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -1080,7 +1111,7 @@ class _MealCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        description,
+                        _descriptionText(),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -1124,7 +1155,7 @@ class _MealCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              for (final entry in entries)
+              for (final entry in sorted)
                 _SwipeEntryRow(
                   entry: entry,
                   color: color,
@@ -1199,7 +1230,7 @@ class _MealCard extends StatelessWidget {
 // Tab 2: Thực đơn (tìm món Việt Nam từ Excel + quốc tế từ USDA)
 // ---------------------------------------------------------------------------
 
-enum _Source { all, vietnam, world, drink }
+enum _Source { all, vietnam, world, drink, homemade }
 
 class _MenuTab extends StatefulWidget {
   const _MenuTab({required this.nutrition});
@@ -1317,10 +1348,38 @@ class _MenuTabState extends State<_MenuTab> {
     }
   }
 
+  /// Chụp ảnh món ăn, ML Kit đoán loại món rồi điền vào ô tìm kiếm.
+  Future<void> _searchByPhoto() async {
+    final messenger = ScaffoldMessenger.of(context);
+    String msg;
+    try {
+      final shot = await ImagePicker()
+          .pickImage(source: ImageSource.camera, maxWidth: 1024);
+      if (shot == null || !mounted) return;
+      final guess = await guessFoodFromPhoto(shot.path);
+      if (!mounted) return;
+      if (guess == null) {
+        msg = 'Chưa nhận ra món trong ảnh. Bạn thử tìm bằng tên nhé.';
+      } else {
+        _controller.text = guess.keyword;
+        _controller.selection =
+            TextSelection.collapsed(offset: guess.keyword.length);
+        _onQueryChanged(guess.keyword);
+        msg = 'Nhận diện: ${guess.label} → tìm "${guess.keyword}". '
+            'Chỉ là gợi ý theo loại món, hãy chọn món đúng nhất.';
+      }
+    } catch (_) {
+      msg = 'Không chụp hoặc nhận diện được ảnh.';
+    }
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(msg)));
+  }
+
   void _setSource(_Source source) {
     setState(() {
       _source = source;
-      if (source == _Source.world || source == _Source.drink) {
+      if (source != _Source.all && source != _Source.vietnam) {
         _group = null;
         _vegetarian = null;
       }
@@ -1333,6 +1392,7 @@ class _MenuTabState extends State<_MenuTab> {
     for (final food in widget.nutrition.catalog) {
       if (food is CatalogFood &&
           food.source == FoodSource.vietnam &&
+          food.category == FoodCategory.vietnamese &&
           food.group.isNotEmpty &&
           !seen.contains(food.group)) {
         seen.add(food.group);
@@ -1354,6 +1414,24 @@ class _MenuTabState extends State<_MenuTab> {
     }).toList();
   }
 
+  /// Các món người dùng tự nấu (lọc theo ô tìm kiếm).
+  List<FoodItem> get _homemadeFoods {
+    final q = _query.toLowerCase();
+    return [
+      for (final r in widget.nutrition.recipes)
+        if (q.isEmpty || r.name.toLowerCase().contains(q)) r.toFoodItem(),
+    ];
+  }
+
+  Future<void> _openRecipeBuilder() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => RecipeBuilderScreen(nutrition: widget.nutrition),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
   List<FoodItem> get _world {
     final offline = widget.nutrition
         .search(keyword: _query)
@@ -1361,7 +1439,9 @@ class _MenuTabState extends State<_MenuTab> {
         .where((food) {
       if (_source == _Source.drink) return food.category == FoodCategory.drink;
       if (_source == _Source.world) return food.category != FoodCategory.drink;
-      return true;
+      // Xem tất cả: 200 đồ uống Việt chỉ hiện ở ô "Đồ uống" (hoặc khi đang tìm).
+      return _query.isNotEmpty ||
+          !(food is CatalogFood && food.source == FoodSource.vietnam);
     });
     final names = offline.map((f) => f.name.toLowerCase()).toSet();
     return [
@@ -1373,7 +1453,9 @@ class _MenuTabState extends State<_MenuTab> {
   @override
   Widget build(BuildContext context) {
     final showVietnam = _source == _Source.all || _source == _Source.vietnam;
-    final showWorld = _source != _Source.vietnam;
+    final showHomemade = _source == _Source.homemade;
+    final showWorld = _source != _Source.vietnam && !showHomemade;
+    final homemade = showHomemade ? _homemadeFoods : const <FoodItem>[];
     final vietnamese = showVietnam ? _vietnamese : const <FoodItem>[];
     final world = showWorld ? _world : const <FoodItem>[];
     final groups = _groups;
@@ -1396,9 +1478,10 @@ class _MenuTabState extends State<_MenuTab> {
         _SearchField(
           controller: _controller,
           hint: _byGrams
-              ? 'Tìm nguyên liệu: cơm, ức gà, trứng...'
+              ? 'Tìm nguyên liệu: cơm, ức gà, trứng, muối...'
               : 'Tìm món: phở, bún chả, chicken breast...',
           onChanged: _onQueryChanged,
+          onCamera: _searchByPhoto,
           onClear: () {
             _controller.clear();
             _onQueryChanged('');
@@ -1475,6 +1558,35 @@ class _MenuTabState extends State<_MenuTab> {
               text: 'Không tìm thấy món Việt phù hợp.',
             ),
           for (final food in vietnamese)
+            _FoodRow(
+              food: food,
+              onTap: () => _openFoodSheet(context, food, _slot),
+              inCart: widget.nutrition.cartPortionOf(food.id),
+              onAdd: () => _addToCart(food),
+            ),
+        ],
+        if (showHomemade) ...[
+          _ListHeader(
+            icon: Icons.soup_kitchen_rounded,
+            title: 'Món tự nấu',
+            count: homemade.length,
+            color: AppTheme.primary,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: FilledButton.icon(
+              onPressed: _openRecipeBuilder,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Tạo món tự nấu mới'),
+            ),
+          ),
+          if (homemade.isEmpty)
+            const _InfoBox(
+              icon: Icons.soup_kitchen_rounded,
+              text:
+                  'Chưa có món tự nấu. Bấm "Tạo món tự nấu mới" để gộp nguyên liệu theo gram thành một món.',
+            ),
+          for (final food in homemade)
             _FoodRow(
               food: food,
               onTap: () => _openFoodSheet(context, food, _slot),
@@ -1575,7 +1687,7 @@ class _MenuTabState extends State<_MenuTab> {
     );
   }
 
-  /// Phần "Theo định lượng": nguyên liệu tính theo gram, tách riêng món ăn.
+  /// Phần "Theo định lượng": nguyên liệu (cả gia vị, trái cây) tính theo gram.
   List<Widget> _gramChildren() {
     final n = widget.nutrition;
     final groups = <String>[];
@@ -1639,6 +1751,7 @@ class _MenuTabState extends State<_MenuTab> {
       backgroundColor: Colors.transparent,
       builder: (_) => GramSheet(
         ingredient: ingredient,
+        initialGrams: ingredient.isSeasoning ? 5 : 100,
         onAdd: (grams) {
           HapticFeedback.selectionClick();
           widget.nutrition.addIngredientToCart(ingredient, grams);
@@ -1822,12 +1935,14 @@ class _SearchField extends StatelessWidget {
     required this.onChanged,
     required this.onClear,
     this.hint = 'Tìm món: phở, bún chả, chicken breast...',
+    this.onCamera,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final VoidCallback onClear;
   final String hint;
+  final VoidCallback? onCamera;
 
   @override
   Widget build(BuildContext context) {
@@ -1853,7 +1968,17 @@ class _SearchField extends StatelessWidget {
             color: AppTheme.textSecondary,
           ),
           suffixIcon: controller.text.isEmpty
-              ? null
+              ? (onCamera == null
+                  ? null
+                  : IconButton(
+                      tooltip: 'Chụp ảnh món ăn để tìm',
+                      onPressed: onCamera,
+                      icon: const Icon(
+                        Icons.photo_camera_outlined,
+                        size: 21,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ))
               : IconButton(
                   onPressed: onClear,
                   icon: const Icon(
@@ -2632,13 +2757,41 @@ class _FoodSheetState extends State<_FoodSheet> {
                               ),
                             ],
                           ),
-                          if (food.fiber > 0 ||
-                              food.sugar > 0 ||
-                              food.sodium > 0 ||
-                              extra?.calcium != null ||
-                              extra?.iron != null) ...[
-                            const SizedBox(height: 14),
-                            const Divider(height: 1),
+                          const SizedBox(height: 14),
+                          const Divider(height: 1),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              _Micro(
+                                'Đường',
+                                _microText(
+                                  food.sugar * _portion * k,
+                                  unknown: extra?.source == FoodSource.usda,
+                                ),
+                              ),
+                              _Micro(
+                                'Muối',
+                                _microText(
+                                  saltGramsOf(food.sodium * _portion * k),
+                                  unknown: extra?.source == FoodSource.usda &&
+                                      food.sodium <= 0,
+                                ),
+                              ),
+                              _Micro(
+                                'Chất xơ',
+                                _microText(
+                                  food.fiber * _portion * k,
+                                  unknown: extra != null &&
+                                      !extra.hasFiberData &&
+                                      food.fiber <= 0,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (extra != null &&
+                              (extra.calcium != null ||
+                                  extra.iron != null)) ...[
                             const SizedBox(height: 12),
                             Wrap(
                               alignment: WrapAlignment.spaceAround,
@@ -2646,16 +2799,7 @@ class _FoodSheetState extends State<_FoodSheet> {
                               spacing: 18,
                               runSpacing: 10,
                               children: [
-                                if (food.fiber > 0)
-                                  _Micro('Chất xơ',
-                                      '${_grams(food.fiber * _portion * k)} g'),
-                                if (food.sugar > 0)
-                                  _Micro('Đường',
-                                      '${_grams(food.sugar * _portion * k)} g'),
-                                if (food.sodium > 0)
-                                  _Micro('Natri',
-                                      '${(food.sodium * _portion * k).round()} mg'),
-                                if (extra?.calcium != null)
+                                if (extra.calcium != null)
                                   _Micro('Canxi',
                                       '${(extra!.calcium! * _portion * k).round()} mg'),
                                 if (extra?.iron != null)
@@ -2664,6 +2808,14 @@ class _FoodSheetState extends State<_FoodSheet> {
                               ],
                             ),
                           ],
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Đường, muối (quy đổi từ natri) và chất xơ là số ước tính.',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -2914,6 +3066,7 @@ class _FoodSheetState extends State<_FoodSheet> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+ persist: false, duration: const Duration(seconds: 5),
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -3001,6 +3154,10 @@ class _SheetMacro extends StatelessWidget {
   }
 }
 
+/// Giá trị vi chất dạng chữ; `unknown` (nguồn không có số liệu) thì hiện "—".
+String _microText(double value, {bool unknown = false}) =>
+    unknown && value <= 0 ? '—' : '${_grams(value)} g';
+
 class _Micro extends StatelessWidget {
   const _Micro(this.label, this.value);
 
@@ -3047,7 +3204,31 @@ class _StatsTabState extends State<_StatsTab>
   /// 0 = Ngày, 1 = Tuần, 2 = Tháng.
   int _range = 0;
 
+  /// Ngày cuối của khoảng Tuần/Tháng đang xem. Tách riêng khỏi ngày đang chọn
+  /// để bấm vào một cột không làm khung biểu đồ bị dịch đi, và để lùi/tiến
+  /// được sang các tuần/tháng khác.
+  late DateTime _windowEnd = widget.nutrition.selectedDay;
+
   NutritionRepository get nutrition => widget.nutrition;
+
+  int get _days => _range == 1 ? 7 : 30;
+
+  static DateTime get _today {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  bool get _canGoNext => _windowEnd.isBefore(_today);
+
+  void _shiftWindow(int direction) {
+    var next = DateTime(
+      _windowEnd.year,
+      _windowEnd.month,
+      _windowEnd.day + direction * _days,
+    );
+    if (direction > 0 && next.isAfter(_today)) next = _today;
+    setState(() => _windowEnd = next);
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -3062,38 +3243,65 @@ class _StatsTabState extends State<_StatsTab>
         controller: scroll,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
-          child: Text(
-            _range != 0
-                ? 'Kết thúc ngày ${_formatDay(nutrition.selectedDay)}'
-                : nutrition.isToday
-                    ? 'Thống kê hôm nay'
-                    : 'Thống kê ${_formatDay(nutrition.selectedDay)}',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.white70,
+        if (_range == 0)
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 12),
+            child: Text(
+              nutrition.isToday
+                  ? 'Thống kê hôm nay'
+                  : 'Thống kê ${_formatDay(nutrition.selectedDay)}',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.white70,
+              ),
             ),
           ),
-        ),
         _SegmentedPills(
           labels: const ['Ngày', 'Tuần', 'Tháng'],
           selected: _range,
-          onChanged: (i) => setState(() => _range = i),
+          onChanged: (i) => setState(() {
+            _range = i;
+            _windowEnd = nutrition.selectedDay;
+          }),
         ),
         const SizedBox(height: 14),
         if (_range != 0) ...[
+          _WindowNav(
+            end: _windowEnd,
+            days: _days,
+            canNext: _canGoNext,
+            onPrev: () => _shiftWindow(-1),
+            onNext: () => _shiftWindow(1),
+            onToday: () => setState(() => _windowEnd = _today),
+          ),
+          const SizedBox(height: 14),
           _WeekChartCard(
             key: ValueKey(_range),
             nutrition: nutrition,
-            days: _range == 1 ? 7 : 30,
+            days: _days,
+            endDay: _windowEnd,
+          ),
+          const SizedBox(height: 16),
+          _NutrientChartCard(
+            key: ValueKey('nutrient$_range'),
+            nutrition: nutrition,
+            days: _days,
+            endDay: _windowEnd,
+          ),
+          const SizedBox(height: 16),
+          _AnalysisCard(
+            key: ValueKey('analysis$_range'),
+            nutrition: nutrition,
+            days: _days,
+            endDay: _windowEnd,
           ),
           const SizedBox(height: 16),
           _WaterChartCard(
             key: ValueKey('water$_range'),
             nutrition: nutrition,
-            days: _range == 1 ? 7 : 30,
+            days: _days,
+            endDay: _windowEnd,
           ),
         ] else if (summary.calories == 0) ...[
           const _StatsEmptyCard(),
@@ -3287,7 +3495,17 @@ class _StatsTabState extends State<_StatsTab>
         ],
         if (_range == 0 && summary.calories > 0) ...[
           const SizedBox(height: 16),
-          _InsightCard(summary: summary),
+          _MicroDayCard(
+            summary: summary,
+            limits: _limitsFor(context, nutrition),
+          ),
+          const SizedBox(height: 16),
+          _AnalysisCard(
+            key: const ValueKey('analysis-day'),
+            nutrition: nutrition,
+            days: 1,
+            endDay: nutrition.selectedDay,
+          ),
         ],
         if (_range == 0) ...[
           const SizedBox(height: 16),
@@ -3361,11 +3579,15 @@ class _WeekChartCard extends StatefulWidget {
   const _WeekChartCard({
     super.key,
     required this.nutrition,
+    required this.endDay,
     this.days = 7,
   });
 
   final NutritionRepository nutrition;
   final int days;
+
+  /// Ngày cuối của khung biểu đồ.
+  final DateTime endDay;
 
   @override
   State<_WeekChartCard> createState() => _WeekChartCardState();
@@ -3390,12 +3612,12 @@ class _WeekChartCardState extends State<_WeekChartCard> {
   void _refresh() {
     final n = widget.nutrition;
     final key =
-        '${widget.days}-${n.selectedDay.millisecondsSinceEpoch}-${n.summary.calories}-${n.todayEntries.length}';
+        '${widget.days}-${widget.endDay.millisecondsSinceEpoch}-${n.summary.calories}-${n.todayEntries.length}';
     if (key == _lastKey) return;
     _lastKey = key;
     final user = AuthScope.of(context, listen: false).currentUser;
     if (user == null) return;
-    n.caloriesLastDays(user.id, n.selectedDay, days: widget.days).then((data) {
+    n.caloriesLastDays(user.id, widget.endDay, days: widget.days).then((data) {
       if (mounted) setState(() => _data = data);
     });
   }
@@ -3748,77 +3970,6 @@ class _SlotBar extends StatelessWidget {
   }
 }
 
-class _InsightCard extends StatelessWidget {
-  const _InsightCard({required this.summary});
-
-  final NutritionSummary summary;
-
-  @override
-  Widget build(BuildContext context) {
-    final String text;
-    final IconData icon;
-    final Color color;
-
-    if (summary.calories == 0) {
-      text = 'Thêm món ăn đầu tiên để xem phân tích dinh dưỡng của bạn.';
-      icon = Icons.tips_and_updates_rounded;
-      color = AppTheme.blue;
-    } else if (summary.calorieProgress >= 1 &&
-        summary.remainingCalories < 0) {
-      text = 'Bạn đã vượt mục tiêu calo hôm nay. Cân nhắc bữa nhẹ cho phần còn lại.';
-      icon = Icons.warning_amber_rounded;
-      color = AppTheme.orange;
-    } else if (summary.proteinPercent < 0.15) {
-      text = 'Protein còn thấp. Thử thêm trứng, đậu phụ hoặc ức gà vào bữa tới.';
-      icon = Icons.egg_alt_rounded;
-      color = AppTheme.primary;
-    } else if (summary.fatPercent > 0.4) {
-      text = 'Chất béo hơi cao. Ưu tiên món luộc, hấp hoặc canh cho bữa tiếp theo.';
-      icon = Icons.opacity_rounded;
-      color = AppTheme.orange;
-    } else {
-      text = 'Tỉ lệ dinh dưỡng khá cân đối. Tiếp tục phát huy nhé!';
-      icon = Icons.thumb_up_alt_rounded;
-      color = AppTheme.primary;
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Color.alphaBlend(
-          color.withValues(alpha: 0.12),
-          Colors.white.withValues(alpha: 0.92),
-        ),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 12.5,
-                height: 1.4,
-                color: AppTheme.textPrimary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Ba thẻ số liệu nhóm chất.
 class _MacroCard extends StatelessWidget {
   const _MacroCard({
@@ -3992,10 +4143,17 @@ class _MacroPiePainter extends CustomPainter {
 }
 
 /// Mở màn hình thêm món ăn.
-Future<void> _openAddFood(BuildContext context, {MealSlot? slot}) async {
+Future<void> _openAddFood(
+  BuildContext context, {
+  MealSlot? slot,
+  bool byGrams = false,
+}) async {
   await Navigator.of(context).push(
     MaterialPageRoute<void>(
-      builder: (_) => AddFoodScreen(initialSlot: slot ?? MealSlot.breakfast),
+      builder: (_) => AddFoodScreen(
+        initialSlot: slot ?? MealSlot.breakfast,
+        initialByGrams: byGrams,
+      ),
     ),
   );
 }
@@ -4394,11 +4552,15 @@ class _WaterChartCard extends StatefulWidget {
   const _WaterChartCard({
     super.key,
     required this.nutrition,
+    required this.endDay,
     this.days = 7,
   });
 
   final NutritionRepository nutrition;
   final int days;
+
+  /// Ngày cuối của khung biểu đồ.
+  final DateTime endDay;
 
   @override
   State<_WaterChartCard> createState() => _WaterChartCardState();
@@ -4423,12 +4585,12 @@ class _WaterChartCardState extends State<_WaterChartCard> {
   void _refresh() {
     final n = widget.nutrition;
     final key =
-        '${widget.days}-${n.selectedDay.millisecondsSinceEpoch}-${n.waterMl}';
+        '${widget.days}-${widget.endDay.millisecondsSinceEpoch}-${n.waterMl}';
     if (key == _lastKey) return;
     _lastKey = key;
     final user = AuthScope.of(context, listen: false).currentUser;
     if (user == null) return;
-    n.waterLastDays(user.id, n.selectedDay, days: widget.days).then((data) {
+    n.waterLastDays(user.id, widget.endDay, days: widget.days).then((data) {
       if (mounted) setState(() => _data = data);
     });
   }
@@ -4723,6 +4885,7 @@ class _SwipeEntryRow extends StatelessWidget {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+ persist: false,
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -4792,16 +4955,21 @@ class _SwipeEntryRow extends StatelessWidget {
                   children: [
                 Row(
                   children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration:
-                          BoxDecoration(color: color, shape: BoxShape.circle),
-                    ),
+                    if (_isSeasoningEntry(nutrition, entry))
+                      Icon(Icons.grain_rounded, size: 11, color: color)
+                    else
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration:
+                            BoxDecoration(color: color, shape: BoxShape.circle),
+                      ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        '${entry.foodName} · ${entry.portionLabel}',
+                        _isSeasoningEntry(nutrition, entry)
+                            ? 'Nêm thêm: ${entry.foodName} · ${entry.portionLabel}'
+                            : '${entry.foodName} · ${entry.portionLabel}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -5848,6 +6016,17 @@ class _CategoryTiles extends StatelessWidget {
             onTap: () => onTap(_Source.drink),
           ),
         ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _CategoryTile(
+            label: 'Tự nấu',
+            asset: 'cat_homemade',
+            fallbackAsset: 'food_canh_lau',
+            color: AppTheme.primaryDark,
+            selected: selected == _Source.homemade,
+            onTap: () => onTap(_Source.homemade),
+          ),
+        ),
       ],
     );
   }
@@ -5938,6 +6117,918 @@ class _CategoryTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Thống kê chi tiết: đường, muối, béo, carb, đạm, chất xơ + phân tích & gợi ý
+// ---------------------------------------------------------------------------
+
+String _dm(DateTime d) =>
+    '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}';
+
+/// Số thập phân kiểu Việt Nam, bỏ ",0" thừa; từ 100 trở lên thì làm tròn.
+String _fmtMetric(double v) {
+  if (v >= 100) return v.round().toString();
+  final s = v.toStringAsFixed(1);
+  return (s.endsWith('.0') ? s.substring(0, s.length - 2) : s)
+      .replaceAll('.', ',');
+}
+
+/// Mức khuyến nghị theo mục tiêu calo và cân nặng của người dùng hiện tại.
+NutritionLimits _limitsFor(BuildContext context, NutritionRepository n) {
+  final user = AuthScope.of(context, listen: false).currentUser;
+  return NutritionLimits(
+    calorieGoal: n.summary.calorieGoal,
+    weightKg: user?.weightKg,
+  );
+}
+
+/// Thanh chuyển khoảng thời gian của thống kê Tuần/Tháng (lùi/tiến).
+class _WindowNav extends StatelessWidget {
+  const _WindowNav({
+    required this.end,
+    required this.days,
+    required this.canNext,
+    required this.onPrev,
+    required this.onNext,
+    required this.onToday,
+  });
+
+  final DateTime end;
+  final int days;
+  final bool canNext;
+  final VoidCallback onPrev;
+  final VoidCallback onNext;
+  final VoidCallback onToday;
+
+  @override
+  Widget build(BuildContext context) {
+    final start = DateTime(end.year, end.month, end.day - (days - 1));
+    final unit = days == 7 ? 'tuần' : 'tháng';
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            tooltip: '${unit[0].toUpperCase()}${unit.substring(1)} trước',
+            visualDensity: VisualDensity.compact,
+            onPressed: onPrev,
+            icon: const Icon(Icons.chevron_left_rounded, color: Colors.white),
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                '${_dm(start)} – ${_dm(end)}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          if (canNext)
+            TextButton(
+              onPressed: onToday,
+              style: TextButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+              child: const Text('Hôm nay', style: TextStyle(fontSize: 12)),
+            ),
+          IconButton(
+            tooltip: '${unit[0].toUpperCase()}${unit.substring(1)} sau',
+            visualDensity: VisualDensity.compact,
+            onPressed: canNext ? onNext : null,
+            icon: Icon(
+              Icons.chevron_right_rounded,
+              color: canNext ? Colors.white : Colors.white30,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Một chỉ số có thể xem trên biểu đồ Tuần/Tháng.
+class _MetricDef {
+  const _MetricDef({
+    required this.label,
+    required this.color,
+    required this.isMax,
+    required this.value,
+    required this.limit,
+  });
+
+  final String label;
+  final Color color;
+
+  /// `true`: càng thấp càng tốt (vượt mốc là xấu); `false`: càng cao càng
+  /// tốt (thấp hơn mốc là thiếu).
+  final bool isMax;
+  final double Function(DayNutrition d) value;
+  final double Function(NutritionLimits l) limit;
+}
+
+final List<_MetricDef> _metricDefs = [
+  _MetricDef(
+    label: 'Đường',
+    color: AppTheme.pink,
+    isMax: true,
+    value: (d) => d.sugar,
+    limit: (l) => l.sugarMaxG,
+  ),
+  _MetricDef(
+    label: 'Muối',
+    color: AppTheme.purple,
+    isMax: true,
+    value: (d) => d.salt,
+    limit: (l) => l.saltMaxG,
+  ),
+  _MetricDef(
+    label: 'Béo',
+    color: AppTheme.orange,
+    isMax: true,
+    value: (d) => d.fat,
+    limit: (l) => l.fatMaxG,
+  ),
+  _MetricDef(
+    label: 'Carb',
+    color: AppTheme.blue,
+    isMax: true,
+    value: (d) => d.carbs,
+    limit: (l) => l.carbsMaxG,
+  ),
+  _MetricDef(
+    label: 'Đạm',
+    color: AppTheme.primary,
+    isMax: false,
+    value: (d) => d.protein,
+    limit: (l) => l.proteinMinG,
+  ),
+  _MetricDef(
+    label: 'Chất xơ',
+    color: AppTheme.primaryDark,
+    isMax: false,
+    value: (d) => d.fiber,
+    limit: (l) => l.fiberMinG,
+  ),
+];
+
+/// Biểu đồ cột Tuần/Tháng cho đường, muối, béo, carb, đạm, chất xơ.
+class _NutrientChartCard extends StatefulWidget {
+  const _NutrientChartCard({
+    super.key,
+    required this.nutrition,
+    required this.endDay,
+    this.days = 7,
+  });
+
+  final NutritionRepository nutrition;
+  final int days;
+  final DateTime endDay;
+
+  @override
+  State<_NutrientChartCard> createState() => _NutrientChartCardState();
+}
+
+class _NutrientChartCardState extends State<_NutrientChartCard> {
+  List<DayNutrition> _data = const [];
+  String _lastKey = '';
+  int _metric = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refresh();
+  }
+
+  @override
+  void didUpdateWidget(covariant _NutrientChartCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _refresh();
+  }
+
+  void _refresh() {
+    final n = widget.nutrition;
+    final key = '${widget.days}-${widget.endDay.millisecondsSinceEpoch}-'
+        '${n.summary.calories}-${n.summary.sugar.round()}-'
+        '${n.summary.sodium.round()}-${n.todayEntries.length}';
+    if (key == _lastKey) return;
+    _lastKey = key;
+    final user = AuthScope.of(context, listen: false).currentUser;
+    if (user == null) return;
+    n
+        .nutritionLastDays(user.id, widget.endDay, days: widget.days)
+        .then((data) {
+      if (mounted) setState(() => _data = data);
+    });
+  }
+
+  static const _weekdays = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+
+  @override
+  Widget build(BuildContext context) {
+    final n = widget.nutrition;
+    final def = _metricDefs[_metric];
+    final limit = def.limit(_limitsFor(context, n));
+    final compact = widget.days > 7;
+
+    final logged = _data.where((d) => d.hasData && d.calories > 0).toList();
+    final average = logged.isEmpty
+        ? 0.0
+        : logged.fold<double>(0, (a, d) => a + def.value(d)) / logged.length;
+    bool isBad(double v) => def.isMax ? v > limit : v < limit;
+    final badDays = logged.where((d) => isBad(def.value(d))).length;
+    final okDays = logged.length - badDays;
+
+    var maxValue = limit;
+    for (final d in _data) {
+      final v = def.value(d);
+      if (v > maxValue) maxValue = v;
+    }
+    if (maxValue <= 0) maxValue = 1;
+
+    const chartHeight = 112.0;
+    const labelArea = 22.0;
+    final lineBottom = labelArea + chartHeight * (limit / maxValue);
+
+    return _SoftCard(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Dinh dưỡng chi tiết',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+              if (logged.isEmpty)
+                const Text(
+                  'Chưa có dữ liệu',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              for (var i = 0; i < _metricDefs.length; i++)
+                ChoiceChip(
+                  label: Text(_metricDefs[i].label),
+                  selected: i == _metric,
+                  showCheckmark: false,
+                  visualDensity: VisualDensity.compact,
+                  selectedColor: _metricDefs[i].color.withValues(alpha: 0.22),
+                  labelStyle: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                        i == _metric ? FontWeight.w800 : FontWeight.w500,
+                    color: i == _metric
+                        ? AppTheme.textPrimary
+                        : AppTheme.textSecondary,
+                  ),
+                  onSelected: (_) => setState(() => _metric = i),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: chartHeight + 44,
+            child: Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (var i = 0; i < _data.length; i++)
+                      Expanded(
+                        child: _NutrientBar(
+                          value: def.value(_data[i]),
+                          hasData: _data[i].hasData,
+                          maxValue: maxValue,
+                          chartHeight: chartHeight,
+                          baseColor: def.color,
+                          bad: _data[i].hasData && isBad(def.value(_data[i])),
+                          compact: compact,
+                          selected: _data[i].day == n.selectedDay,
+                          label: compact
+                              ? ((_data.length - 1 - i) % 5 == 0
+                                  ? '${_data[i].day.day}'
+                                  : '')
+                              : _weekdays[_data[i].day.weekday - 1],
+                          onTap: () => n.selectDay(_data[i].day),
+                        ),
+                      ),
+                  ],
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: lineBottom,
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      size: const Size(double.infinity, 1),
+                      painter: _DashedLinePainter(
+                        color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  bottom: lineBottom + 2,
+                  child: IgnorePointer(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        '${def.isMax ? 'Tối đa' : 'Tối thiểu'} ${_fmtMetric(limit)} g',
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _RangeStat(
+                  label: 'Trung bình/ngày',
+                  value: '${_fmtMetric(average)} g',
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              Expanded(
+                child: _RangeStat(
+                  label: def.isMax ? 'Ngày trong mức' : 'Ngày đạt mức',
+                  value: '$okDays ngày',
+                  color: AppTheme.primary,
+                ),
+              ),
+              Expanded(
+                child: _RangeStat(
+                  label: def.isMax ? 'Ngày vượt mức' : 'Ngày thiếu',
+                  value: '$badDays ngày',
+                  color: badDays > 0 ? AppTheme.orange : AppTheme.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Đường, muối, chất xơ là số ước tính (muối quy đổi từ natri). '
+            'Đường gồm cả đường tự nhiên trong trái cây, sữa. '
+            'Cột cam là ngày vượt mức (hoặc thiếu). Bấm vào cột để xem ngày đó.',
+            style: TextStyle(
+              fontSize: 10.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NutrientBar extends StatelessWidget {
+  const _NutrientBar({
+    required this.value,
+    required this.hasData,
+    required this.maxValue,
+    required this.chartHeight,
+    required this.baseColor,
+    required this.bad,
+    required this.selected,
+    required this.label,
+    required this.onTap,
+    this.compact = false,
+  });
+
+  final double value;
+  final bool hasData;
+  final double maxValue;
+  final double chartHeight;
+  final Color baseColor;
+  final bool bad;
+  final bool selected;
+  final bool compact;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = bad ? AppTheme.orange : baseColor;
+    final barHeight = (!hasData || value <= 0)
+        ? 3.0
+        : (chartHeight * value / maxValue).clamp(6.0, chartHeight);
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (!compact && hasData && value > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 3),
+              child: Text(
+                _fmtMetric(value),
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                  color:
+                      selected ? AppTheme.textPrimary : AppTheme.textSecondary,
+                ),
+              ),
+            ),
+          Container(
+            width: compact ? 5 : 18,
+            height: barHeight,
+            decoration: BoxDecoration(
+              color: (!hasData || value <= 0)
+                  ? AppTheme.textSecondary.withValues(alpha: 0.2)
+                  : color.withValues(alpha: selected ? 1 : 0.55),
+              borderRadius: BorderRadius.circular(compact ? 3 : 6),
+            ),
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 16,
+            child: OverflowBox(
+              maxWidth: 40,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 0 : 6,
+                  vertical: 1,
+                ),
+                decoration: BoxDecoration(
+                  color: selected && !compact
+                      ? baseColor.withValues(alpha: 0.16)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: compact ? 9 : 11,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                    color: selected ? AppTheme.textPrimary : AppTheme.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Thẻ đường / muối / chất xơ của ngày đang xem so với mức tham khảo.
+class _MicroDayCard extends StatelessWidget {
+  const _MicroDayCard({required this.summary, required this.limits});
+
+  final NutritionSummary summary;
+  final NutritionLimits limits;
+
+  @override
+  Widget build(BuildContext context) {
+    return _SoftCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Đường, muối & chất xơ',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+              Text(
+                'Ước tính',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          _LimitBar(
+            label: 'Đường',
+            value: summary.sugar,
+            limit: limits.sugarMaxG,
+            isMax: true,
+            color: AppTheme.pink,
+          ),
+          const SizedBox(height: 12),
+          _LimitBar(
+            label: 'Muối',
+            value: summary.salt,
+            limit: limits.saltMaxG,
+            isMax: true,
+            color: AppTheme.purple,
+            note: '≈ ${summary.sodium.round()} mg natri',
+          ),
+          const SizedBox(height: 12),
+          _LimitBar(
+            label: 'Chất xơ',
+            value: summary.fiber,
+            limit: limits.fiberMinG,
+            isMax: false,
+            color: AppTheme.primary,
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Đường gồm cả đường tự nhiên (trái cây, sữa). Muối quy đổi từ '
+            'natri (muối = natri × 2,5). Mức tham khảo theo khuyến nghị của WHO.',
+            style: TextStyle(
+              fontSize: 10.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LimitBar extends StatelessWidget {
+  const _LimitBar({
+    required this.label,
+    required this.value,
+    required this.limit,
+    required this.isMax,
+    required this.color,
+    this.note,
+  });
+
+  final String label;
+  final double value;
+  final double limit;
+  final bool isMax;
+  final Color color;
+  final String? note;
+
+  @override
+  Widget build(BuildContext context) {
+    final over = isMax && value > limit;
+    final reached = !isMax && value >= limit;
+    final ratio = limit <= 0 ? 0.0 : (value / limit).clamp(0.0, 1.0);
+    final barColor = over ? AppTheme.orange : color;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            if (over || reached) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                decoration: BoxDecoration(
+                  color: (over ? AppTheme.orange : AppTheme.primary)
+                      .withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  over ? 'Vượt mức' : 'Đạt',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: over ? AppTheme.orange : AppTheme.primary,
+                  ),
+                ),
+              ),
+            ],
+            const Spacer(),
+            Text(
+              '${_fmtMetric(value)} / ${isMax ? '≤ ' : '≥ '}${_fmtMetric(limit)} g',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: LinearProgressIndicator(
+            value: ratio,
+            minHeight: 8,
+            backgroundColor: color.withValues(alpha: 0.15),
+            valueColor: AlwaysStoppedAnimation<Color>(barColor),
+          ),
+        ),
+        if (note != null) ...[
+          const SizedBox(height: 3),
+          Text(
+            note!,
+            style: const TextStyle(
+              fontSize: 10.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Phân tích thói quen ăn uống và gợi ý món phù hợp (tuần/tháng/ngày).
+class _AnalysisCard extends StatefulWidget {
+  const _AnalysisCard({
+    super.key,
+    required this.nutrition,
+    required this.endDay,
+    required this.days,
+  });
+
+  final NutritionRepository nutrition;
+  final DateTime endDay;
+  final int days;
+
+  @override
+  State<_AnalysisCard> createState() => _AnalysisCardState();
+}
+
+class _AnalysisCardState extends State<_AnalysisCard> {
+  NutritionReport _report = NutritionReport.empty;
+  bool _loaded = false;
+  String _lastKey = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _refresh();
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnalysisCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _refresh();
+  }
+
+  void _refresh() {
+    final n = widget.nutrition;
+    final key = '${widget.days}-${widget.endDay.millisecondsSinceEpoch}-'
+        '${n.summary.calories}-${n.summary.sugar.round()}-'
+        '${n.summary.sodium.round()}-${n.todayEntries.length}-'
+        '${n.ingredients.length}';
+    if (key == _lastKey) return;
+    _lastKey = key;
+    final user = AuthScope.of(context, listen: false).currentUser;
+    if (user == null) return;
+    n
+        .nutritionReport(user.id, widget.endDay, days: widget.days)
+        .then((report) {
+      if (mounted) {
+        setState(() {
+          _report = report;
+          _loaded = true;
+        });
+      }
+    });
+  }
+
+  void _addSuggestion(SuggestedFood item) {
+    widget.nutrition.addToCart(item.food, portion: item.portion);
+    // Lấy sẵn Navigator/Messenger: nút trên SnackBar có thể bấm khi thẻ này
+    // đã bị gỡ khỏi cây widget (đổi Tuần/Tháng).
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+ persist: false,
+          content: Text('Đã thêm ${item.label} vào giỏ'),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Chọn bữa',
+            onPressed: () => navigator.push(
+              MaterialPageRoute<void>(
+                builder: (_) => AddFoodScreen(
+                  initialSlot: _slotForNow(),
+                  initialByGrams: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final n = widget.nutrition;
+    final insights = _loaded
+        ? NutritionInsights.analyze(
+            report: _report,
+            limits: _limitsFor(context, n),
+            ingredients: n.ingredients,
+            catalog: n.catalog,
+          )
+        : const <NutritionInsight>[];
+
+    final period = widget.days == 1
+        ? 'Hôm nay'
+        : (widget.days == 7 ? '7 ngày' : '30 ngày');
+
+    return _SoftCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.insights_rounded,
+                size: 20,
+                color: AppTheme.primary,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Phân tích & gợi ý',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+              Text(
+                period,
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (!_loaded)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                'Đang phân tích...',
+                style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+              ),
+            )
+          else
+            for (var i = 0; i < insights.length; i++) ...[
+              if (i > 0) const SizedBox(height: 14),
+              _InsightTile(item: insights[i], onPick: _addSuggestion),
+            ],
+          const SizedBox(height: 12),
+          const Text(
+            'Gợi ý chỉ mang tính tham khảo dựa trên số liệu ước tính, không '
+            'thay thế tư vấn của chuyên gia dinh dưỡng.',
+            style: TextStyle(
+              fontSize: 10.5,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightTile extends StatelessWidget {
+  const _InsightTile({required this.item, required this.onPick});
+
+  final NutritionInsight item;
+  final void Function(SuggestedFood food) onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color;
+    final IconData icon;
+    switch (item.level) {
+      case InsightLevel.good:
+        color = AppTheme.primary;
+        icon = Icons.thumb_up_alt_rounded;
+      case InsightLevel.info:
+        color = AppTheme.blue;
+        icon = Icons.lightbulb_rounded;
+      case InsightLevel.warn:
+        color = AppTheme.orange;
+        icon = Icons.warning_amber_rounded;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 18, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  item.title,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            item.message,
+            style: const TextStyle(
+              fontSize: 12.2,
+              height: 1.4,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+          if (item.foods.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            const Text(
+              'Gợi ý thêm (bấm để thêm vào giỏ):',
+              style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              runSpacing: 0,
+              children: [
+                for (final f in item.foods)
+                  ActionChip(
+                    avatar: Icon(Icons.add_rounded, size: 16, color: color),
+                    label: Text(f.label),
+                    visualDensity: VisualDensity.compact,
+                    labelStyle: const TextStyle(fontSize: 11.5),
+                    backgroundColor: Colors.white,
+                    onPressed: () => onPick(f),
+                  ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

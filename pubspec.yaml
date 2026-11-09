@@ -49,6 +49,9 @@ dependencies:
   cross_file: ^0.3.4
   # Quét mã vạch (tra Open Food Facts).
   mobile_scanner: ^7.0.0
+  # ML Kit chạy trên máy: đọc bảng dinh dưỡng và đoán món từ ảnh.
+  google_mlkit_text_recognition: ^0.17.1
+  google_mlkit_image_labeling: ^0.16.1
 
 dev_dependencies:
   flutter_test:

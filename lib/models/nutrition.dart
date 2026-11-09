@@ -42,7 +42,18 @@ enum MealSlot {
 const String kIngredientIdPrefix = 'ing-';
 
 /// `true` nếu [foodId] là nguyên liệu ăn theo gram (1 phần = 100 g).
-bool isIngredientFoodId(String foodId) => foodId.startsWith(kIngredientIdPrefix);
+///
+/// Nhận cả tiền tố cũ `ing_` (do `Ingredient.toFoodItem` tạo ra) lẫn `ing-`,
+/// để nhật ký đã lưu trước đó vẫn được hiểu là ăn theo gram.
+bool isIngredientFoodId(String foodId) =>
+    foodId.startsWith(kIngredientIdPrefix) || foodId.startsWith('ing_');
+
+/// Quy đổi natri (mg) sang muối ăn (g): muối = natri × 2,5.
+double saltGramsOf(double sodiumMg) => sodiumMg * 2.5 / 1000;
+
+/// Bước tăng/giảm số gram trong giỏ: nhỏ khi lượng ít (gia vị), lớn khi nhiều.
+int gramStepUp(int grams) => grams < 20 ? 5 : (grams < 50 ? 10 : 50);
+int gramStepDown(int grams) => grams <= 20 ? 5 : (grams <= 50 ? 10 : 50);
 
 /// Số gram tương ứng với [portion] phần của nguyên liệu (1 phần = 100 g).
 int gramsOfPortion(double portion) => (portion * 100).round();
@@ -62,12 +73,11 @@ class FoodItem {
   /// Mô tả khối lượng một phần, ví dụ `1 tô (300g)`.
   final String servingLabel;
 
-  /// Chất xơ (g), đường (g) và natri (mg) cho một phần ăn chuẩn.
-  /// Không có số liệu thì là 0. Với món Việt/nguyên liệu, đường và natri là
-  /// số ước tính từ thành phần (xem `NutrientEstimator`).
-  final double fiber;
+  /// Đường (g), natri (mg) và chất xơ (g) cho một phần ăn chuẩn. Là số ước
+  /// tính; món chưa có dữ liệu thì để 0.
   final double sugar;
   final double sodium;
+  final double fiber;
 
   const FoodItem({
     required this.id,
@@ -78,9 +88,9 @@ class FoodItem {
     required this.carbs,
     required this.fat,
     required this.servingLabel,
-    this.fiber = 0,
     this.sugar = 0,
     this.sodium = 0,
+    this.fiber = 0,
   });
 
   Map<String, Object?> toMap() {
@@ -93,9 +103,9 @@ class FoodItem {
       'carbs': carbs,
       'fat': fat,
       'serving_label': servingLabel,
-      'fiber': fiber,
       'sugar': sugar,
       'sodium': sodium,
+      'fiber': fiber,
     };
   }
 
@@ -109,9 +119,9 @@ class FoodItem {
       carbs: (map['carbs'] as num).toDouble(),
       fat: (map['fat'] as num).toDouble(),
       servingLabel: map['serving_label'] as String? ?? '1 phần',
-      fiber: (map['fiber'] as num?)?.toDouble() ?? 0,
       sugar: (map['sugar'] as num?)?.toDouble() ?? 0,
       sodium: (map['sodium'] as num?)?.toDouble() ?? 0,
+      fiber: (map['fiber'] as num?)?.toDouble() ?? 0,
     );
   }
 }
@@ -167,10 +177,14 @@ class MealEntry {
   /// Lưu kèm để khi xóa/sửa món thì trừ lại đúng số đã cộng.
   final int waterMl;
 
-  /// Chất xơ (g), đường (g), natri (mg) của cả dòng (đã nhân khẩu phần).
-  final double fiber;
+  /// Đường (g), natri (mg), chất xơ (g) của khẩu phần đã ăn (số ước tính).
   final double sugar;
   final double sodium;
+  final double fiber;
+
+  /// `false` với bản ghi lưu từ phiên bản cũ chưa có đường/natri/chất xơ; khi
+  /// đó repository tra lại theo danh mục để thống kê.
+  final bool hasMicro;
 
   /// Ghi chú tự do của người dùng cho dòng này (ví dụ "ăn ở nhà bạn").
   final String? note;
@@ -191,9 +205,10 @@ class MealEntry {
     required this.fat,
     required this.eatenAt,
     this.waterMl = 0,
-    this.fiber = 0,
     this.sugar = 0,
     this.sodium = 0,
+    this.fiber = 0,
+    this.hasMicro = true,
     this.note,
     this.photoPath,
   });
@@ -229,9 +244,9 @@ class MealEntry {
       fat: food.fat * portion * scale,
       eatenAt: eatenAt,
       waterMl: (drinkMlOf(food) * portion).round(),
-      fiber: food.fiber * portion * scale,
       sugar: food.sugar * portion * scale,
       sodium: food.sodium * portion * scale,
+      fiber: food.fiber * portion * scale,
     );
   }
 
@@ -248,9 +263,9 @@ class MealEntry {
     double? fat,
     DateTime? eatenAt,
     int? waterMl,
-    double? fiber,
     double? sugar,
     double? sodium,
+    double? fiber,
   }) {
     return MealEntry(
       id: id ?? this.id,
@@ -265,9 +280,10 @@ class MealEntry {
       fat: fat ?? this.fat,
       eatenAt: eatenAt ?? this.eatenAt,
       waterMl: waterMl ?? this.waterMl,
-      fiber: fiber ?? this.fiber,
       sugar: sugar ?? this.sugar,
       sodium: sodium ?? this.sodium,
+      fiber: fiber ?? this.fiber,
+      hasMicro: hasMicro,
       note: note,
       photoPath: photoPath,
     );
@@ -293,6 +309,7 @@ class MealEntry {
       fiber: fiber,
       sugar: sugar,
       sodium: sodium,
+      hasMicro: hasMicro,
       note: (trimmed == null || trimmed.isEmpty) ? null : trimmed,
       photoPath: photoPath,
     );
@@ -324,9 +341,9 @@ class MealEntry {
       'fat': fat,
       'eaten_at': eatenAt.millisecondsSinceEpoch,
       'water_ml': waterMl,
-      'fiber': fiber,
       'sugar': sugar,
       'sodium': sodium,
+      'fiber': fiber,
       'note': note,
       'photo_path': photoPath,
     };
@@ -348,9 +365,10 @@ class MealEntry {
         (map['eaten_at'] as num).toInt(),
       ),
       waterMl: (map['water_ml'] as num?)?.toInt() ?? 0,
-      fiber: (map['fiber'] as num?)?.toDouble() ?? 0,
       sugar: (map['sugar'] as num?)?.toDouble() ?? 0,
       sodium: (map['sodium'] as num?)?.toDouble() ?? 0,
+      fiber: (map['fiber'] as num?)?.toDouble() ?? 0,
+      hasMicro: map.containsKey('sodium'),
       note: map['note'] as String?,
       photoPath: map['photo_path'] as String?,
     );
@@ -365,10 +383,10 @@ class NutritionSummary {
   final double fat;
   final int calorieGoal;
 
-  /// Chất xơ (g), đường (g), natri (mg) cả ngày.
-  final double fiber;
+  /// Đường (g), natri (mg) và chất xơ (g) đã nạp trong ngày (ước tính).
   final double sugar;
   final double sodium;
+  final double fiber;
 
   const NutritionSummary({
     required this.calories,
@@ -376,9 +394,9 @@ class NutritionSummary {
     required this.carbs,
     required this.fat,
     required this.calorieGoal,
-    this.fiber = 0,
     this.sugar = 0,
     this.sodium = 0,
+    this.fiber = 0,
   });
 
   static const NutritionSummary empty = NutritionSummary(
@@ -388,6 +406,9 @@ class NutritionSummary {
     fat: 0,
     calorieGoal: 2000,
   );
+
+  /// Muối quy đổi từ natri (g).
+  double get salt => saltGramsOf(sodium);
 
   int get remainingCalories => calorieGoal - calories;
 
@@ -422,9 +443,9 @@ class NutritionSummary {
       carbs: carbs,
       fat: fat,
       calorieGoal: calorieGoal ?? this.calorieGoal,
-      fiber: fiber,
       sugar: sugar,
       sodium: sodium,
+      fiber: fiber,
     );
   }
 }

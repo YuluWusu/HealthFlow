@@ -50,6 +50,7 @@ class _RecipeBuilderScreenState extends State<RecipeBuilderScreen> {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
+ persist: false, duration: const Duration(seconds: 5),
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -79,6 +80,16 @@ class _RecipeBuilderScreenState extends State<RecipeBuilderScreen> {
     );
     if (grams == null || !mounted) return;
     setState(() => _items.add(RecipeItem.fromIngredient(picked, grams)));
+  }
+
+  /// Nêm nếm nhanh: chọn gia vị rồi nhập vài gram (mặc định 5 g).
+  Future<void> _addSeasoning(Ingredient ing) async {
+    final grams = await showDialog<double>(
+      context: context,
+      builder: (_) => _GramsDialog(ingredient: ing),
+    );
+    if (grams == null || !mounted) return;
+    setState(() => _items.add(RecipeItem.fromIngredient(ing, grams)));
   }
 
   Future<void> _editGrams(int index) async {
@@ -378,6 +389,40 @@ class _RecipeBuilderScreenState extends State<RecipeBuilderScreen> {
             side: BorderSide(color: AppTheme.primary.withValues(alpha: 0.5)),
           ),
         ),
+        const SizedBox(height: 14),
+        const Text(
+          'Nêm nếm (gia vị)',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        const Text(
+          'Muối, đường, nước mắm, bột ngọt... tính vài gram. 1 muỗng cà phê ≈ 5 g.',
+          style: TextStyle(fontSize: 11.5, color: AppTheme.textSecondary),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            for (final ing in _n.ingredients)
+              if (ing.isSeasoning)
+                ActionChip(
+                  label: Text(ing.name),
+                  labelStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  backgroundColor: const Color(0xFFF1F4F2),
+                  side: BorderSide.none,
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => _addSeasoning(ing),
+                ),
+          ],
+        ),
         if (_items.isNotEmpty) ...[
           const SizedBox(height: 16),
           Container(
@@ -604,12 +649,18 @@ class _GramsDialog extends StatefulWidget {
 class _GramsDialogState extends State<_GramsDialog> {
   late final TextEditingController _c = TextEditingController(
     text: widget.initial == null
-        ? '100'
+        ? (widget.ingredient.isSeasoning ? '5' : '100')
         : (widget.initial! == widget.initial!.roundToDouble()
             ? widget.initial!.toStringAsFixed(0)
             : widget.initial!.toStringAsFixed(1)),
   );
   String? _error;
+
+  static String _f1(double v) {
+    final t = v.toStringAsFixed(1);
+    return (t.endsWith('.0') ? t.substring(0, t.length - 2) : t)
+        .replaceAll('.', ',');
+  }
 
   @override
   void dispose() {
@@ -650,9 +701,37 @@ class _GramsDialogState extends State<_GramsDialog> {
               errorText: _error,
             ),
           ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final q in (widget.ingredient.isSeasoning
+                  ? const [1, 2, 5, 10, 15, 20]
+                  : const [50, 100, 200, 300]))
+                ChoiceChip(
+                  label: Text('$q g'),
+                  selected: grams == q,
+                  showCheckmark: false,
+                  visualDensity: VisualDensity.compact,
+                  onSelected: (_) => setState(() {
+                    _c.text = '$q';
+                    _error = null;
+                  }),
+                ),
+            ],
+          ),
+          if (widget.ingredient.isSeasoning) ...[
+            const SizedBox(height: 8),
+            const Text(
+              '1 muỗng cà phê ≈ 5 g · 1 muỗng canh ≈ 15 g',
+              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            ),
+          ],
           const SizedBox(height: 8),
           Text(
-            '≈ ${widget.ingredient.caloriesFor(grams)} kcal',
+            '≈ ${widget.ingredient.caloriesFor(grams)} kcal'
+            '${widget.ingredient.isSeasoning ? ' · đường ${_f1(widget.ingredient.sugarFor(grams))} g · muối ${_f1(saltGramsOf(widget.ingredient.sodiumFor(grams)))} g' : ''}',
             style: const TextStyle(color: AppTheme.textSecondary),
           ),
         ],
